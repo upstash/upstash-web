@@ -1,0 +1,387 @@
+---
+slug: visual-qa-pull-requests-upstash-box-browser
+title: "Visual QA for Every Pull Request with Upstash Box Browser"
+authors: [leodev]
+tags: [box, ai, browser, github, playwright, testing]
+description: "A GitHub check that runs main and the pull request side by side in one Upstash Box and measures the result in Box Browser at mobile and desktop sizes."
+---
+
+I run several coding agents in parallel across Git worktrees. When an agent finishes a task in its worktree and opens a pull request, `tsc` and the test suite are already green in the terminal. What the agent does not check by default is how the change renders in a real browser across mobile and desktop viewports compared to `main`.
+
+A two-line CSS change in a dialog can push the submit button below the fold on a phone screen while every unit test still passes. Even with separate worktrees ready on disk, reviewing ten pull requests by hand means starting two dev servers on different ports, opening both in a browser, resizing DevTools to a mobile viewport, and clicking through the flow yourself.
+
+I wanted every pull request on GitHub to get that before-and-after browser check automatically. When you pass `browser: true` to [Upstash Box](https://upstash.com/docs/box/overall/browser/overview), the container boots with a managed Chromium instance next to its shell, filesystem, Git checkout, and coding agent. A single Box can restore from a warm snapshot, run `main` on `:3000` and the pull request branch on `:3001`, inspect both in Chromium, upload screenshots to [Upstash Blob](https://upstash.com/docs/blob/overall/quickstart), and post a visual review comment on the pull request.
+
+![Pull request #1 on GitHub showing the two-line layout diff in app/billing/index.html](/blog/visual-qa-pull-requests-upstash-box-browser/pr-diff.png)
+
+Here is a 28-second walkthrough of the flow on [PR #1 in `leoisadev1/box-pr-visual-tester`](https://github.com/leoisadev1/box-pr-visual-tester/pull/1):
+
+<Frame>
+  <video
+    src="/blog/visual-qa-pull-requests-upstash-box-browser/demo.mp4"
+    poster="/blog/visual-qa-pull-requests-upstash-box-browser/demo-poster.jpg"
+    controls
+    muted
+    playsInline
+    aria-label="A pull request gets a visual check: Box Browser opens main and the pull request side by side, finds the clipped button on mobile, and posts a review comment"
+    className="block h-auto w-full"
+  />
+</Frame>
+
+The pixel measurements in the video are the real ones from PR #1. The box ID, restore time, and cost shown in it are example values.
+
+The full source code, GitHub Actions workflow, and captured artifacts are in [`leoisadev1/box-pr-visual-tester`](https://github.com/leoisadev1/box-pr-visual-tester).
+
+---
+
+## Visual QA options in Upstash Box Browser
+
+Enabling `browser: true` on `Box.create` or `Box.fromSnapshot` gives you five ways to drive Chromium and inspect a live page. All of them operate on the same browser instance inside the Box, so you can use one or combine them in a single test run.
+
+| Capability                        | SDK call                                                                      | Best for                                                                                                                   |
+| --------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| AI actions and zero-LLM replay    | `tab.act("...")` and `tab.observe("...")`                                     | Clicking buttons or stepping through flows described in plain English, then replaying the resolved selector without an LLM |
+| Schema-validated extraction       | `tab.extract(prompt, zodSchema)` and `tab.content()`                          | Asking a DOM-aware agent structured questions about the rendered page and getting back typed Zod data                      |
+| Screenshots, video, and live view | `tab.screenshot()`, `box.browser.recordings.start()`, and `tab.liveViewUrl()` | Capturing viewport or full-page PNGs, recording MP4 session videos, or streaming a live view URL                           |
+| Playwright or Puppeteer over CDP  | `await box.browser.cdpUrl()`                                                  | Attaching `playwright-core` to the same tab for exact viewport sizing and `getBoundingClientRect()` layout math            |
+| In-box coding agent               | `box.agent.run({ prompt, responseSchema })`                                   | Running Claude Code, Codex, or OpenCode inside the Box next to the browser                                                 |
+
+Here is how those calls work together on a single tab:
+
+```typescript
+// src/box-stages.ts
+import { Agent, Box, BoxApiKey, ClaudeCode } from "@upstash/box";
+import { z } from "zod";
+
+const box = await Box.create({
+  runtime: "node",
+  browser: true,
+  agent: {
+    harness: Agent.ClaudeCode,
+    model: ClaudeCode.Sonnet_4_5,
+    apiKey: BoxApiKey.UpstashKey,
+  },
+});
+
+// 1. Open a tab against the app running on the Box's own localhost
+const tab = await box.browser.tab.create("http://localhost:3000/billing/", {
+  waitUntil: "networkidle",
+});
+
+// 2. Trigger UI state in plain English, or resolve once with tab.observe and replay
+const { elements } = await tab.observe("the Upgrade Plan button");
+if (elements[0]?.selector) {
+  await tab.act(elements[0]); // deterministic replay: no LLM call, zero tokens
+} else {
+  await tab.act("Click the Upgrade Plan button");
+}
+
+// 3. Extract Zod-validated state from the live DOM
+const dialogState = await tab.extract(
+  "Read the checkout dialog. Return the primary button's label and the validation message under the cardholder name, or null if there is none.",
+  z.object({
+    primaryButtonLabel: z.string(),
+    validationMessage: z.string().nullable(),
+  }),
+);
+
+// 4. Capture a PNG screenshot, or record MP4 video with box.browser.recordings.start
+const png = await tab.screenshot({ fullPage: false });
+```
+
+Because `box.browser.tab.create()` and `box.browser.cdpUrl()` point to the same Chromium process, a tab opened through the Box SDK is immediately visible to Playwright over CDP.
+
+![Four-step architecture of the visual QA runner from GitHub PR trigger to Upstash Box Browser and PR comment](/blog/visual-qa-pull-requests-upstash-box-browser/architecture.png)
+
+In our pull request tester, `tab.act()` opens the checkout modal, Playwright resizes the tab to `390x844` mobile and `1440x900` desktop viewports to measure the submit button's exact pixel coordinates, `tab.extract()` reads the rendered dialog state, and `tab.screenshot()` captures the annotated before-and-after PNGs.
+
+---
+
+## The bug that terminal checks miss
+
+On the `/billing/` page of our demo app, clicking **Upgrade Plan** opens the `#checkout` modal. On `main`, the `#checkout` container uses `fixed inset-x-4 top-12` without a height cap or scroll container, and the footer uses a static `<div class="modal-foot">`.
+
+On a `1440x900` desktop monitor, the modal fits with room to spare on both branches:
+
+![Desktop 1440x900 comparison showing both main and PR #1 passing with 100% button visibility](/blog/visual-qa-pull-requests-upstash-box-browser/desktop-comparison.png)
+
+On a `390x844` mobile viewport, the modal overflows the screen on `main` and pushes the **Confirm upgrade** button below the bottom edge:
+
+![Mobile 390x844 comparison showing the clipped Confirm upgrade button on main versus the visible button on PR #1](/blog/visual-qa-pull-requests-upstash-box-browser/mobile-regression.png)
+
+On `main` at `390x844`, `getBoundingClientRect()` on `#confirm` reports `top: 861.5px` and `bottom: 910px`. The button ends `66px` below the `844px` fold with `0%` of the button visible on screen, so attempting to submit the form times out.
+
+Pull request #1 fixes the modal in `app/billing/index.html` with two class updates:
+
+```diff
+// app/billing/index.html
+- <div id="checkout" class="modal fixed inset-x-4 top-12" role="dialog" aria-modal="true" aria-labelledby="checkout-title" hidden>
++ <div id="checkout" class="modal fixed inset-x-4 top-12 max-h-[85dvh] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="checkout-title" hidden>
+...
+- <div class="modal-foot">
++ <div class="modal-foot sticky bottom-0">
+```
+
+With that change, the button moves up to `top: 696.9px` and `bottom: 745.4px`, leaving `98.6px` of room above the `844px` mobile fold. Submitting with an empty cardholder name renders `"Enter the name on your card."` while keeping `100%` of the button visible.
+
+---
+
+## Step 1. Pre-warm a Box snapshot once
+
+Installing npm dependencies from scratch on every pull request adds unnecessary wait time. Instead, we create a seed Box with `browser: true`, clone the repository once, warm the npm cache with `npm ci`, and save the container state with `seed.snapshot()`.
+
+```typescript
+// src/box-stages.ts
+import { Agent, Box, BoxApiKey, ClaudeCode } from "@upstash/box";
+
+export async function createBaseSnapshot(repoUrl: string): Promise<string> {
+  const seed = await Box.create({
+    runtime: "node",
+    size: "small",
+    browser: true,
+    agent: {
+      harness: Agent.ClaudeCode,
+      model: ClaudeCode.Sonnet_4_5,
+      apiKey: process.env.ANTHROPIC_API_KEY ?? BoxApiKey.UpstashKey,
+    },
+    git: { token: process.env.GITHUB_TOKEN! },
+  });
+
+  try {
+    await seed.git.clone({ repo: repoUrl, folder: "seed", depth: 1 });
+    await seed.cd("seed");
+    await seed.exec.command("npm ci --no-audit --no-fund");
+
+    const snapshot = await seed.snapshot({ name: "pr-visual-base" });
+    return snapshot.id;
+  } finally {
+    await seed.delete();
+  }
+}
+```
+
+Run `src/create-snapshot.ts` once and save the printed `BOX_SNAPSHOT_ID` in your repository secrets:
+
+```bash
+# terminal.sh
+npx tsx src/create-snapshot.ts https://github.com/leoisadev1/box-pr-visual-tester
+```
+
+![Terminal output of create-snapshot.ts creating a small Node box with browser: true and printing BOX_SNAPSHOT_ID](/blog/visual-qa-pull-requests-upstash-box-browser/snapshot-terminal.png)
+
+This is the format the script prints. The box ID, snapshot ID, size, and timings in it are examples; yours will differ.
+
+---
+
+## Step 2. Restore the Box and boot `main` and the PR side by side
+
+When a pull request opens or updates, `Box.fromSnapshot()` restores a fresh container from that snapshot. Inside the Box, we clone the base branch into `/workspace/home/main` on port `3000` and the pull request branch into `/workspace/home/pr` on port `3001`. Both checkouts pin the exact commit SHAs from the pull request event.
+
+```typescript
+// src/box-stages.ts
+export const BRANCHES = [
+  { key: "before", folder: "main", port: 3000 },
+  { key: "after", folder: "pr", port: 3001 },
+] as const;
+
+const box = await Box.fromSnapshot(process.env.BOX_SNAPSHOT_ID!, {
+  size: "small",
+  browser: true,
+  keepAlive: false,
+  agent: {
+    harness: Agent.ClaudeCode,
+    model: ClaudeCode.Sonnet_4_5,
+    apiKey: process.env.ANTHROPIC_API_KEY ?? BoxApiKey.UpstashKey,
+  },
+  git: { token: process.env.GITHUB_TOKEN! },
+});
+
+for (const branch of BRANCHES) {
+  const isHead = branch.key === "after";
+  const sha = isHead ? pr.headSha : pr.baseSha;
+
+  await box.git.clone({
+    repo: isHead ? pr.headCloneUrl : pr.baseCloneUrl,
+    branch: isHead ? pr.headRef : pr.baseRef,
+    folder: branch.folder,
+    depth: 1,
+  });
+
+  await box.cd(branch.folder);
+  await box.exec.command(
+    `git fetch --depth 1 origin ${sha} && git checkout --detach ${sha}`,
+  );
+  await box.exec.command("npm ci --prefer-offline --no-audit --no-fund");
+  await box.exec.command(
+    `PORT=${branch.port} nohup npm start > /tmp/${branch.folder}.log 2>&1 &`,
+  );
+  await box.cd("..");
+}
+```
+
+Running both branches inside the same Box means the baseline and the pull request render with the same fonts, the same Chromium, and the same machine.
+
+---
+
+## Step 3. Inspect both branches with Box Browser
+
+Once `localhost:3000` and `localhost:3001` respond, `inspectPreviews()` connects to the Box's Chromium instance. Each branch is opened with `box.browser.tab.create()`, clicked with `tab.act()`, measured at `390x844` and `1440x900` over `box.browser.cdpUrl()`, cross-checked with `tab.extract()`, and captured with `tab.screenshot()`.
+
+```typescript
+// src/box-stages.ts
+import { chromium, type Browser } from "playwright-core";
+import { z } from "zod";
+import { annotate, inspectCheckout, VIEWPORTS } from "./probe.js";
+
+export const AgentRead = z.object({
+  primaryButtonLabel: z.string(),
+  validationMessage: z.string().nullable(),
+});
+
+async function inspectBranch(
+  box: Box,
+  browser: Browser,
+  url: string,
+  label: string,
+) {
+  const tab = await box.browser.tab.create(url, { waitUntil: "networkidle" });
+  const page = browser
+    .contexts()
+    .flatMap((c) => c.pages())
+    .find((p) => p.url().startsWith(url))!;
+
+  const openCheckout = async () => {
+    const action = await tab.act("Click the Upgrade Plan button");
+    if (!action.success)
+      await page.getByRole("button", { name: "Upgrade Plan" }).click();
+  };
+
+  const shots: Record<string, Uint8Array> = {};
+  const reports: Record<string, unknown> = {};
+
+  for (const viewport of VIEWPORTS) {
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send("Emulation.setDeviceMetricsOverride", {
+      width: viewport.width,
+      height: viewport.height,
+      deviceScaleFactor: 2,
+      mobile: viewport.name === "mobile",
+    });
+
+    const report = await inspectCheckout({ page, viewport, openCheckout });
+    await annotate(page, report);
+    shots[viewport.name] = await tab.screenshot();
+    reports[viewport.name] = report;
+    await cdp.detach();
+  }
+
+  const agentRead = await tab.extract(
+    "Read the checkout dialog. Return the primary button's label and the validation message under the cardholder name, or null if there is none.",
+    AgentRead,
+  );
+
+  await tab.close();
+  return { run: { label, reports }, shots, agentRead };
+}
+```
+
+Here is the step runner from the repo running against PR #1, with both branches serving on `:3000` and `:3001` and the four viewport checks running against pinned SHAs `846a88c` and `2a94f48`. The demo repo has no Box key configured yet, so this run used the repo's local Chromium mode: the same probe, run in Chromium on the machine instead of in Box Browser. The desktop and mobile comparisons above come from the same run.
+
+![Terminal output showing main on port 3000 and PR #1 on port 3001 with mobile and desktop inspection results](/blog/visual-qa-pull-requests-upstash-box-browser/dual-server-terminal.png)
+
+---
+
+## Step 4. Generate a typed verdict with `box.agent.run` and upload screenshots to Upstash Blob
+
+With the four screenshots and viewport measurements collected, we call `box.agent.run()` with a Zod `responseSchema`. Claude Code runs inside the Box, compares the base branch metrics against the pull request metrics along with the `tab.extract()` output, and returns a validated `Verdict` object.
+
+```typescript
+// src/report.ts & src/box-stages.ts
+import { Bucket } from "@upstash/blob";
+import { z } from "zod";
+
+export const VerdictSchema = z.object({
+  status: z.enum(["pass", "fail"]),
+  headline: z.string().describe("One sentence, under 90 characters."),
+  summary: z.string().describe("Two or three sentences a reviewer can act on."),
+  regressions: z
+    .array(z.string())
+    .describe("Problems the PR introduces. Empty when there are none."),
+});
+
+const run = await box.agent.run({
+  prompt: buildVerdictPrompt({
+    prNumber: pr.number,
+    title: pr.title,
+    before,
+    after,
+    agentRead,
+  }),
+  responseSchema: VerdictSchema,
+  timeout: 120_000,
+});
+
+const bucket = new Bucket({ token: process.env.UPSTASH_BLOB_TOKEN! });
+const blob = await bucket.put(
+  `visual-qa/${pr.repo}/pr-${pr.number}/${pr.headSha}/after-mobile.png`,
+  shots.after.mobile,
+  { contentType: "image/png", cache: "immutable" },
+);
+```
+
+---
+
+## Step 5. Post the sticky pull request comment from CI
+
+Finally, `upsertComment()` searches the pull request for an existing comment containing `<!-- upstash-box-visual-review -->`. It updates that comment in place on new pushes or creates it on the first run, so repeated commits from a coding agent never spam the pull request thread.
+
+Running the whole flow in GitHub Actions takes a single workflow file:
+
+```yaml
+# .github/workflows/visual-qa.yml
+name: Visual QA
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  visual-qa:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Run visual QA in Upstash Box Browser
+        env:
+          UPSTASH_BOX_API_KEY: ${{ secrets.UPSTASH_BOX_API_KEY }}
+          UPSTASH_BLOB_TOKEN: ${{ secrets.UPSTASH_BLOB_TOKEN }}
+          BOX_SNAPSHOT_ID: ${{ secrets.BOX_SNAPSHOT_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx tsx src/pr-visual-tester.ts run "${{ github.repository }}" "${{ github.event.pull_request.number }}"
+```
+
+The workflow in the repo splits this into separate steps and falls back to local Chromium when the Box secrets are missing, so pull requests from forks still get a check. Here is its run on PR #1. "Restore Box from snapshot" is skipped because the demo repo has no Box secrets yet:
+
+![GitHub Actions workflow run for PR #1 with every step green and the Box restore step skipped](/blog/visual-qa-pull-requests-upstash-box-browser/actions-run.png)
+
+Here is the live comment posted on [`leoisadev1/box-pr-visual-tester#1`](https://github.com/leoisadev1/box-pr-visual-tester/pull/1#issuecomment-6477831685):
+
+![Live GitHub comment on PR #1 showing the before-and-after mobile screenshots, verdict, and DOM metrics table](/blog/visual-qa-pull-requests-upstash-box-browser/pr-comment.png)
+
+Because that run used local Chromium, the comment carries the rule-based verdict and no cost line. A run inside a Box adds Claude Code's verdict and the run cost.
+
+---
+
+## What a run records
+
+Every call in `box-stages.ts` records the command time and agent spend that `Run.cost` returns, plus the token counts from `tab.act()`. The comment adds those up into one cost line for the run.
+
+Because `box.delete()` runs inside the `finally` block as soon as the comment is posted, nothing keeps running between pull requests. When several coding agents push branches from their worktrees at the same time, each push gets its own Box, runs its browser checks in isolation, posts its screenshots, and deletes itself.
+
+The full source, the GitHub Actions workflow, and every artifact in this post are in [`leoisadev1/box-pr-visual-tester`](https://github.com/leoisadev1/box-pr-visual-tester).
