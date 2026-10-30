@@ -1,7 +1,8 @@
 import { geolocation } from "@vercel/functions";
 import { NextResponse, type NextRequest } from "next/server";
 
-// All EU/EEA countries with GDPR codes
+// All EU/EEA countries with GDPR codes, plus the UK and Switzerland, which also
+// require cookie consent
 // source: https://www.gdpradvisor.co.uk/gdpr-countries
 const GDPR_COUNTRIES = new Set([
   "AT", // Austria
