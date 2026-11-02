@@ -1,0 +1,117 @@
+---
+authors: [ramazan]
+slug: mcp-oauth-token-audience
+tags: [context7, mcp, oauth, security]
+title: "How to Validate Token Audience in an MCP Server (RFC 8707 Resource Indicators)"
+description: A short guide to the MCP authorization spec. Send the resource parameter, put it in the token's aud claim, and check the audience in your MCP server without logging users out.
+---
+
+The MCP authorization spec says two things that many servers skip:
+
+- **Clients** must send a `resource` parameter, the URL of the MCP server, when they ask for a token.
+- **Servers** must only accept tokens that were issued for them. That means checking the token's audience (`aud`).
+
+Without the audience check, a token issued for one service can be replayed against another. This guide shows how we added it to the Context7 MCP server without logging anyone out, and what to watch for if you do the same.
+
+## What does the MCP spec require?
+
+| Who | Must do |
+| --- | --- |
+| MCP client | Send `resource` in the authorization request **and** the token request (RFC 8707). |
+| Authorization server | Put that `resource` into the token's `aud` claim. |
+| MCP server | Reject tokens whose `aud` is not the server. |
+| MCP server | Never forward the token it received to another API ("token passthrough"). |
+
+The server also publishes Protected Resource Metadata (RFC 9728), so clients know which authorization server to use.
+
+## Step 1: Make tokens easy to check
+
+If your access tokens are opaque, the server has to ask the authorization server about every token. Switch to signed JWT access tokens (RFC 9068) and verify them locally:
+
+```ts
+import { createRemoteJWKSet, jwtVerify } from "jose";
+
+const jwks = createRemoteJWKSet(new URL(`${ISSUER}/.well-known/jwks.json`));
+
+const { payload } = await jwtVerify(token, jwks, {
+  issuer: ISSUER,
+  typ: "at+jwt",
+  clockTolerance: 30,
+});
+```
+
+One rule matters more than it looks: **if you can't verify a token because the authorization server is down, answer 503, not 401.** Clients treat 401 as "sign in again". If thousands of them do that at once, a short outage turns into a sign-in storm.
+
+## Step 2: Put the audience into tokens
+
+Turn on the authorization server's option that copies `resource` into `aud`. Two things to know:
+
+- It only affects **new** grants. Older grants keep issuing tokens without `aud`.
+- Many servers can upgrade an older grant when a refresh request names a `resource`. This binding is one-way: a later refresh with a different resource fails with `invalid_target`. So only add a resource on refresh when you know which one the grant should have.
+
+## Step 3: Check the audience in stages
+
+Don't switch straight to rejecting. We used three modes:
+
+| Mode | Token for another server | Token with no `aud` |
+| --- | --- | --- |
+| `observe` | log, accept | log, accept |
+| `foreign` | reject | log, accept |
+| `required` | reject | reject |
+
+```ts
+type Mode = "observe" | "foreign" | "required";
+const ALLOWED = ["https://mcp.example.com", "https://mcp.example.com/mcp"];
+const stripQuery = (url: string) => url.split("?")[0];
+
+function checkAudience(aud: string | string[] | undefined, mode: Mode) {
+  const values = [aud ?? []].flat().map(stripQuery);
+  if (values.length === 0) return mode === "required" ? "reject" : "accept";
+  return values.some((v) => ALLOWED.includes(v)) || mode === "observe" ? "accept" : "reject";
+}
+```
+
+What `observe` taught us before we enforced anything:
+
+- **Clients send the URL they were configured with**, sometimes with a path or query string. Decide how you compare (we ignore the query string on our own hosts) before you reject.
+- **Tokens from gateways have the gateway's audience.** If users reach you through an API gateway with its own OAuth, those tokens are not yours. Reject them with a message that says what to do instead, for example "use an API key". Otherwise the client keeps trying to sign in.
+- **Enforce at the edge first.** If an API behind your MCP server also checks the audience, raise the mode on the MCP server first. Otherwise the server may read the API's rejection as an expired token and loop.
+
+## What if a client doesn't send `resource`?
+
+Some clients leave `resource` out of the authorization request but send it in the token request. Once audiences are enforced, that fails with `invalid_target`, and the user can't sign in.
+
+You can fix it on the server side. When an authorization request has no `resource`, redirect it back to the authorization server with your default resource added. Then mark the request, so a request that still has none is refused instead of looping. The audience is taken from the authorization request, so the token request works whether it repeats the resource or leaves it out.
+
+## Why do users get logged out after a refresh?
+
+Most authorization servers rotate refresh tokens: every refresh returns a new one, and reusing an old one revokes the whole grant. A client that refreshes twice in parallel logs its own user out.
+
+There's no server-side fix. In your client, hold a lock around refresh and save the new refresh token before anything else uses it.
+
+## Should I use CIMD or Dynamic Client Registration?
+
+The newer spec prefers Client ID Metadata Documents (CIMD): the client identifies itself with a URL that hosts its metadata. If your authorization server supports CIMD, let it handle it, and list that server first in your Protected Resource Metadata. Avoid building CIMD into your own proxy in front of it. That needs one shared upstream client and a consent screen of your own, which is the "confused deputy" setup the spec warns about.
+
+## Checklist
+
+**MCP server**
+
+- Publish Protected Resource Metadata.
+- Verify JWT access tokens locally; return 503 when you can't decide.
+- Have the authorization server put `resource` into `aud`.
+- Roll out the audience check: `observe` → `foreign` → `required`.
+- Give rejected tokens a clear error message.
+- Add a default `resource` for clients that leave it out.
+- Never pass the client's token on to another API.
+
+**MCP client**
+
+- Send the same `resource` in the authorization, token and refresh requests.
+- Refresh behind a lock and store the rotated refresh token first.
+- Treat 401 as "sign in again" and 503 as "retry later".
+- Use CIMD where the authorization server supports it.
+
+## Where Context7 is today
+
+New sign-ins always get a token bound to Context7, and tokens issued for other servers are rejected. Tokens from older grants without an audience are still accepted while they phase out; after that we'll require an audience on every token. The plain `/mcp` endpoint stays open without sign-in, so trying Context7 never requires an account.
