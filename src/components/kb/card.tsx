@@ -30,11 +30,17 @@ export function KbAvatar({ author, size }: { author: KbAuthor; size: number }) {
 }
 
 // After the blog's grid cards: the title and two lines of the article's
-// opening, with the authors and, across from them, the date at the foot. The
-// card's three rows are its grid row's (subgrid), so in a row of cards the
-// openings and the feet start level, as tall as that row's longest title.
-// The whole card is the link.
-export function KbCard({ article }: { article: KbArticle }) {
+// opening, with the authors and, across from them, the date (unless showDate
+// is off) at the foot. The card's three rows are its grid row's (subgrid), so
+// in a row of cards the openings and the feet start level, as tall as that
+// row's longest title. The whole card is the link.
+export function KbCard({
+  article,
+  showDate = true,
+}: {
+  article: KbArticle;
+  showDate?: boolean;
+}) {
   const excerpt = kbExcerpt(article);
 
   return (
@@ -61,22 +67,30 @@ export function KbCard({ article }: { article: KbArticle }) {
             </span>
           </span>
         )}
-        <time
-          dateTime={article.publishedAt}
-          className="ml-auto shrink-0 opacity-60"
-        >
-          {formatKbDate(article.publishedAt)}
-        </time>
+        {showDate && (
+          <time
+            dateTime={article.publishedAt}
+            className="ml-auto shrink-0 opacity-60"
+          >
+            {formatKbDate(article.publishedAt)}
+          </time>
+        )}
       </div>
     </Link>
   );
 }
 
-export function KbGrid({ articles }: { articles: KbArticle[] }) {
+export function KbGrid({
+  articles,
+  showDate,
+}: {
+  articles: KbArticle[];
+  showDate?: boolean;
+}) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 md:gap-8 lg:grid-cols-3">
       {articles.map((article) => (
-        <KbCard key={article.id} article={article} />
+        <KbCard key={article.id} article={article} showDate={showDate} />
       ))}
     </div>
   );
