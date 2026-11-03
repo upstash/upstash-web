@@ -33,7 +33,7 @@ export const WORKFLOW_FAQ = [
   {
     question: "What is a step, and how are steps billed?",
     answer:
-      "A step is one unit of work in your workflow, such as context.run, context.sleep, or context.waitForEvent. Each executed step is one billed step, and a retry is another step. context.call and context.invoke count as two steps. See the pricing page FAQ for the full rules.",
+      "A step is one unit of work in your workflow, such as context.run, context.sleep, or context.waitForEvent. Each executed step is one billed step, and a retry is another step. context.call and context.invoke count as two steps, and each step that runs in parallel adds one extra step. See the pricing page FAQ for the full rules.",
   },
   {
     question: "How much does Upstash Workflow cost?",

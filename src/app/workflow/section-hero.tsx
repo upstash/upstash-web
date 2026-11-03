@@ -30,9 +30,9 @@ export default function SectionHero() {
 
           <p className="mt-6 max-w-2xl text-balance text-lg text-text-mute md:text-2xl">
             Upstash Workflow turns an API route into a durable, multi-step
-            process. Each step runs once, its result is saved, and failures
-            retry only the step that failed. Sleep for days, wait for events,
-            and call slow APIs without hitting function timeouts.
+            process. Each completed step's result is saved, and failures retry
+            only the step that failed. Sleep for days, wait for events, and call
+            slow APIs without hitting function timeouts.
           </p>
 
           <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
