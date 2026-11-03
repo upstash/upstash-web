@@ -1,4 +1,5 @@
 import { negotiate } from "@/lib/accept";
+import { PRODUCT_PAGE_SLUGS } from "@/lib/product-pages";
 import { Tracker } from "@bydefault/vercel";
 import type { NextFetchEvent, NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -51,6 +52,8 @@ const PRICING_PATH = new RegExp(
   `^/pricing(?:/(${PRICING_MD_PRODUCTS.join("|")}))?$`,
 );
 
+const PRODUCT_PATH = new RegExp(`^/(${PRODUCT_PAGE_SLUGS.join("|")})$`);
+
 function unacceptableResponse(): NextResponse {
   return new NextResponse(
     "Not Acceptable\n\nAvailable representations:\n- text/html\n- text/markdown\n",
@@ -97,7 +100,9 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
   // regardless of Accept header. This is the conventional pattern (GitHub,
   // llms.txt, etc.) and gives us distinct cache keys without Vary headaches.
   if (pathname === "/blog.md") {
-    const res = NextResponse.rewrite(new URL("/api/blog/markdown", request.url));
+    const res = NextResponse.rewrite(
+      new URL("/api/blog/markdown", request.url),
+    );
     res.headers.set("Vary", "Accept");
     res.headers.set("x-content-bucket", "md");
     if (aiAgent) res.headers.set("x-ai-agent", aiAgent);
@@ -166,6 +171,25 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
     }
   }
 
+  const productMatch = pathname.match(PRODUCT_PATH);
+  if (productMatch && accept) {
+    const decision = negotiate(accept);
+
+    if (decision === "unacceptable") {
+      return unacceptableResponse();
+    }
+
+    if (decision === "markdown") {
+      const res = NextResponse.rewrite(
+        new URL(`/${productMatch[1]}.md`, request.url),
+      );
+      res.headers.set("Vary", "Accept");
+      res.headers.set("x-content-bucket", "md");
+      if (aiAgent) res.headers.set("x-ai-agent", aiAgent);
+      return res;
+    }
+  }
+
   const queryParams = request.nextUrl.searchParams;
   const affiliateCode = queryParams.get(AFFILIATE_CODE);
 
@@ -182,7 +206,7 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
   }
   // HTML variants of content-negotiated pages must vary on Accept so caches
   // never hand the HTML to a client that asked for markdown (or vice versa).
-  if (pathname === "/" || pricingMatch) {
+  if (pathname === "/" || pricingMatch || productMatch) {
     response.headers.append("Vary", "Accept");
     response.headers.set("x-content-bucket", "html");
     if (aiAgent) response.headers.set("x-ai-agent", aiAgent);

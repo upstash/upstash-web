@@ -176,6 +176,20 @@ const nextConfig = {
           },
         ],
       },
+      // Product landing pages are content-negotiated against text/markdown
+      // too. Keep in sync with PRODUCT_PAGE_SLUGS in src/lib/product-pages.ts.
+      ...["redis", "vector", "qstash", "workflow", "box", "blob"].map(
+        (product) => ({
+          source: `/${product}`,
+          headers: [
+            { key: "Vary", value: "Accept" },
+            {
+              key: "Link",
+              value: `<https://upstash.com/${product}.md>; rel="alternate"; type="text/markdown"`,
+            },
+          ],
+        }),
+      ),
     ];
   },
 };
