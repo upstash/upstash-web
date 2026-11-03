@@ -17,7 +17,7 @@ The four problems:
 1. **Agents couldn't turn on daily backups:** Since there was no tool available in the MCP server to turn on daily backups, agents couldn’t do it. One agent got around this by taking the account API key from its own config file and then calling our API directly.
 2. **Agents looked for Redis logs that don't exist:** Agents didn’t know that Upstash does not keep any command log for Redis, so some agents tried things like `SLOWLOG` and `ACL LOG` to get logs.
 3. **Agents reported 0 commands right after traffic:** Usage stats are out of date for some time, and there was no way to tell that from the result.
-4. **Deletes had no confirmation step:** When asked to delete a database, agents went ahead without checking with the user first.
+4. **Deletes had no confirmation step:** When the user named a database and asked to delete it, agents took that as the go-ahead and deleted it.
 
 ## What we changed
 
@@ -26,7 +26,7 @@ To fix these issues, we did the following:
 - **Set daily backups.** `redis_set_daily_backup` turns daily backups on or off.
 - **Clarify log scope.** The logs tool now clarifies that it only provides QStash and Workflow logs. It also links to stats and insights for Redis.
 - **Clarify lag in stats.** To get a sense of how lagged stats are, we checked a new database and 30 commands were in the stats 91 to 121 seconds after the commands had been run. This tool now clarifies that the count is about two minutes delayed, so getting a count of 0 right after traffic is expected.
-- **Confirm deletes.** The first delete call now deletes nothing. If the agent's app supports MCP elicitation, the server shows the person a form to type the database name. Otherwise it asks the agent to check with the person and call again with the name they confirmed.
+- **Confirm deletes.** The first delete call now deletes nothing. If the agent's app supports [MCP elicitation](https://modelcontextprotocol.io/docs/learn/client-concepts), which lets a server ask the user a question directly, the server shows the person a form to type the database name. Otherwise it asks the agent to check with the person and call again with the name they confirmed.
 
 ## Before and after
 
