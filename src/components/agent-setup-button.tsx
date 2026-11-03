@@ -33,6 +33,8 @@ export const AGENT_SETUP_PROMPT = [
   "- Running work in Box cloud sandboxes",
   "",
   "If I need a Redis database before I have an account, POST https://upstash.com/start-redis for a free one with no signup (it lasts 3 days unless I claim it).",
+  "",
+  "For anything else, read the docs at https://upstash.com/docs/introduction (every page is listed in https://upstash.com/docs/llms.txt).",
 ].join("\n");
 
 type SetupOption = {
