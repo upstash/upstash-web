@@ -72,7 +72,7 @@ export const FEATURES: SectionFeaturesProps = {
     {
       icon: <IconInbox className="size-5" stroke={1.5} />,
       title: "Queues",
-      desc: "Process messages in order with FIFO queues and configurable parallelism, so downstream services see a steady stream.",
+      desc: "Deliver messages one at a time in FIFO order with queues, so downstream services see a steady stream.",
     },
     {
       icon: <IconGauge className="size-5" stroke={1.5} />,
@@ -87,7 +87,7 @@ export const FEATURES: SectionFeaturesProps = {
     {
       icon: <IconCoin className="size-5" stroke={1.5} />,
       title: "Pay per message",
-      desc: "Start free with 1,000 messages a day. Pay as you go is $1 per 100K messages with no idle cost.",
+      desc: "Start free with 1,000 messages a day. Pay as you go is $1 per 100K messages with no monthly base fee.",
     },
   ],
 };

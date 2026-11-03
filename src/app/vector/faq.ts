@@ -38,7 +38,7 @@ export const VECTOR_FAQ = [
   {
     question: "How much does Upstash Vector cost?",
     answer:
-      "The free plan includes up to 10,000 queries a day and 1 GB of data. Pay as you go is $0.40 per 100K requests and $0.25 per GB of storage, with 200 GB of bandwidth free each month. Queries and upserts cost the same. A Fixed plan is $60 a month for up to 1M queries a day, and Pro plans are available for high-volume workloads. See the pricing page for details.",
+      "The free plan includes up to 10,000 queries and updates a day and 1 GB of data. Pay as you go is $0.40 per 100K requests and $0.25 per GB of storage, with 200 GB of bandwidth free each month. A query or fetch counts as one request however many vectors it returns, while an upsert or delete counts one request per vector. A Fixed plan is $60 a month for up to 1M queries and updates a day, and Pro plans are available for high-volume workloads. See the pricing page for details.",
   },
   {
     question: "Which regions are available?",

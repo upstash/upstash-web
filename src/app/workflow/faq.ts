@@ -8,7 +8,7 @@ export const WORKFLOW_FAQ = [
   {
     question: "What is durable execution?",
     answer:
-      "Durable execution records a function's progress step by step. If the process crashes, times out, or is redeployed, it resumes from the last completed step instead of starting over. It replaces the hand-built queues, state tables, and retry logic that multi-step background jobs usually need.",
+      "Durable execution records a function's progress step by step. If the process crashes or times out, it resumes from the last completed step instead of starting over. It replaces the hand-built queues, state tables, and retry logic that multi-step background jobs usually need.",
   },
   {
     question: "How does Workflow avoid serverless function timeouts?",
