@@ -185,13 +185,14 @@ function LogoGrid({
 
 function MarqueeTrack({
   items,
-  duration,
+  secondsPerLogo,
   reverse,
   gapClass,
   renderItem,
 }: {
   items: LogoItem[];
-  duration: number;
+  // Speed scales with length, so rows of different sizes move alike.
+  secondsPerLogo: number;
   reverse?: boolean;
   gapClass: string;
   renderItem: (item: LogoItem, hidden: boolean) => ReactNode;
@@ -199,11 +200,14 @@ function MarqueeTrack({
   return (
     <div
       onFocus={(e) => {
-        // The track stops while focused; bring the link out of the edge fade.
+        // Keyboard focus stops the track (see :has below); bring the link out
+        // of the edge fade. Mouse focus must not scroll, or the click misses.
         const target = e.target;
-        requestAnimationFrame(() =>
-          target.scrollIntoView({ inline: "center", block: "nearest" }),
-        );
+        if (target.matches(":focus-visible")) {
+          requestAnimationFrame(() =>
+            target.scrollIntoView({ inline: "center", block: "nearest" }),
+          );
+        }
       }}
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget)) {
@@ -228,7 +232,11 @@ function MarqueeTrack({
           "[&:has(:focus-visible)]:animate-none",
           "motion-reduce:w-auto motion-reduce:animate-none",
         )}
-        style={{ "--marquee-duration": `${duration}s` } as React.CSSProperties}
+        style={
+          {
+            "--marquee-duration": `${items.length * secondsPerLogo}s`,
+          } as React.CSSProperties
+        }
       >
         {[false, true].map((hidden) => (
           <div
@@ -261,7 +269,7 @@ function LogoMarquee() {
     <div className="mt-16 md:mt-24">
       <MarqueeTrack
         items={logos}
-        duration={70}
+        secondsPerLogo={2.8}
         gapClass="gap-x-10 gap-y-4 motion-safe:pr-10 md:gap-x-16 md:gap-y-6 md:motion-safe:pr-16"
         renderItem={(item, hidden) => (
           <LogoLink
@@ -300,7 +308,7 @@ function LogoRows() {
           <MarqueeTrack
             key={row === top ? "top" : "bottom"}
             items={row}
-            duration={55}
+            secondsPerLogo={4.2}
             reverse={row === bottom}
             gapClass="gap-2 motion-safe:pr-2 md:gap-3 md:motion-safe:pr-3"
             renderItem={(item, hidden) => (
@@ -376,7 +384,7 @@ function LogoCycle() {
         className="mx-auto mt-16 grid max-w-[1080px] grid-cols-2 gap-2 motion-reduce:hidden md:mt-24 md:grid-cols-4 md:gap-3 xl:grid-cols-6"
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        onFocus={() => setFocused(true)}
+        onFocus={(e) => setFocused(e.target.matches(":focus-visible"))}
         onBlur={(e) => {
           if (!e.currentTarget.contains(e.relatedTarget)) {
             setFocused(false);
