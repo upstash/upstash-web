@@ -724,7 +724,8 @@ function LogoTabs() {
         role="tabpanel"
         id="logo-tabpanel"
         aria-labelledby={`logo-tab-${active}`}
-        // Focusable so Tab reaches a panel that has no story links.
+        // Focusable so Tab reaches a panel that has no story links (ARIA tabs pattern).
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: role="tabpanel" with no focusable content
         tabIndex={0}
         // Tallest group (12 logos) at each breakpoint, so switching tabs never
         // moves the content below.
