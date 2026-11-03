@@ -226,7 +226,7 @@ function MarqueeTrack({
           "flex w-max",
           "animate-[marquee_var(--marquee-duration)_linear_infinite]",
           reverse && "[animation-direction:reverse]",
-          "group-hover/marquee:[animation-play-state:paused]",
+          "[@media(hover:hover)]:group-hover/marquee:[animation-play-state:paused]",
           // Keyboard focus: stop at the start so the browser can scroll the
           // focused link into view instead of it sitting off screen.
           "[&:has(:focus-visible)]:animate-none",
@@ -276,7 +276,8 @@ function LogoMarquee() {
             item={item}
             hidden={hidden}
             className={cx(
-              "flex h-12 items-center text-text-mute transition-colors dark:text-text",
+              // Clay is a bitmap that ignores currentColor; mute it to match.
+              "flex h-12 items-center text-text-mute transition-colors dark:text-text [&_img]:opacity-60",
               item.slug && "hover:text-primary dark:hover:text-white",
             )}
           >
@@ -382,8 +383,9 @@ function LogoCycle() {
       <LogoGrid items={logos} className="hidden motion-reduce:flex" />
       <div
         className="mx-auto mt-16 grid max-w-[1080px] grid-cols-2 gap-2 motion-reduce:hidden md:mt-24 md:grid-cols-4 md:gap-3 xl:grid-cols-6"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        // Mouse only: a tap fires mouseenter with no matching mouseleave.
+        onPointerEnter={(e) => setHovered(e.pointerType === "mouse")}
+        onPointerLeave={() => setHovered(false)}
         onFocus={(e) => setFocused(e.target.matches(":focus-visible"))}
         onBlur={(e) => {
           if (!e.currentTarget.contains(e.relatedTarget)) {
