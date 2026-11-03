@@ -1,12 +1,21 @@
 import Bg from "@/components/bg";
 import Button from "@/components/button";
 import Container from "@/components/container";
-import IconVector from "@/components/icon-vector";
 import cx from "@/utils/cx";
-import { IconNotes, IconPlus, IconTag } from "@tabler/icons-react";
+import { IconNotes, IconTag } from "@tabler/icons-react";
 import Link from "next/link";
+import type { SectionHeroProps } from "./types";
 
-export default function SectionHero() {
+export default function SectionHero({
+  icon: Icon,
+  title,
+  description,
+  gradient,
+  titleClassName,
+  primaryAction,
+  docsHref,
+  pricingHref,
+}: SectionHeroProps) {
   return (
     <section className="relative py-10 md:py-24">
       <Bg className="top-32 h-1/2" />
@@ -18,45 +27,33 @@ export default function SectionHero() {
               "flex flex-col items-center gap-4 md:gap-6",
               "text-center font-display text-4xl font-bold md:text-7xl",
               "bg-gradient-to-r bg-clip-text text-transparent",
-              "from-primary-text via-primary to-orange-300",
+              "from-primary-text via-primary",
+              gradient,
+              titleClassName,
             )}
           >
-            <IconVector className="size-12 shrink-0 md:size-20" />
-            <span>
-              <span className="block">Serverless vector database</span>{" "}
-              <span className="block">for AI and search</span>
-            </span>
+            <Icon className="size-12 shrink-0 md:size-20" />
+            <span>{title}</span>
           </h1>
 
           <p className="mt-6 max-w-2xl text-balance text-lg text-text-mute md:text-2xl">
-            Upstash Vector stores embeddings and finds the closest matches in
-            milliseconds. Upsert raw text and let a built-in model embed it,
-            combine semantic and keyword search, filter on metadata, and pay per
-            request with no idle cost.
+            {description}
           </p>
 
           <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-            <a
-              href="https://console.upstash.com/vector"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a href={primaryAction.href} target="_blank" rel="noreferrer">
               <Button variant="primary" className="h-[42px] px-5">
-                Create Index
-                <IconPlus size={24} />
+                {primaryAction.label}
+                {primaryAction.icon}
               </Button>
             </a>
-            <a
-              href="https://upstash.com/docs/vector/overall/getstarted"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a href={docsHref} target="_blank" rel="noreferrer">
               <Button variant="defaultDark" className="h-[42px] px-5">
                 Documentation
                 <IconNotes size={24} />
               </Button>
             </a>
-            <Link href="/pricing/vector">
+            <Link href={pricingHref}>
               <Button variant="default" className="h-[42px] px-5">
                 View Pricing
                 <IconTag size={24} />

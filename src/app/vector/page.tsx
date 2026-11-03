@@ -1,11 +1,12 @@
-import SectionFaq from "@/app/redis/section-faq";
+import { CTA, FEATURES, HERO, USE_CASES, WHAT_IS } from "@/app/vector/content";
 import { VECTOR_FAQ } from "@/app/vector/faq";
 import SectionCode from "@/app/vector/section-code";
-import SectionCta from "@/app/vector/section-cta";
-import SectionFeatures from "@/app/vector/section-features";
-import SectionHero from "@/app/vector/section-hero";
-import SectionUseCases from "@/app/vector/section-use-cases";
-import SectionWhatIs from "@/app/vector/section-what-is";
+import SectionCta from "@/components/product-page/section-cta";
+import SectionFaq from "@/components/product-page/section-faq";
+import SectionFeatures from "@/components/product-page/section-features";
+import SectionHero from "@/components/product-page/section-hero";
+import SectionUseCases from "@/components/product-page/section-use-cases";
+import SectionWhatIs from "@/components/product-page/section-what-is";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 import type { Metadata } from "next";
 
@@ -53,13 +54,13 @@ export default function VectorPage() {
       />
 
       <main className="text-center">
-        <SectionHero />
-        <SectionFeatures />
+        <SectionHero {...HERO} />
+        <SectionFeatures {...FEATURES} />
         <SectionCode />
-        <SectionUseCases />
-        <SectionWhatIs />
+        <SectionUseCases {...USE_CASES} />
+        <SectionWhatIs {...WHAT_IS} />
         <SectionFaq items={VECTOR_FAQ} />
-        <SectionCta />
+        <SectionCta {...CTA} />
       </main>
     </>
   );

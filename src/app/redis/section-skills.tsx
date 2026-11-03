@@ -17,7 +17,9 @@ export default function SectionSkills() {
       <Bg className="top-32 h-1/2" />
 
       <Container className="max-w-screen-md">
-        <PageHeaderTitle as="h2">Build Redis with your AI agent</PageHeaderTitle>
+        <PageHeaderTitle as="h2">
+          Build Redis with your AI agent
+        </PageHeaderTitle>
 
         <PageHeaderDesc className="mt-3">
           Install the Upstash skill so Claude Code, Cursor, and other coding
@@ -35,9 +37,8 @@ export default function SectionSkills() {
         <PageHeaderDesc className="mt-14 text-pretty">
           Your agent can also create a free Redis database instantly with the{" "}
           <code className="font-mono">start-redis</code> endpoint - no signup or
-          authentication required. It
-          gets back credentials and a quickstart in markdown, and unclaimed
-          databases are deleted after 3 days.
+          authentication required. It gets back credentials and a quickstart in
+          markdown, and unclaimed databases are deleted after 3 days.
         </PageHeaderDesc>
 
         <CommandBlock className="mt-8" command={START_REDIS_COMMAND} />

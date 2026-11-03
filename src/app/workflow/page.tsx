@@ -1,11 +1,18 @@
-import SectionFaq from "@/app/redis/section-faq";
+import {
+  CTA,
+  FEATURES,
+  HERO,
+  USE_CASES,
+  WHAT_IS,
+} from "@/app/workflow/content";
 import { WORKFLOW_FAQ } from "@/app/workflow/faq";
 import SectionCode from "@/app/workflow/section-code";
-import SectionCta from "@/app/workflow/section-cta";
-import SectionFeatures from "@/app/workflow/section-features";
-import SectionHero from "@/app/workflow/section-hero";
-import SectionUseCases from "@/app/workflow/section-use-cases";
-import SectionWhatIs from "@/app/workflow/section-what-is";
+import SectionCta from "@/components/product-page/section-cta";
+import SectionFaq from "@/components/product-page/section-faq";
+import SectionFeatures from "@/components/product-page/section-features";
+import SectionHero from "@/components/product-page/section-hero";
+import SectionUseCases from "@/components/product-page/section-use-cases";
+import SectionWhatIs from "@/components/product-page/section-what-is";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 import type { Metadata } from "next";
 
@@ -53,13 +60,13 @@ export default function WorkflowPage() {
       />
 
       <main className="text-center">
-        <SectionHero />
-        <SectionFeatures />
+        <SectionHero {...HERO} />
+        <SectionFeatures {...FEATURES} />
         <SectionCode />
-        <SectionUseCases />
-        <SectionWhatIs />
+        <SectionUseCases {...USE_CASES} />
+        <SectionWhatIs {...WHAT_IS} />
         <SectionFaq items={WORKFLOW_FAQ} />
-        <SectionCta />
+        <SectionCta {...CTA} />
       </main>
     </>
   );
