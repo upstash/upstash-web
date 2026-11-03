@@ -29,6 +29,7 @@ import cx from "@/utils/cx";
 import Link from "next/link";
 import {
   useEffect,
+  useRef,
   useState,
   type ComponentType,
   type ReactNode,
@@ -197,6 +198,11 @@ function MarqueeTrack({
 }) {
   return (
     <div
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+          e.currentTarget.scrollLeft = 0;
+        }
+      }}
       className={cx(
         "group/marquee overflow-hidden",
         "[mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]",
@@ -208,7 +214,10 @@ function MarqueeTrack({
           "flex w-max",
           "animate-[marquee_var(--marquee-duration)_linear_infinite]",
           reverse && "[animation-direction:reverse]",
-          "group-focus-within/marquee:[animation-play-state:paused] group-hover/marquee:[animation-play-state:paused]",
+          "group-hover/marquee:[animation-play-state:paused]",
+          // Keyboard focus: stop at the start so the browser can scroll the
+          // focused link into view instead of it sitting off screen.
+          "[&:has(:focus-visible)]:animate-none",
           "motion-reduce:w-auto motion-reduce:animate-none",
         )}
         style={{ "--marquee-duration": `${duration}s` } as React.CSSProperties}
@@ -222,7 +231,7 @@ function MarqueeTrack({
               gapClass,
               hidden && "motion-reduce:hidden",
               !hidden &&
-                "motion-reduce:w-full motion-reduce:shrink motion-reduce:flex-wrap motion-reduce:justify-center",
+                "motion-reduce:w-full motion-reduce:shrink motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:pr-0",
             )}
           >
             {items.map((item) => (
@@ -245,7 +254,7 @@ function LogoMarquee() {
       <MarqueeTrack
         items={logos}
         duration={70}
-        gapClass="gap-x-12 gap-y-6 pr-12 md:gap-x-16 md:pr-16"
+        gapClass="gap-x-10 gap-y-4 pr-10 md:gap-x-16 md:gap-y-6 md:pr-16"
         renderItem={(item, hidden) => (
           <LogoLink
             item={item}
@@ -309,75 +318,78 @@ const CYCLE_MS = 1800;
 // Fixed shuffle so swaps hop around the grid instead of sweeping left to right.
 const SLOT_ORDER = [4, 9, 1, 7, 11, 2, 6, 0, 10, 3, 8, 5];
 
+// Cells the current breakpoint shows: 2x3, 4x2 or 6x2.
+function visibleSlots() {
+  if (window.matchMedia("(min-width: 1280px)").matches) {
+    return CYCLE_SLOTS;
+  }
+  return window.matchMedia("(min-width: 768px)").matches ? 8 : 6;
+}
+
 function LogoCycle() {
-  const [shown, setShown] = useState(() => logos.slice(0, CYCLE_SLOTS));
+  // A permutation of all logos: the first `visible` fill the shown cells, the
+  // rest wait in line. A swap puts the next in line into a cell and sends the
+  // outgoing logo to the back, so every logo comes round at every breakpoint.
+  const [order, setOrder] = useState(logos);
   const [paused, setPaused] = useState(false);
-  const [reduced, setReduced] = useState(false);
+  const tick = useRef(0);
 
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const onChange = () => setReduced(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-
-  useEffect(() => {
-    if (paused || reduced) {
+    if (
+      paused ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       return;
     }
-    let tick = 0;
-    let queue = logos.slice(CYCLE_SLOTS);
     const id = setInterval(() => {
-      setShown((prev) => {
-        // Only swap slots the current breakpoint shows (6 / 8 / 12 cells).
-        const visible = window.matchMedia("(min-width: 1280px)").matches
-          ? CYCLE_SLOTS
-          : window.matchMedia("(min-width: 768px)").matches
-            ? 8
-            : 6;
-        const order = SLOT_ORDER.filter((s) => s < visible);
-        const slot = order[tick++ % order.length];
-        const [incoming, ...rest] = queue;
-        queue = [...rest, prev[slot]];
+      const visible = visibleSlots();
+      const slots = SLOT_ORDER.filter((s) => s < visible);
+      const slot = slots[tick.current++ % slots.length];
+      setOrder((prev) => {
         const next = [...prev];
-        next[slot] = incoming;
+        next[slot] = prev[visible];
+        next.splice(visible, 1);
+        next.push(prev[slot]);
         return next;
       });
     }, CYCLE_MS);
     return () => clearInterval(id);
-  }, [paused, reduced]);
-
-  if (reduced) {
-    return <LogoGrid items={logos} />;
-  }
+  }, [paused]);
 
   return (
-    <div
-      className="mx-auto mt-16 grid max-w-[1080px] grid-cols-2 gap-2 md:mt-24 md:grid-cols-4 md:gap-3 xl:grid-cols-6"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
-      onBlur={() => setPaused(false)}
-    >
-      {shown.map((item, i) => (
-        <LogoLink
-          // Keyed by slot so a swap remounts only the card inside.
-          // biome-ignore lint/suspicious/noArrayIndexKey: slots are fixed positions
-          key={i}
-          item={item}
-          className={cx(
-            i >= 6 && "hidden md:block",
-            i >= 8 && "md:hidden xl:block",
-          )}
-        >
-          <LogoCard
-            key={item.name}
+    <>
+      {/* Reduced motion: one static grid in priority order. */}
+      <LogoGrid items={logos} className="hidden motion-reduce:flex" />
+      <div
+        className="mx-auto mt-16 grid max-w-[1080px] grid-cols-2 gap-2 motion-reduce:hidden md:mt-24 md:grid-cols-4 md:gap-3 xl:grid-cols-6"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onFocus={() => setPaused(true)}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget)) {
+            setPaused(false);
+          }
+        }}
+      >
+        {order.slice(0, CYCLE_SLOTS).map((item, i) => (
+          <LogoLink
+            // Keyed by slot so a swap remounts only the card inside.
+            // biome-ignore lint/suspicious/noArrayIndexKey: slots are fixed positions
+            key={i}
             item={item}
-            className="[&>svg]:animate-logo-in"
-          />
-        </LogoLink>
-      ))}
-    </div>
+            className={cx(
+              i >= 6 && "hidden md:block",
+              i >= 8 && "md:hidden xl:block",
+            )}
+          >
+            <LogoCard
+              key={item.name}
+              item={item}
+              className="[&>*]:animate-logo-in"
+            />
+          </LogoLink>
+        ))}
+      </div>
+    </>
   );
 }
