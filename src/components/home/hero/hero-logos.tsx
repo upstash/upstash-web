@@ -79,7 +79,7 @@ export default function HeroLogos() {
       <LogoGrid items={logos} className="hidden motion-reduce:flex" />
       <div className="mt-16 flex flex-col gap-2 motion-reduce:hidden md:mt-24 md:gap-3">
         {rows.map((row, r) => (
-          <MarqueeTrack key={r} items={row} reverse={r === 1} />
+          <MarqueeTrack key={row[0].name} items={row} reverse={r === 1} />
         ))}
       </div>
     </>
