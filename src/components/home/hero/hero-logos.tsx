@@ -504,11 +504,18 @@ function RollRow({ cols }: { cols: number }) {
     }
     let frame = 0;
     const id = setInterval(() => {
+      // A hidden tab runs no frames; skip so steps don't pile up.
+      if (document.hidden) {
+        return;
+      }
+      cancelAnimationFrame(frame);
       setPos((prev) => prev.map((p, c) => (p >= columns[c].length ? 0 : p)));
       // Two frames so the jump back paints before the roll starts.
       frame = requestAnimationFrame(() => {
         frame = requestAnimationFrame(() =>
-          setPos((prev) => prev.map((p) => p + 1)),
+          setPos((prev) =>
+            prev.map((p, c) => Math.min(p + 1, columns[c].length)),
+          ),
         );
       });
     }, ROLL_MS);
@@ -532,12 +539,15 @@ function RollRow({ cols }: { cols: number }) {
             <div
               className={cx(
                 "flex flex-col",
-                // Position 0 is only ever reached by the jump back: no transition.
+                // Position 0 is only ever reached by the jump back, which must be
+                // instant: no transition and no delay (a delayed 0s transition
+                // would still hold the old position and make the roll rewind).
                 pos[c] > 0 && "transition-transform duration-700 ease-in-out",
               )}
               style={{
                 transform: `translateY(${-pos[c] * (100 / stack.length)}%)`,
-                transitionDelay: `${c * 90}ms`,
+                transition: pos[c] > 0 ? undefined : "none",
+                transitionDelay: pos[c] > 0 ? `${c * 90}ms` : undefined,
               }}
             >
               {stack.map((item, i) => {
@@ -714,9 +724,11 @@ function LogoTabs() {
         role="tabpanel"
         id="logo-tabpanel"
         aria-labelledby={`logo-tab-${active}`}
+        // Focusable so Tab reaches a panel that has no story links.
+        tabIndex={0}
         // Tallest group (12 logos) at each breakpoint, so switching tabs never
         // moves the content below.
-        className="min-h-[472px] sm:min-h-[232px] md:min-h-[240px] xl:min-h-[168px]"
+        className="min-h-[472px] sm:min-h-[232px] md:min-h-[240px] xl:min-h-[156px]"
       >
         <LogoGrid
           key={group.label}
