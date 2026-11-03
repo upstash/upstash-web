@@ -23,7 +23,8 @@ import { PRODUCT_TAGLINES } from "./product-features";
 import ProductSeoData from "./product-seo-data";
 
 const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
-  const { title, docsLink, consoleLink } = PRODUCT_TAGLINES[activeProduct];
+  const { title, docsLink, consoleLink, landingLink } =
+    PRODUCT_TAGLINES[activeProduct];
 
   return (
     <div className="mb-8 flex flex-col items-center gap-4 py-4">
@@ -31,26 +32,10 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
         {title}
       </h2>
       <div className="flex flex-col justify-center gap-3 xs:flex-row">
-        {activeProduct === Product.REDIS && (
-          <Link href="/redis">
+        {landingLink && (
+          <Link href={landingLink}>
             <Button variant={"default"} className="h-[42px] px-5">
-              Explore Redis
-              <IconArrowRight size={24} />
-            </Button>
-          </Link>
-        )}
-        {activeProduct === Product.BLOB && (
-          <Link href="/blob">
-            <Button variant={"default"} className="h-[42px] px-5">
-              Explore Blob
-              <IconArrowRight size={24} />
-            </Button>
-          </Link>
-        )}
-        {activeProduct === Product.BOX && (
-          <Link href="/box">
-            <Button variant={"default"} className="h-[42px] px-5">
-              Explore Box
+              Explore {activeProduct}
               <IconArrowRight size={24} />
             </Button>
           </Link>

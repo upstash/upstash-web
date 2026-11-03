@@ -4,6 +4,8 @@ export interface ProductTagline {
   title: string;
   docsLink: string;
   consoleLink: string;
+  /** Product landing page, linked from the tab as "Explore <Product>". */
+  landingLink?: string;
 }
 
 /**
@@ -15,21 +17,25 @@ export const PRODUCT_TAGLINES: Record<Product, ProductTagline> = {
     title: "Serverless Redis in the cloud with low latency and durable storage",
     docsLink: "https://upstash.com/docs/redis",
     consoleLink: "https://console.upstash.com/redis",
+    landingLink: "/redis",
   },
   [Product.VECTOR]: {
     title: "Serverless Vector database for high-performance search at scale",
     docsLink: "https://upstash.com/docs/vector",
     consoleLink: "https://console.upstash.com/vector",
+    landingLink: "/vector",
   },
   [Product.QSTASH]: {
     title: "Serverless messaging and scheduling via HTTP",
     docsLink: "https://upstash.com/docs/qstash",
     consoleLink: "https://console.upstash.com/qstash",
+    landingLink: "/qstash",
   },
   [Product.WORKFLOW]: {
     title: "Durable, reliable and performant serverless functions",
     docsLink: "https://upstash.com/docs/workflow",
     consoleLink: "https://console.upstash.com/workflow",
+    landingLink: "/workflow",
   },
   [Product.SEARCH]: {
     title: "Serverless AI search at scale",
@@ -40,11 +46,13 @@ export const PRODUCT_TAGLINES: Record<Product, ProductTagline> = {
     title: "Secure cloud containers for AI agents",
     docsLink: "https://upstash.com/docs/box",
     consoleLink: "https://console.upstash.com/box",
+    landingLink: "/box",
   },
   [Product.BLOB]: {
     title: "Serverless file storage for web developers",
     docsLink: "https://upstash.com/docs/blob/overall/quickstart",
     consoleLink: "https://console.upstash.com/blob",
+    landingLink: "/blob",
   },
 };
 
