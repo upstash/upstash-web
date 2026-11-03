@@ -27,7 +27,13 @@ import { LogoZapier } from "@/components/customers/logo-zapier";
 import { LogoZoComputer } from "@/components/customers/logo-zo-computer";
 import cx from "@/utils/cx";
 import Link from "next/link";
-import { type ComponentType, type ReactNode, type SVGProps, useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+  type ComponentType,
+  type ReactNode,
+  type SVGProps,
+} from "react";
 
 type LogoItem = {
   name: string;
@@ -78,12 +84,20 @@ export default function HeroLogos() {
 
   useEffect(() => {
     const v = new URLSearchParams(window.location.search).get("logos");
-    if (VARIANTS.includes(v as Variant)) { setVariant(v as Variant); }
+    if (VARIANTS.includes(v as Variant)) {
+      setVariant(v as Variant);
+    }
   }, []);
 
-  if (variant === "grid") { return <LogoGrid items={logos} />; }
-  if (variant === "rows") { return <LogoRows />; }
-  if (variant === "cycle") { return <LogoCycle />; }
+  if (variant === "grid") {
+    return <LogoGrid items={logos} />;
+  }
+  if (variant === "rows") {
+    return <LogoRows />;
+  }
+  if (variant === "cycle") {
+    return <LogoCycle />;
+  }
   return <LogoMarquee />;
 }
 
@@ -139,9 +153,20 @@ function LogoCard({ item, className }: { item: LogoItem; className?: string }) {
 
 /* 1. Grid: the current static wall, rows of 2/4/6, centered last row */
 
-function LogoGrid({ items }: { items: LogoItem[] }) {
+function LogoGrid({
+  items,
+  className,
+}: {
+  items: LogoItem[];
+  className?: string;
+}) {
   return (
-    <div className="mx-auto mt-16 flex max-w-[1080px] flex-wrap justify-center gap-2 md:mt-24 md:gap-3">
+    <div
+      className={cx(
+        "mx-auto mt-16 flex max-w-[1080px] flex-wrap justify-center gap-2 md:mt-24 md:gap-3",
+        className,
+      )}
+    >
       {items.map((item) => (
         <LogoLink
           key={item.name}
@@ -220,7 +245,7 @@ function LogoMarquee() {
       <MarqueeTrack
         items={logos}
         duration={70}
-        gapClass="gap-12 pr-12 md:gap-16 md:pr-16"
+        gapClass="gap-x-12 gap-y-6 pr-12 md:gap-x-16 md:pr-16"
         renderItem={(item, hidden) => (
           <LogoLink
             item={item}
@@ -250,26 +275,30 @@ function LogoRows() {
   const top = logos.filter((_, i) => i % 2 === 0);
   const bottom = logos.filter((_, i) => i % 2 === 1);
   return (
-    <div className="mt-16 flex flex-col gap-2 md:mt-24 md:gap-3">
-      {[top, bottom].map((row) => (
-        <MarqueeTrack
-          key={row === top ? "top" : "bottom"}
-          items={row}
-          duration={55}
-          reverse={row === bottom}
-          gapClass="gap-2 pr-2 md:gap-3 md:pr-3"
-          renderItem={(item, hidden) => (
-            <LogoLink
-              item={item}
-              hidden={hidden}
-              className="block w-[160px] md:w-[180px]"
-            >
-              <LogoCard item={item} />
-            </LogoLink>
-          )}
-        />
-      ))}
-    </div>
+    <>
+      {/* Reduced motion: one static grid in priority order. */}
+      <LogoGrid items={logos} className="hidden motion-reduce:flex" />
+      <div className="mt-16 flex flex-col gap-2 motion-reduce:hidden md:mt-24 md:gap-3">
+        {[top, bottom].map((row) => (
+          <MarqueeTrack
+            key={row === top ? "top" : "bottom"}
+            items={row}
+            duration={55}
+            reverse={row === bottom}
+            gapClass="gap-2 pr-2 md:gap-3 md:pr-3"
+            renderItem={(item, hidden) => (
+              <LogoLink
+                item={item}
+                hidden={hidden}
+                className="block w-[160px] md:w-[180px]"
+              >
+                <LogoCard item={item} />
+              </LogoLink>
+            )}
+          />
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -294,7 +323,9 @@ function LogoCycle() {
   }, []);
 
   useEffect(() => {
-    if (paused || reduced) { return; }
+    if (paused || reduced) {
+      return;
+    }
     let tick = 0;
     let queue = logos.slice(CYCLE_SLOTS);
     const id = setInterval(() => {
@@ -317,7 +348,9 @@ function LogoCycle() {
     return () => clearInterval(id);
   }, [paused, reduced]);
 
-  if (reduced) { return <LogoGrid items={logos} />; }
+  if (reduced) {
+    return <LogoGrid items={logos} />;
+  }
 
   return (
     <div
