@@ -462,16 +462,16 @@ export default function CompareTable() {
           <th className="px-0 text-left font-normal">Sparse Vectors</th>
           {/**/}
           <Col plan={showFree}>
-            <CompareValue suffix="Coming soon" />
+            <CompareValue type="boolean" />
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue suffix="Coming soon" />
+            <CompareValue type="boolean" />
           </Col>
           <Col plan={showFixed}>
-            <CompareValue suffix="Coming soon" />
+            <CompareValue type="boolean" />
           </Col>
           <Col plan={showPro}>
-            <CompareValue suffix="Coming soon" />
+            <CompareValue type="boolean" />
           </Col>
         </tr>
 
