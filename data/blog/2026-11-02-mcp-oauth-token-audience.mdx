@@ -42,7 +42,7 @@ const { payload } = await jwtVerify(token, jwks, {
 
 The `audience` option does the audience check for you: a token made for another server fails.
 
-**If you can't check a token because the authorization server is down, answer 503, not 401.** Clients read 401 as "sign in again". If many of them do that at once, a short outage turns into a wave of sign-ins.
+**If the authorization server is down and you can't check a token, answer 503 ("try again later"), not 401 ("your token is bad").** Clients read a 401 as "sign in again". If many of them do that at once, a short outage turns into a wave of sign-ins.
 
 ## Step 2: Get the audience into tokens
 
@@ -81,7 +81,7 @@ Newer revisions of the spec prefer **Client ID Metadata Documents**: instead of 
 
 - Publish Protected Resource Metadata, so clients know where to sign in.
 - Check JWT access tokens yourself, including the audience.
-- Answer 503, not 401, when you can't decide.
+- If you can't check a token because the authorization server is down, answer 503 ("try again later"), not 401.
 - Log mismatches first, then reject other servers' tokens, then tokens with no audience.
 - Explain every rejection in plain words.
 - Never forward a client's token to another API.
@@ -92,6 +92,3 @@ Newer revisions of the spec prefer **Client ID Metadata Documents**: instead of 
 - Refresh one at a time, and save the new refresh token first.
 - Read 401 as "sign in again" and 503 as "try again later".
 
-## Where Context7 is today
-
-Every new sign-in to Context7 gets a token made for Context7, and tokens made for other servers are rejected. Older sign-ins without an audience still work while they refresh into the new format. After that, every token will need one. You can still use Context7's MCP server without signing in at all.
