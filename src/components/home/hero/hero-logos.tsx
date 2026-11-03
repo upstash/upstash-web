@@ -29,6 +29,7 @@ import cx from "@/utils/cx";
 import Link from "next/link";
 import {
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ComponentType,
@@ -369,11 +370,7 @@ function LogoCycle() {
   // rest wait in line. A swap puts the next in line into a cell and sends the
   // outgoing logo to the back, so every logo comes round at every breakpoint.
   const [order, setOrder] = useState(logos);
-  // Hover and keyboard focus each pause on their own, so leaving one does
-  // not resume rotation under the other.
-  const [hovered, setHovered] = useState(false);
-  const [focused, setFocused] = useState(false);
-  const paused = hovered || focused;
+  const [paused, pauseHandlers] = usePause();
   const tick = useRef(0);
 
   useEffect(() => {
@@ -404,15 +401,7 @@ function LogoCycle() {
       <LogoGrid items={logos} className="hidden motion-reduce:flex" />
       <div
         className="mx-auto mt-16 grid max-w-[1080px] grid-cols-2 gap-2 motion-reduce:hidden md:mt-24 md:grid-cols-4 md:gap-3 xl:grid-cols-6"
-        // Mouse only: a tap fires mouseenter with no matching mouseleave.
-        onPointerEnter={(e) => setHovered(e.pointerType === "mouse")}
-        onPointerLeave={() => setHovered(false)}
-        onFocus={(e) => setFocused(e.target.matches(":focus-visible"))}
-        onBlur={(e) => {
-          if (!e.currentTarget.contains(e.relatedTarget)) {
-            setFocused(false);
-          }
-        }}
+        {...pauseHandlers}
       >
         {order.slice(0, CYCLE_SLOTS).map((item, i) => (
           <LogoLink
@@ -437,12 +426,14 @@ function LogoCycle() {
   );
 }
 
-/* Shared: pause on mouse hover or keyboard focus, never on touch or mouse focus */
+/* Shared: pause on mouse hover or keyboard focus, never on touch or mouse focus.
+   Hover and focus are tracked apart so leaving one does not resume under the other. */
 
 function usePause() {
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const handlers = {
+    // Mouse only: a tap fires pointerenter with no matching pointerleave.
     onPointerEnter: (e: React.PointerEvent) =>
       setHovered(e.pointerType === "mouse"),
     onPointerLeave: () => setHovered(false),
@@ -463,25 +454,45 @@ const ROLL_MS = 2600;
 const ROLL_ROW = "h-16";
 
 function LogoRoll() {
+  // One row, sized to the viewport: 3 / 4 / 6 cells. Remounting on change
+  // restarts the roll from the top names.
+  const [cols, setCols] = useState(6);
+  useEffect(() => {
+    const lg = window.matchMedia("(min-width: 1024px)");
+    const sm = window.matchMedia("(min-width: 640px)");
+    const update = () => setCols(lg.matches ? 6 : sm.matches ? 4 : 3);
+    update();
+    lg.addEventListener("change", update);
+    sm.addEventListener("change", update);
+    return () => {
+      lg.removeEventListener("change", update);
+      sm.removeEventListener("change", update);
+    };
+  }, []);
   return (
     <>
       {/* Reduced motion: one static grid in priority order. */}
       <LogoGrid items={logos} className="hidden motion-reduce:flex" />
       <div className="mt-16 motion-reduce:hidden md:mt-24">
-        <RollRow cols={6} className="hidden md:grid md:grid-cols-6" />
-        <RollRow cols={3} className="grid grid-cols-3 md:hidden" />
+        <RollRow key={cols} cols={cols} />
       </div>
     </>
   );
 }
 
-function RollRow({ cols, className }: { cols: number; className: string }) {
+function RollRow({ cols }: { cols: number }) {
   // Deal logos into columns so the first row shows the best-known names.
-  const columns = Array.from({ length: cols }, (_, c) =>
-    logos.filter((_, i) => i % cols === c),
+  const columns = useMemo(
+    () =>
+      Array.from({ length: cols }, (_, c) =>
+        logos.filter((_, i) => i % cols === c),
+      ),
+    [cols],
   );
+  // pos[c] runs 0..length; at `length` the column shows a copy of its first
+  // logo. The next tick jumps back to 0 (same picture, no transition) and
+  // then rolls on, so wrapping never depends on transitionend.
   const [pos, setPos] = useState(() => columns.map(() => 0));
-  const [snap, setSnap] = useState(() => columns.map(() => false));
   const [paused, pauseHandlers] = usePause();
 
   useEffect(() => {
@@ -491,55 +502,62 @@ function RollRow({ cols, className }: { cols: number; className: string }) {
     ) {
       return;
     }
+    let frame = 0;
     const id = setInterval(() => {
-      setSnap((prev) => prev.map(() => false));
-      setPos((prev) => prev.map((p) => p + 1));
+      setPos((prev) => prev.map((p, c) => (p >= columns[c].length ? 0 : p)));
+      // Two frames so the jump back paints before the roll starts.
+      frame = requestAnimationFrame(() => {
+        frame = requestAnimationFrame(() =>
+          setPos((prev) => prev.map((p) => p + 1)),
+        );
+      });
     }, ROLL_MS);
-    return () => clearInterval(id);
-  }, [paused]);
+    return () => {
+      clearInterval(id);
+      cancelAnimationFrame(frame);
+    };
+  }, [paused, columns]);
 
   return (
     <div
-      className={cx("mx-auto max-w-[1080px] gap-4", className)}
+      className="mx-auto grid max-w-[1080px] gap-4"
+      style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       {...pauseHandlers}
     >
       {columns.map((col, c) => {
         // The first logo is repeated at the end so the roll wraps seamlessly.
         const stack = [...col, col[0]];
-        const current = pos[c] % col.length;
         return (
           <div key={col[0].name} className={cx(ROLL_ROW, "overflow-hidden")}>
             <div
               className={cx(
                 "flex flex-col",
-                !snap[c] && "transition-transform duration-700 ease-in-out",
+                // Position 0 is only ever reached by the jump back: no transition.
+                pos[c] > 0 && "transition-transform duration-700 ease-in-out",
               )}
               style={{
                 transform: `translateY(${-pos[c] * (100 / stack.length)}%)`,
-                transitionDelay: snap[c] ? undefined : `${c * 90}ms`,
-              }}
-              onTransitionEnd={() => {
-                if (pos[c] >= col.length) {
-                  setSnap((prev) => prev.map((v, i) => (i === c ? true : v)));
-                  setPos((prev) => prev.map((v, i) => (i === c ? 0 : v)));
-                }
+                transitionDelay: `${c * 90}ms`,
               }}
             >
               {stack.map((item, i) => {
-                const shown =
-                  i === current || (i === col.length && pos[c] === col.length);
+                const shown = i === pos[c];
                 return (
                   <div
                     // biome-ignore lint/suspicious/noArrayIndexKey: the wrap copy repeats a name
                     key={i}
                     aria-hidden={!shown || undefined}
                     inert={!shown}
-                    className={cx(ROLL_ROW, "flex items-center justify-center")}
+                    className={cx(
+                      ROLL_ROW,
+                      // px-1 keeps the focus ring inside the clipped cell.
+                      "flex items-center justify-center px-1",
+                    )}
                   >
                     <LogoLink
                       item={item}
                       className={cx(
-                        "flex items-center text-text-mute transition-colors dark:text-text [&_img]:opacity-60",
+                        "flex max-w-full items-center text-text-mute transition-colors dark:text-text [&_img]:opacity-60",
                         item.slug && "hover:text-primary dark:hover:text-white",
                       )}
                     >
@@ -582,7 +600,7 @@ function LogoWall() {
             className="w-auto max-w-full"
           />
           {item.slug && (
-            <span className="absolute bottom-3 right-4 text-xs font-medium text-text-mute transition-opacity md:opacity-0 md:group-hover/cell:opacity-100 md:group-focus-visible/cell:opacity-100">
+            <span className="absolute bottom-3 right-4 text-xs font-medium text-text-mute transition-opacity group-hover/cell:opacity-100 group-focus-visible/cell:opacity-100 [@media(hover:hover)]:opacity-0">
               Read story →
             </span>
           )}
@@ -671,7 +689,16 @@ function LogoTabs() {
             id={`logo-tab-${i}`}
             aria-selected={i === active}
             aria-controls="logo-tabpanel"
+            tabIndex={i === active ? 0 : -1}
             onClick={() => setActive(i)}
+            onKeyDown={(e) => {
+              const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+              if (step) {
+                const next = (i + step + TAB_GROUPS.length) % TAB_GROUPS.length;
+                setActive(next);
+                document.getElementById(`logo-tab-${next}`)?.focus();
+              }
+            }}
             className={cx(
               "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
               i === active
@@ -687,7 +714,9 @@ function LogoTabs() {
         role="tabpanel"
         id="logo-tabpanel"
         aria-labelledby={`logo-tab-${active}`}
-        className="min-h-[168px]"
+        // Tallest group (12 logos) at each breakpoint, so switching tabs never
+        // moves the content below.
+        className="min-h-[472px] sm:min-h-[232px] md:min-h-[240px] xl:min-h-[168px]"
       >
         <LogoGrid
           key={group.label}
@@ -714,8 +743,7 @@ function LogoSpotlight() {
             hidden={hidden}
             className={cx(
               "group/logo relative flex h-20 items-center text-text-mute transition-colors dark:text-text [&_img]:opacity-60",
-              item.slug &&
-                "hover:text-text dark:hover:text-white [&_img]:hover:opacity-100",
+              item.slug && "hover:text-text dark:hover:text-white",
             )}
           >
             <item.Logo
