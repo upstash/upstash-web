@@ -17,6 +17,16 @@ const cspHeader = `
   manifest-src 'self' https://upstash.com;
 `;
 
+// Advertised on every page. Next.js keeps only the last matching header with a
+// given key, so pages that add their own Link header must repeat these.
+const SITE_LINKS = [
+  '<https://upstash.com/llms.txt>; rel="alternate"; type="text/plain"; title="LLM-friendly content index"',
+  '<https://context7.com/api/v2/ask?siteKey=ask_4cf2adc7846aa874f833b068>; rel="search"; type="text/plain"; title="Search upstash.com"',
+  '<https://upstash.com/docs/devops/developer-api/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="Upstash Developer API (OpenAPI)"',
+  '<https://upstash.com/docs/qstash/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="QStash REST API (OpenAPI)"',
+  '<https://upstash.com/docs/workflow/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="Upstash Workflow REST API (OpenAPI)"',
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: {
@@ -98,13 +108,7 @@ const nextConfig = {
         headers: [
           {
             key: "Link",
-            value: [
-              '<https://upstash.com/llms.txt>; rel="alternate"; type="text/plain"; title="LLM-friendly content index"',
-              '<https://context7.com/api/v2/ask?siteKey=ask_4cf2adc7846aa874f833b068>; rel="search"; type="text/plain"; title="Search upstash.com"',
-              '<https://upstash.com/docs/devops/developer-api/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="Upstash Developer API (OpenAPI)"',
-              '<https://upstash.com/docs/qstash/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="QStash REST API (OpenAPI)"',
-              '<https://upstash.com/docs/workflow/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="Upstash Workflow REST API (OpenAPI)"',
-            ].join(", "),
+            value: SITE_LINKS.join(", "),
           },
         ],
       },
@@ -185,7 +189,10 @@ const nextConfig = {
             { key: "Vary", value: "Accept" },
             {
               key: "Link",
-              value: `<https://upstash.com/${product}.md>; rel="alternate"; type="text/markdown"`,
+              value: [
+                ...SITE_LINKS,
+                `<https://upstash.com/${product}.md>; rel="alternate"; type="text/markdown"`,
+              ].join(", "),
             },
           ],
         }),
