@@ -30,20 +30,20 @@ type SetupOption = {
 
 /**
  * The first entry is what the button itself copies, so the dropdown never
- * changes what a plain click does. Per-client commands live in the docs the
- * last menu row links to.
+ * changes what a plain click does. Same rows as the console's agent setup
+ * menu; per-client commands live in the docs the last menu row links to.
  */
 const SETUP_OPTIONS: SetupOption[] = [
+  { id: "prompt", label: "Copy prompt", value: AGENT_SETUP_PROMPT },
   {
-    id: "command",
-    // The command itself, so the reader sees what they are copying.
-    label: <code className="font-mono">npx upstash</code>,
-    value: "npx upstash",
+    id: "mcp_url",
+    label: "Copy remote MCP URL",
+    value: "https://mcp.upstash.com/mcp",
   },
   {
-    id: "prompt",
-    label: "Copy setup prompt",
-    value: AGENT_SETUP_PROMPT,
+    id: "skills",
+    label: "Copy skills command",
+    value: "npx skills add upstash/skills",
   },
 ];
 
