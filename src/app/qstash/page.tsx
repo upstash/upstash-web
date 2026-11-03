@@ -1,11 +1,12 @@
+import { CTA, FEATURES, HERO, USE_CASES, WHAT_IS } from "@/app/qstash/content";
 import { QSTASH_FAQ } from "@/app/qstash/faq";
 import SectionCode from "@/app/qstash/section-code";
-import SectionCta from "@/app/qstash/section-cta";
-import SectionFeatures from "@/app/qstash/section-features";
-import SectionHero from "@/app/qstash/section-hero";
-import SectionUseCases from "@/app/qstash/section-use-cases";
-import SectionWhatIs from "@/app/qstash/section-what-is";
-import SectionFaq from "@/app/redis/section-faq";
+import SectionCta from "@/components/product-page/section-cta";
+import SectionFaq from "@/components/product-page/section-faq";
+import SectionFeatures from "@/components/product-page/section-features";
+import SectionHero from "@/components/product-page/section-hero";
+import SectionUseCases from "@/components/product-page/section-use-cases";
+import SectionWhatIs from "@/components/product-page/section-what-is";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 import type { Metadata } from "next";
 
@@ -53,13 +54,13 @@ export default function QStashPage() {
       />
 
       <main className="text-center">
-        <SectionHero />
-        <SectionFeatures />
+        <SectionHero {...HERO} />
+        <SectionFeatures {...FEATURES} />
         <SectionCode />
-        <SectionUseCases />
-        <SectionWhatIs />
+        <SectionUseCases {...USE_CASES} />
+        <SectionWhatIs {...WHAT_IS} />
         <SectionFaq items={QSTASH_FAQ} />
-        <SectionCta />
+        <SectionCta {...CTA} />
       </main>
     </>
   );
