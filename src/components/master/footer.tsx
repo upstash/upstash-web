@@ -36,20 +36,37 @@ export default function Footer({ className, ...props }: IAppFooter) {
             <OutLink href="/trust/terms.pdf">Terms of Service</OutLink>
           </div>
 
-          <div className="mt-4 flex flex-col flex-wrap items-center justify-center gap-4 text-text-mute md:flex-row">
-            {PRODUCT_LINKS.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className="group inline-flex items-center gap-1 hover:text-primary hover:underline"
-              >
-                {label}
-                <IconArrowUpRight
-                  size={16}
-                  className="opacity-50 group-hover:opacity-100"
-                />
-              </Link>
-            ))}
+          <div className="mt-4 flex flex-col items-center gap-4 text-text-mute md:flex-row">
+            <Link
+              href="/redis"
+              className="group inline-flex items-center gap-1 hover:text-primary hover:underline"
+            >
+              Redis Database
+              <IconArrowUpRight
+                size={16}
+                className="opacity-50 group-hover:opacity-100"
+              />
+            </Link>
+            <Link
+              href="/blob"
+              className="group inline-flex items-center gap-1 hover:text-primary hover:underline"
+            >
+              Blob Storage
+              <IconArrowUpRight
+                size={16}
+                className="opacity-50 group-hover:opacity-100"
+              />
+            </Link>
+            <Link
+              href="/box"
+              className="group inline-flex items-center gap-1 hover:text-primary hover:underline"
+            >
+              AI Agent Sandboxes
+              <IconArrowUpRight
+                size={16}
+                className="opacity-50 group-hover:opacity-100"
+              />
+            </Link>
           </div>
 
           <div className="flex gap-2">
@@ -103,13 +120,3 @@ export default function Footer({ className, ...props }: IAppFooter) {
     </footer>
   );
 }
-
-// Product landing pages, labelled with the search term each one targets.
-const PRODUCT_LINKS = [
-  { href: "/redis", label: "Redis Database" },
-  { href: "/vector", label: "Vector Database" },
-  { href: "/qstash", label: "Message Queue" },
-  { href: "/workflow", label: "Durable Workflows" },
-  { href: "/box", label: "AI Agent Sandboxes" },
-  { href: "/blob", label: "Blob Storage" },
-];
