@@ -528,7 +528,7 @@ function RollRow({ cols }: { cols: number }) {
               <div
                 key={`out-${tick}`}
                 aria-hidden
-                className="absolute inset-0 flex animate-roll-out items-center justify-center px-1"
+                className="pointer-events-none absolute inset-0 flex animate-roll-out items-center justify-center px-1"
                 style={delay}
               >
                 <RollLogo item={prev} hidden />
@@ -537,7 +537,9 @@ function RollRow({ cols }: { cols: number }) {
             <div
               key={`in-${tick}`}
               className={cx(
-                "absolute inset-0 flex items-center justify-center px-1",
+                // Layers pass clicks through; only the logos themselves catch them,
+                // so a logo half rolled out stays clickable under the next layer.
+                "pointer-events-none absolute inset-0 flex items-center justify-center px-1",
                 prev && "animate-roll-in",
               )}
               style={delay}
@@ -557,7 +559,7 @@ function RollLogo({ item, hidden }: { item: LogoItem; hidden?: boolean }) {
       item={item}
       hidden={hidden}
       className={cx(
-        "flex max-w-full items-center text-text-mute transition-colors dark:text-text [&_img]:opacity-60",
+        "pointer-events-auto flex max-w-full items-center text-text-mute transition-colors dark:text-text [&_img]:opacity-60",
         item.slug && "hover:text-primary dark:hover:text-white",
       )}
     >
