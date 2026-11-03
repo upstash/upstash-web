@@ -1,0 +1,65 @@
+---
+authors: [arda]
+slug: coding-agent-benchmark-mcp-server
+tags: [mcp, agents, redis, ai]
+title: What a Coding Agent Benchmark Taught Us About Our MCP Server
+description: We ran coding agents through real Upstash Redis tasks with the Upstash MCP server, fixed what the benchmark found, and compared the results before and after.
+---
+
+[Leo](https://x.com/leodev) challenged seven coding agents with real-world Upstash Redis tasks using the [Upstash MCP server](https://upstash.com/docs/agent-resources/mcp) and verified each result against a live account. Across Claude Code, Codex, Cursor, OpenCode, Pi, Factory Droid, and Devin, he recorded 369 runs and [published the entire evaluation](https://github.com/upstash/upstash-mcp-evals).
+
+The majority of tasks completed successfully: creating databases, enabling eviction, adding read regions, seeding data, writing credentials to `.env`, and adding rate limiting to an API. When four things did not go well, we fixed the problems and ran the same tasks again.
+
+## What the benchmark found
+
+The four problems:
+
+1. **Agents couldn't turn on daily backups:** Since there was no tool available in the MCP server to turn on daily backups, agents couldn’t do it. One agent got around this by taking the account API key from its own config file and then calling our API directly.
+2. **Agents looked for Redis logs that don't exist:** Agents didn’t know that Upstash does not keep any command log for Redis, so some agents tried things like `SLOWLOG` and `ACL LOG` to get logs.
+3. **Agents reported 0 commands right after traffic:** Usage stats are out of date for some time, and there was no way to tell that from the result.
+4. **Deletes had no confirmation step:** When asked to delete a database, agents went ahead without checking with the user first.
+
+## What we changed
+
+To fix these issues, we did the following:
+
+- **Set daily backups.** `redis_set_daily_backup` turns daily backups on or off.
+- **Clarify log scope.** The logs tool now clarifies that it only provides QStash and Workflow logs. It also links to stats and insights for Redis.
+- **Clarify lag in stats.** To get a sense of how lagged stats are, we checked a new database and 30 commands were in the stats 91 to 121 seconds after the commands had been run. This tool now clarifies that the count is about two minutes delayed, so getting a count of 0 right after traffic is expected.
+- **Confirm deletes.** The first delete call now deletes nothing. If the agent's app supports MCP elicitation, the server shows the person a form to type the database name. Otherwise it asks the agent to check with the person and call again with the name they confirmed.
+
+## Before and after
+
+For six tasks we reran the task on the server as it was, and with the fixes. We had 5 agent and model pairs (Claude Code on Opus 5.5, Claude Code on Sonnet 5.5, Claude Code on Haiku 5.5, Codex on gpt-6.1-sol, and OpenCode on Opus 5.5). For each pair we ran the task 3 times (15 tries per task).
+
+| Task | Before | After |
+| --- | --- | --- |
+| Turn on daily backups (through the MCP) | 0 of 15 | 15 of 15 |
+| Show the logs | 15 of 15 | 15 of 15 |
+| Confirm before deleting a database | 1 of 15 | 15 of 15 |
+| Set up Redis for an app | 12 of 15 | 12 of 15 |
+| Add rate limiting to an API | 12 of 15 | 13 of 15 |
+
+The stats question changed too. Before, every answer to "How many commands this week?" was a flat 0. After, 4 answers had the right number and the other 11 said the counts were still catching up.
+
+All the app setup and rate limiting misses were with Claude Haiku 5.5, an older model that few people use as a coding agent. It created the database and got the credentials then intentionally kept them out of the app's `.env`. All other models passed both tasks in every run.
+
+![](https://cdn.bydefault.so/image-IFsDZ7BTmwqpd9sssn0rC.png)
+
+## How agents confirm deletes now
+
+The confirmation was reached in three ways by the agents:
+
+- **Haiku and Codex asked first**, because the tool's description now says to confirm the name.
+- **OpenCode called the tool**, got a “not deleted, ask the user” response, and then asked the user.
+- **Claude Code on Opus and Sonnet** called the tool, and the server asked the user through a form. Our test ran Claude Code without a screen, so the form was cancelled and nothing was deleted.
+
+In apps that support elicitation, the person has to type out the name themselves, so the agent can’t confirm on their behalf.
+
+## Run the agents, then run them again
+
+We take the Upstash MCP server, and how agents behave with it, very seriously. A benchmark like Leo's is the best way we have found to check it, because it shows what agents do on a real account, which is often different from what we expect them to do.
+
+Each fix here was small. One line in a tool description was enough for two models to check with the user first, and a reply of "not deleted, ask the user" did the same for a third. Agents follow what tools tell them, so the wording of a tool is part of the product. Running the same tasks again after a change is how we know the new wording works.
+
+To connect your agent, see the [MCP docs](https://upstash.com/docs/agent-resources/mcp).
