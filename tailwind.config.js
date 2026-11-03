@@ -9,6 +9,23 @@ module.exports = {
       screens: {
         xs: "420px",
       },
+      keyframes: {
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
+        "logo-in": {
+          from: {
+            opacity: "0",
+            transform: "translateY(8px)",
+            filter: "blur(4px)",
+          },
+          to: { opacity: "1", transform: "translateY(0)", filter: "blur(0)" },
+        },
+      },
+      animation: {
+        "logo-in": "logo-in 0.6s ease-out both",
+      },
       colors: {
         bg: "var(--color-bg)",
         "bg-mute": "var(--color-bg-mute)",
