@@ -19,8 +19,21 @@ import { createPortal } from "react-dom";
  * tells the agent to run `upstash setup` itself rather than hand the reader a
  * command to run.
  */
-export const AGENT_SETUP_PROMPT =
-  "Set up Upstash in my coding agent using the official Upstash instructions, and run the commands yourself instead of asking me to. Run `npx -y upstash setup --yes` with the flag for the agent you are (`--claude`, `--codex`, `--cursor`, `--gemini`, `--vscode`, `--copilot` or `--opencode`). It installs the Upstash plugin where your agent supports plugins, and otherwise adds the remote MCP server https://mcp.upstash.com/mcp plus the Upstash skills (https://upstash.com/docs/agent-resources/skills); the MCP server authenticates over OAuth on first use. If you are not one of those agents, install the skills with `npx -y skills add upstash/skills --global` and add the remote MCP server to your MCP config; see https://upstash.com/docs/agent-resources/clients for the exact location. When done, tell me what was installed and whether I need to restart or reload (in Claude Code, `/reload-plugins`).";
+export const AGENT_SETUP_PROMPT = [
+  "Set up Upstash in my coding agent using the official Upstash instructions, and run the commands yourself instead of asking me to.",
+  "",
+  "1. Run `npx -y upstash setup --yes` with the flag for the agent you are (`--claude`, `--codex`, `--cursor`, `--gemini`, `--vscode`, `--copilot` or `--opencode`). It installs the Upstash plugin where your agent supports plugins, and otherwise adds the remote MCP server https://mcp.upstash.com/mcp (OAuth on first use) and the Upstash skills.",
+  "2. For any other agent, install the skills with `npx -y skills add upstash/skills --global` and add https://mcp.upstash.com/mcp to your MCP config (see https://upstash.com/docs/agent-resources/clients).",
+  "3. Tell me what was installed and whether I need to restart or reload (in Claude Code, `/reload-plugins`).",
+  "",
+  "The skills cover:",
+  "",
+  "- SDKs for Redis, Ratelimit, QStash, Workflow, Vector, Search, Blob and Box",
+  "- The `upstash` CLI",
+  "- Running work in Box cloud sandboxes",
+  "",
+  "If I need a Redis database before I have an account, POST https://upstash.com/start-redis for a free one with no signup (it lasts 3 days unless I claim it).",
+].join("\n");
 
 type SetupOption = {
   id: string;
