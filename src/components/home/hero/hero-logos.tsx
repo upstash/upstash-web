@@ -198,13 +198,21 @@ function MarqueeTrack({
 }) {
   return (
     <div
+      onFocus={(e) => {
+        // The track stops while focused; bring the link out of the edge fade.
+        const target = e.target;
+        requestAnimationFrame(() =>
+          target.scrollIntoView({ inline: "center", block: "nearest" }),
+        );
+      }}
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget)) {
           e.currentTarget.scrollLeft = 0;
         }
       }}
       className={cx(
-        "group/marquee overflow-hidden",
+        // py-1 leaves room for the focus ring inside the clipped box.
+        "group/marquee overflow-hidden py-1",
         "[mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]",
         "motion-reduce:[mask-image:none]",
       )}
@@ -231,7 +239,7 @@ function MarqueeTrack({
               gapClass,
               hidden && "motion-reduce:hidden",
               !hidden &&
-                "motion-reduce:w-full motion-reduce:shrink motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:pr-0",
+                "motion-reduce:w-full motion-reduce:shrink motion-reduce:flex-wrap motion-reduce:justify-center",
             )}
           >
             {items.map((item) => (
@@ -254,7 +262,7 @@ function LogoMarquee() {
       <MarqueeTrack
         items={logos}
         duration={70}
-        gapClass="gap-x-10 gap-y-4 pr-10 md:gap-x-16 md:gap-y-6 md:pr-16"
+        gapClass="gap-x-10 gap-y-4 motion-safe:pr-10 md:gap-x-16 md:gap-y-6 md:motion-safe:pr-16"
         renderItem={(item, hidden) => (
           <LogoLink
             item={item}
@@ -294,7 +302,7 @@ function LogoRows() {
             items={row}
             duration={55}
             reverse={row === bottom}
-            gapClass="gap-2 pr-2 md:gap-3 md:pr-3"
+            gapClass="gap-2 motion-safe:pr-2 md:gap-3 md:motion-safe:pr-3"
             renderItem={(item, hidden) => (
               <LogoLink
                 item={item}
@@ -331,7 +339,11 @@ function LogoCycle() {
   // rest wait in line. A swap puts the next in line into a cell and sends the
   // outgoing logo to the back, so every logo comes round at every breakpoint.
   const [order, setOrder] = useState(logos);
-  const [paused, setPaused] = useState(false);
+  // Hover and keyboard focus each pause on their own, so leaving one does
+  // not resume rotation under the other.
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const paused = hovered || focused;
   const tick = useRef(0);
 
   useEffect(() => {
@@ -362,12 +374,12 @@ function LogoCycle() {
       <LogoGrid items={logos} className="hidden motion-reduce:flex" />
       <div
         className="mx-auto mt-16 grid max-w-[1080px] grid-cols-2 gap-2 motion-reduce:hidden md:mt-24 md:grid-cols-4 md:gap-3 xl:grid-cols-6"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-        onFocus={() => setPaused(true)}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onFocus={() => setFocused(true)}
         onBlur={(e) => {
           if (!e.currentTarget.contains(e.relatedTarget)) {
-            setPaused(false);
+            setFocused(false);
           }
         }}
       >
