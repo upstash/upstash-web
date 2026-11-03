@@ -3,7 +3,7 @@ export const QSTASH_FAQ = [
   {
     question: "What is Upstash QStash?",
     answer:
-      "Upstash QStash is a serverless message queue and task scheduler that works over HTTP. You publish a message to QStash with an HTTP request or the @upstash/qstash SDK, and QStash delivers it to your endpoint as an HTTP request, retrying until it succeeds. It also runs cron schedules, delays messages, and fans out to multiple endpoints.",
+      "Upstash QStash is a serverless message queue and task scheduler that works over HTTP. You publish a message to QStash with an HTTP request or the @upstash/qstash SDK, and QStash delivers it to your endpoint as an HTTP request, retrying failed deliveries up to a configurable limit before moving the message to a dead letter queue. It also runs cron schedules, delays messages, and fans out to multiple endpoints.",
   },
   {
     question: "What is a message queue?",
