@@ -76,10 +76,19 @@ const logos: LogoItem[] = [
   { name: "Zo Computer", Logo: LogoZoComputer, h: 25 },
 ];
 
-const VARIANTS = ["grid", "marquee", "rows", "cycle"] as const;
+const VARIANTS = [
+  "grid",
+  "marquee",
+  "rows",
+  "cycle",
+  "roll",
+  "wall",
+  "tabs",
+  "spotlight",
+] as const;
 type Variant = (typeof VARIANTS)[number];
 
-// Preview only: `?logos=grid|marquee|rows|cycle` picks a layout to compare.
+// Preview only: `?logos=<variant>` picks a layout to compare.
 export default function HeroLogos() {
   const [variant, setVariant] = useState<Variant>("marquee");
 
@@ -98,6 +107,18 @@ export default function HeroLogos() {
   }
   if (variant === "cycle") {
     return <LogoCycle />;
+  }
+  if (variant === "roll") {
+    return <LogoRoll />;
+  }
+  if (variant === "wall") {
+    return <LogoWall />;
+  }
+  if (variant === "tabs") {
+    return <LogoTabs />;
+  }
+  if (variant === "spotlight") {
+    return <LogoSpotlight />;
   }
   return <LogoMarquee />;
 }
@@ -413,5 +434,314 @@ function LogoCycle() {
         ))}
       </div>
     </>
+  );
+}
+
+/* Shared: pause on mouse hover or keyboard focus, never on touch or mouse focus */
+
+function usePause() {
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const handlers = {
+    onPointerEnter: (e: React.PointerEvent) =>
+      setHovered(e.pointerType === "mouse"),
+    onPointerLeave: () => setHovered(false),
+    onFocus: (e: React.FocusEvent) =>
+      setFocused((e.target as Element).matches(":focus-visible")),
+    onBlur: (e: React.FocusEvent<HTMLElement>) => {
+      if (!e.currentTarget.contains(e.relatedTarget)) {
+        setFocused(false);
+      }
+    },
+  };
+  return [hovered || focused, handlers] as const;
+}
+
+/* 5. Roll: a row of cells that each roll up to their next logo, in a wave (clerk.com) */
+
+const ROLL_MS = 2600;
+const ROLL_ROW = "h-16";
+
+function LogoRoll() {
+  return (
+    <>
+      {/* Reduced motion: one static grid in priority order. */}
+      <LogoGrid items={logos} className="hidden motion-reduce:flex" />
+      <div className="mt-16 motion-reduce:hidden md:mt-24">
+        <RollRow cols={6} className="hidden md:grid md:grid-cols-6" />
+        <RollRow cols={3} className="grid grid-cols-3 md:hidden" />
+      </div>
+    </>
+  );
+}
+
+function RollRow({ cols, className }: { cols: number; className: string }) {
+  // Deal logos into columns so the first row shows the best-known names.
+  const columns = Array.from({ length: cols }, (_, c) =>
+    logos.filter((_, i) => i % cols === c),
+  );
+  const [pos, setPos] = useState(() => columns.map(() => 0));
+  const [snap, setSnap] = useState(() => columns.map(() => false));
+  const [paused, pauseHandlers] = usePause();
+
+  useEffect(() => {
+    if (
+      paused ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+    const id = setInterval(() => {
+      setSnap((prev) => prev.map(() => false));
+      setPos((prev) => prev.map((p) => p + 1));
+    }, ROLL_MS);
+    return () => clearInterval(id);
+  }, [paused]);
+
+  return (
+    <div
+      className={cx("mx-auto max-w-[1080px] gap-4", className)}
+      {...pauseHandlers}
+    >
+      {columns.map((col, c) => {
+        // The first logo is repeated at the end so the roll wraps seamlessly.
+        const stack = [...col, col[0]];
+        const current = pos[c] % col.length;
+        return (
+          <div key={col[0].name} className={cx(ROLL_ROW, "overflow-hidden")}>
+            <div
+              className={cx(
+                "flex flex-col",
+                !snap[c] && "transition-transform duration-700 ease-in-out",
+              )}
+              style={{
+                transform: `translateY(${-pos[c] * (100 / stack.length)}%)`,
+                transitionDelay: snap[c] ? undefined : `${c * 90}ms`,
+              }}
+              onTransitionEnd={() => {
+                if (pos[c] >= col.length) {
+                  setSnap((prev) => prev.map((v, i) => (i === c ? true : v)));
+                  setPos((prev) => prev.map((v, i) => (i === c ? 0 : v)));
+                }
+              }}
+            >
+              {stack.map((item, i) => {
+                const shown =
+                  i === current || (i === col.length && pos[c] === col.length);
+                return (
+                  <div
+                    // biome-ignore lint/suspicious/noArrayIndexKey: the wrap copy repeats a name
+                    key={i}
+                    aria-hidden={!shown || undefined}
+                    inert={!shown}
+                    className={cx(ROLL_ROW, "flex items-center justify-center")}
+                  >
+                    <LogoLink
+                      item={item}
+                      className={cx(
+                        "flex items-center text-text-mute transition-colors dark:text-text [&_img]:opacity-60",
+                        item.slug && "hover:text-primary dark:hover:text-white",
+                      )}
+                    >
+                      <item.Logo
+                        role="img"
+                        aria-label={item.name}
+                        style={{ height: item.h ?? 24 }}
+                        className="w-auto max-w-full"
+                      />
+                    </LogoLink>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* 6. Wall: every logo in a hairline grid, stories reveal a link (planetscale.com) */
+
+function LogoWall() {
+  return (
+    <div className="mx-auto mt-16 grid max-w-[1080px] grid-cols-2 border-l border-t border-black/10 sm:grid-cols-3 md:mt-24 lg:grid-cols-5 dark:border-white/10">
+      {logos.map((item) => (
+        <LogoLink
+          key={item.name}
+          item={item}
+          className={cx(
+            "group/cell relative flex h-28 items-center justify-center border-b border-r border-black/10 px-6 dark:border-white/10",
+            item.slug && "transition-colors hover:bg-bg-mute",
+          )}
+        >
+          <item.Logo
+            role="img"
+            aria-label={item.name}
+            style={{ height: Math.round((item.h ?? 24) * 1.15) }}
+            className="w-auto max-w-full"
+          />
+          {item.slug && (
+            <span className="absolute bottom-3 right-4 text-xs font-medium text-text-mute transition-opacity md:opacity-0 md:group-hover/cell:opacity-100 md:group-focus-visible/cell:opacity-100">
+              Read story →
+            </span>
+          )}
+        </LogoLink>
+      ))}
+      {/* Blank cells close the last row at 2, 3 and 5 columns. */}
+      {Array.from({ length: 4 }, (_, i) => {
+        const need = (cols: number) =>
+          i < (cols - (logos.length % cols)) % cols;
+        return (
+          <div
+            // biome-ignore lint/suspicious/noArrayIndexKey: blank filler cells
+            key={i}
+            aria-hidden
+            className={cx(
+              "border-b border-r border-black/10 dark:border-white/10",
+              need(2) ? "block" : "hidden",
+              need(3) ? "sm:block" : "sm:hidden",
+              need(5) ? "lg:block" : "lg:hidden",
+            )}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+/* 7. Tabs: logos grouped by industry, one group at a time (tailscale.com, cloudflare.com) */
+
+const TAB_GROUPS: { label: string; names: string[] }[] = [
+  { label: "Featured", names: logos.slice(0, 12).map((l) => l.name) },
+  {
+    label: "AI",
+    names: [
+      "Midjourney",
+      "Sierra",
+      "Clay",
+      "fal",
+      "OpenRouter",
+      "Paper",
+      "Rork",
+      "Nous Research",
+      "Outtake",
+      "Circleback",
+      "Zo Computer",
+    ],
+  },
+  {
+    label: "Developer platforms",
+    names: [
+      "Vercel",
+      "Supabase",
+      "Zapier",
+      "GitBook",
+      "Fly.io",
+      "Privy",
+      "CodeRabbit",
+      "OpenCode",
+      "Composio",
+    ],
+  },
+  {
+    label: "Brands & fintech",
+    names: ["Meta", "Coinbase", "Liverpool FC", "Polymarket", "Paul Smith"],
+  },
+];
+
+function LogoTabs() {
+  const [active, setActive] = useState(0);
+  const group = TAB_GROUPS[active];
+  const items = group.names
+    .map((n) => logos.find((l) => l.name === n))
+    .filter((l): l is LogoItem => Boolean(l));
+  return (
+    <div className="mt-16 md:mt-24">
+      <div
+        role="tablist"
+        aria-label="Customers by industry"
+        className="flex flex-wrap justify-center gap-2"
+      >
+        {TAB_GROUPS.map((g, i) => (
+          <button
+            key={g.label}
+            type="button"
+            role="tab"
+            id={`logo-tab-${i}`}
+            aria-selected={i === active}
+            aria-controls="logo-tabpanel"
+            onClick={() => setActive(i)}
+            className={cx(
+              "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+              i === active
+                ? "bg-text text-bg dark:bg-white dark:text-black"
+                : "bg-bg-mute text-text-mute hover:text-text",
+            )}
+          >
+            {g.label}
+          </button>
+        ))}
+      </div>
+      <div
+        role="tabpanel"
+        id="logo-tabpanel"
+        aria-labelledby={`logo-tab-${active}`}
+        className="min-h-[168px]"
+      >
+        <LogoGrid
+          key={group.label}
+          items={items}
+          className="!mt-6 md:!mt-8 [&>*]:animate-logo-in motion-reduce:[&>*]:animate-none"
+        />
+      </div>
+    </div>
+  );
+}
+
+/* 8. Spotlight: the marquee, with a dot on logos that have a story and a hover label (inngest.com) */
+
+function LogoSpotlight() {
+  return (
+    <div className="mt-16 md:mt-24">
+      <MarqueeTrack
+        items={logos}
+        secondsPerLogo={2.8}
+        gapClass="gap-x-10 gap-y-4 motion-safe:pr-10 md:gap-x-16 md:gap-y-6 md:motion-safe:pr-16"
+        renderItem={(item, hidden) => (
+          <LogoLink
+            item={item}
+            hidden={hidden}
+            className={cx(
+              "group/logo relative flex h-20 items-center text-text-mute transition-colors dark:text-text [&_img]:opacity-60",
+              item.slug &&
+                "hover:text-text dark:hover:text-white [&_img]:hover:opacity-100",
+            )}
+          >
+            <item.Logo
+              role="img"
+              aria-label={item.name}
+              style={{ height: item.h ?? 24 }}
+              className="w-auto"
+            />
+            {item.slug && (
+              <>
+                <span
+                  aria-hidden
+                  className="absolute -right-2.5 top-5 size-1.5 rounded-full bg-primary"
+                />
+                <span className="absolute inset-x-0 bottom-0 whitespace-nowrap text-center text-xs font-medium text-primary opacity-0 transition-opacity group-hover/logo:opacity-100 group-focus-visible/logo:opacity-100">
+                  Read story →
+                </span>
+              </>
+            )}
+          </LogoLink>
+        )}
+      />
+      <p className="mt-2 flex items-center justify-center gap-2 text-sm text-text-mute">
+        <span aria-hidden className="size-1.5 rounded-full bg-primary" />
+        Customer story
+      </p>
+    </div>
   );
 }
