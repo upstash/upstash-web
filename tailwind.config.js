@@ -14,6 +14,14 @@ module.exports = {
           from: { transform: "translateX(0)" },
           to: { transform: "translateX(-50%)" },
         },
+        "roll-in": {
+          from: { transform: "translateY(100%)" },
+          to: { transform: "translateY(0)" },
+        },
+        "roll-out": {
+          from: { transform: "translateY(0)" },
+          to: { transform: "translateY(-100%)" },
+        },
         "logo-in": {
           from: {
             opacity: "0",
@@ -25,6 +33,8 @@ module.exports = {
       },
       animation: {
         "logo-in": "logo-in 0.6s ease-out both",
+        "roll-in": "roll-in 0.7s ease-in-out both",
+        "roll-out": "roll-out 0.7s ease-in-out both",
       },
       colors: {
         bg: "var(--color-bg)",

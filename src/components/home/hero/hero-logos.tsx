@@ -454,13 +454,13 @@ const ROLL_MS = 2600;
 const ROLL_ROW = "h-16";
 
 function LogoRoll() {
-  // One row, sized to the viewport: 3 / 4 / 6 cells. Remounting on change
+  // One row, sized to the viewport: 2 / 4 / 6 cells. Remounting on change
   // restarts the roll from the top names.
   const [cols, setCols] = useState(6);
   useEffect(() => {
     const lg = window.matchMedia("(min-width: 1024px)");
     const sm = window.matchMedia("(min-width: 640px)");
-    const update = () => setCols(lg.matches ? 6 : sm.matches ? 4 : 3);
+    const update = () => setCols(lg.matches ? 6 : sm.matches ? 4 : 2);
     update();
     lg.addEventListener("change", update);
     sm.addEventListener("change", update);
@@ -489,10 +489,10 @@ function RollRow({ cols }: { cols: number }) {
       ),
     [cols],
   );
-  // pos[c] runs 0..length; at `length` the column shows a copy of its first
-  // logo. The next tick jumps back to 0 (same picture, no transition) and
-  // then rolls on, so wrapping never depends on transitionend.
-  const [pos, setPos] = useState(() => columns.map(() => 0));
+  // One counter drives every column: column c shows col[tick % length] and
+  // rolls the previous logo out. Keys change each tick to replay the CSS
+  // animations, so there is no position or wrap state to keep in sync.
+  const [tick, setTick] = useState(0);
   const [paused, pauseHandlers] = usePause();
 
   useEffect(() => {
@@ -502,28 +502,9 @@ function RollRow({ cols }: { cols: number }) {
     ) {
       return;
     }
-    let frame = 0;
-    const id = setInterval(() => {
-      // A hidden tab runs no frames; skip so steps don't pile up.
-      if (document.hidden) {
-        return;
-      }
-      cancelAnimationFrame(frame);
-      setPos((prev) => prev.map((p, c) => (p >= columns[c].length ? 0 : p)));
-      // Two frames so the jump back paints before the roll starts.
-      frame = requestAnimationFrame(() => {
-        frame = requestAnimationFrame(() =>
-          setPos((prev) =>
-            prev.map((p, c) => Math.min(p + 1, columns[c].length)),
-          ),
-        );
-      });
-    }, ROLL_MS);
-    return () => {
-      clearInterval(id);
-      cancelAnimationFrame(frame);
-    };
-  }, [paused, columns]);
+    const id = setInterval(() => setTick((t) => t + 1), ROLL_MS);
+    return () => clearInterval(id);
+  }, [paused]);
 
   return (
     <div
@@ -532,60 +513,61 @@ function RollRow({ cols }: { cols: number }) {
       {...pauseHandlers}
     >
       {columns.map((col, c) => {
-        // The first logo is repeated at the end so the roll wraps seamlessly.
-        const stack = [...col, col[0]];
+        const item = col[tick % col.length];
+        const prev = tick > 0 ? col[(tick - 1) % col.length] : null;
+        // Staggered left to right; `both` holds each layer at its start
+        // position during the delay.
+        const delay = { animationDelay: `${c * 90}ms` };
         return (
-          <div key={col[0].name} className={cx(ROLL_ROW, "overflow-hidden")}>
+          // overflow-clip, not hidden: a clipped box can't be scrolled by focus.
+          <div
+            key={col[0].name}
+            className={cx(ROLL_ROW, "relative overflow-clip")}
+          >
+            {prev && (
+              <div
+                key={`out-${tick}`}
+                aria-hidden
+                className="absolute inset-0 flex animate-roll-out items-center justify-center px-1"
+                style={delay}
+              >
+                <RollLogo item={prev} hidden />
+              </div>
+            )}
             <div
+              key={`in-${tick}`}
               className={cx(
-                "flex flex-col",
-                // Position 0 is only ever reached by the jump back, which must be
-                // instant: no transition and no delay (a delayed 0s transition
-                // would still hold the old position and make the roll rewind).
-                pos[c] > 0 && "transition-transform duration-700 ease-in-out",
+                "absolute inset-0 flex items-center justify-center px-1",
+                prev && "animate-roll-in",
               )}
-              style={{
-                transform: `translateY(${-pos[c] * (100 / stack.length)}%)`,
-                transition: pos[c] > 0 ? undefined : "none",
-                transitionDelay: pos[c] > 0 ? `${c * 90}ms` : undefined,
-              }}
+              style={delay}
             >
-              {stack.map((item, i) => {
-                const shown = i === pos[c];
-                return (
-                  <div
-                    // biome-ignore lint/suspicious/noArrayIndexKey: the wrap copy repeats a name
-                    key={i}
-                    aria-hidden={!shown || undefined}
-                    inert={!shown}
-                    className={cx(
-                      ROLL_ROW,
-                      // px-1 keeps the focus ring inside the clipped cell.
-                      "flex items-center justify-center px-1",
-                    )}
-                  >
-                    <LogoLink
-                      item={item}
-                      className={cx(
-                        "flex max-w-full items-center text-text-mute transition-colors dark:text-text [&_img]:opacity-60",
-                        item.slug && "hover:text-primary dark:hover:text-white",
-                      )}
-                    >
-                      <item.Logo
-                        role="img"
-                        aria-label={item.name}
-                        style={{ height: item.h ?? 24 }}
-                        className="w-auto max-w-full"
-                      />
-                    </LogoLink>
-                  </div>
-                );
-              })}
+              <RollLogo item={item} />
             </div>
           </div>
         );
       })}
     </div>
+  );
+}
+
+function RollLogo({ item, hidden }: { item: LogoItem; hidden?: boolean }) {
+  return (
+    <LogoLink
+      item={item}
+      hidden={hidden}
+      className={cx(
+        "flex max-w-full items-center text-text-mute transition-colors dark:text-text [&_img]:opacity-60",
+        item.slug && "hover:text-primary dark:hover:text-white",
+      )}
+    >
+      <item.Logo
+        role="img"
+        aria-label={hidden ? undefined : item.name}
+        style={{ height: item.h ?? 24 }}
+        className="w-auto max-w-full"
+      />
+    </LogoLink>
   );
 }
 
