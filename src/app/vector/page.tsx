@@ -12,7 +12,7 @@ import type { Metadata } from "next";
 
 const title = "Serverless Vector Database";
 const description =
-  "Upstash Vector is a serverless vector database for RAG, semantic search, and AI apps: built-in embedding models, hybrid search, metadata filtering, and namespaces, priced per request with no idle cost.";
+  "Upstash Vector is a serverless vector database for RAG, semantic search, and AI apps: built-in embedding models, hybrid search, metadata filtering, and namespaces, priced per request and per GB stored.";
 
 export const metadata: Metadata = {
   title,

@@ -51,7 +51,7 @@ export const FEATURES: SectionFeaturesProps = {
     {
       icon: <IconDeviceFloppy className="size-5" stroke={1.5} />,
       title: "Durable steps",
-      desc: "Each step's result is saved once it completes. A crash or redeploy resumes the run from the last finished step.",
+      desc: "Each step's result is saved once it completes. If a step fails or the function crashes, the run resumes from the last finished step.",
     },
     {
       icon: <IconHourglass className="size-5" stroke={1.5} />,
@@ -61,7 +61,7 @@ export const FEATURES: SectionFeaturesProps = {
     {
       icon: <IconClockHour4 className="size-5" stroke={1.5} />,
       title: "Sleep for days",
-      desc: "Pause a run for minutes or months with context.sleep. Nothing runs while it waits, and the whole sleep counts as one step.",
+      desc: "Pause a run for minutes or days with context.sleep, up to a year on pay as you go. Nothing runs while it waits, and the whole sleep counts as one step.",
     },
     {
       icon: <IconBellRinging className="size-5" stroke={1.5} />,
@@ -81,7 +81,7 @@ export const FEATURES: SectionFeaturesProps = {
     {
       icon: <IconGauge className="size-5" stroke={1.5} />,
       title: "Flow control",
-      desc: "Limit how many runs execute at once and how fast, to protect databases and third-party API quotas.",
+      desc: "Limit how many steps run at once and how fast, to protect databases and third-party API quotas.",
     },
     {
       icon: <IconCode className="size-5" stroke={1.5} />,
@@ -115,7 +115,7 @@ export const USE_CASES: SectionUseCasesProps = {
     {
       title: "Webhook processing",
       desc: "Create a webhook URL inside a run and wait for the third-party callback to arrive.",
-      href: "https://upstash.com/docs/workflow/howto/use-webhooks",
+      href: "https://upstash.com/docs/workflow/features/webhooks",
     },
     {
       title: "Scheduled workflows",
@@ -139,9 +139,9 @@ export const WHAT_IS: SectionWhatIsProps = {
       <p>
         <strong>Durable execution</strong> means a function's progress is saved
         as it runs. The work is split into steps, and each step's result is
-        recorded once it completes. If the process crashes, times out, or is
-        redeployed halfway through, it resumes from the last completed step
-        instead of starting over or leaving work half done.
+        recorded once it completes. If the process crashes or times out halfway
+        through, it resumes from the last completed step instead of starting
+        over or leaving work half done.
       </p>
       <p>
         Serverless functions are the opposite by default. They have short time

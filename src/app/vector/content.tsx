@@ -28,10 +28,10 @@ export const HERO: SectionHeroProps = {
   ),
   description: (
     <>
-      Upstash Vector stores embeddings and finds the closest matches in
-      milliseconds. Upsert raw text and let a built-in model embed it, combine
-      semantic and keyword search, filter on metadata, and pay per request with
-      no idle cost.
+      Upstash Vector stores embeddings and finds the closest matches with low
+      latency. Upsert raw text and let a built-in model embed it, combine
+      semantic and keyword search, filter on metadata, and pay per request, so
+      an idle index costs only its storage.
     </>
   ),
   gradient: "to-orange-300",
@@ -47,7 +47,7 @@ export const HERO: SectionHeroProps = {
 export const FEATURES: SectionFeaturesProps = {
   title: "Why Upstash Vector",
   description:
-    "A vector database that scales from a prototype to billions of vectors without a cluster to size.",
+    "A vector database that scales from a prototype to production without a cluster to size.",
   items: [
     {
       icon: <IconBrain className="size-5" stroke={1.5} />,
@@ -72,7 +72,7 @@ export const FEATURES: SectionFeaturesProps = {
     {
       icon: <IconArrowsMaximize className="size-5" stroke={1.5} />,
       title: "Scales on disk",
-      desc: "A disk-based index keeps large datasets fast and affordable, from thousands to billions of vectors.",
+      desc: "A disk-based index keeps large datasets fast and affordable, from thousands to millions of vectors.",
     },
     {
       icon: <IconWorldWww className="size-5" stroke={1.5} />,
@@ -120,7 +120,7 @@ export const USE_CASES: SectionUseCasesProps = {
     },
     {
       title: "LangChain pipelines",
-      desc: "Use Upstash Vector as the vector store behind LangChain retrievers and agents.",
+      desc: "Use Upstash Vector as the vector store for semantic search in LangChain.",
       href: "https://upstash.com/docs/vector/tutorials/langchain",
     },
     {
@@ -163,7 +163,7 @@ export const WHAT_IS: SectionWhatIsProps = {
 export const CTA: SectionCtaProps = {
   title: "Create your first index in seconds",
   description:
-    "Start on the free tier with 10,000 queries a day and 1 GB of data. No credit card required.",
+    "Start on the free tier with 10,000 queries and updates a day and 1 GB of data. No credit card required.",
   gradient: "to-orange-400",
   primaryAction: {
     href: "https://console.upstash.com/vector",
