@@ -154,9 +154,9 @@ export const WHAT_IS: SectionWhatIsProps = {
       <p>
         <strong>Upstash QStash</strong> flips the model. Instead of your code
         pulling messages, QStash pushes each one to your endpoint as an HTTP
-        request and keeps retrying until it succeeds. Anything that can serve
-        HTTP can be a consumer, and every request is signed so your endpoint can
-        verify it came from QStash.
+        request and retries failed deliveries, moving any that still fail to a
+        dead letter queue. Anything that can serve HTTP can be a consumer, and
+        every request is signed so your endpoint can verify it came from QStash.
       </p>
     </>
   ),
