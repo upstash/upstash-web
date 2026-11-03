@@ -300,7 +300,7 @@ function LogoMarquee() {
             className={cx(
               // Clay is a bitmap that ignores currentColor; mute it to match.
               "flex h-12 items-center text-text-mute transition-colors dark:text-text [&_img]:opacity-60",
-              item.slug && "hover:text-primary dark:hover:text-white",
+              item.slug && "hover:text-primary",
             )}
           >
             <item.Logo
@@ -560,7 +560,7 @@ function RollLogo({ item, hidden }: { item: LogoItem; hidden?: boolean }) {
       hidden={hidden}
       className={cx(
         "pointer-events-auto flex max-w-full items-center text-text-mute transition-colors dark:text-text [&_img]:opacity-60",
-        item.slug && "hover:text-primary dark:hover:text-white",
+        item.slug && "hover:text-primary",
       )}
     >
       <item.Logo
@@ -740,7 +740,7 @@ function LogoSpotlight() {
             hidden={hidden}
             className={cx(
               "group/logo relative flex h-20 items-center text-text-mute transition-colors dark:text-text [&_img]:opacity-60",
-              item.slug && "hover:text-text dark:hover:text-white",
+              item.slug && "hover:text-primary",
             )}
           >
             <item.Logo
