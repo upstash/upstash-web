@@ -1,24 +1,12 @@
 {
   "redirects": [
     {
-      "source": "/qstash",
-      "destination": "https://upstash.com/docs/qstash"
+      "source": "/qstash/:path+",
+      "destination": "https://upstash.com/docs/qstash/:path+"
     },
     {
-      "source": "/qstash/:path*",
-      "destination": "https://upstash.com/docs/qstash/:path*"
-    },
-    {
-      "source": "/workflow",
-      "destination": "https://upstash.com/docs/workflow"
-    },
-    {
-      "source": "/workflow/:path*",
-      "destination": "https://upstash.com/docs/workflow/:path*"
-    },
-    {
-      "source": "/vector",
-      "destination": "https://upstash.com/docs/vector"
+      "source": "/workflow/:path+",
+      "destination": "https://upstash.com/docs/workflow/:path+"
     },
     {
       "source": "/box/:path+",
