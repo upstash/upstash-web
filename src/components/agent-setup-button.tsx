@@ -301,19 +301,25 @@ export default function AgentSetupButton({
         }
       }}
     >
-      {/* The 2px emerald-to-amber border is the wrapper's gradient showing
-          through a 2px inset, so the inner radius is the outer 12px minus it. */}
-      <span className="inline-flex rounded-xl bg-gradient-to-r from-emerald-400 to-amber-300 p-0.5">
-        <button
-          type="button"
-          aria-haspopup="menu"
-          aria-expanded={open}
-          onClick={() => onCopy(PRIMARY_OPTION)}
+      {/* The console's agent setup split button (Figma cr5vFlRDSA4fKuI3ql1dUz,
+          node 1762:2515), kept at 44px to line up with "Start for Free". One
+          button for both segments, so the hover covers the whole control. */}
+      <button
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => onCopy(PRIMARY_OPTION)}
+        className={cx(
+          "group flex h-11 items-stretch overflow-hidden rounded-lg border border-emerald-500",
+          // A 10% emerald-to-yellow wash over the page colour, per the design.
+          "bg-[linear-gradient(90deg,rgba(16,185,129,0.1),rgba(234,179,8,0.1)),linear-gradient(white,white)]",
+          "dark:bg-[linear-gradient(90deg,rgba(16,185,129,0.1),rgba(234,179,8,0.1)),linear-gradient(#18181b,#18181b)]",
+        )}
+      >
+        <span
           className={cx(
-            // Same 20px inset as "Start for Free" beside it.
-            "flex h-10 items-center gap-2.5 rounded-[10px] bg-white px-5",
-            "text-base font-medium text-emerald-800 transition hover:bg-emerald-50",
-            "dark:bg-zinc-900 dark:text-emerald-400 dark:hover:bg-zinc-800",
+            "flex items-center gap-2.5 px-4 text-base font-medium text-emerald-800 transition",
+            "group-hover:bg-emerald-500/10 dark:text-emerald-400",
           )}
         >
           <span className="flex items-center" aria-hidden="true">
@@ -339,12 +345,23 @@ export default function AgentSetupButton({
           >
             Set up your agent
           </CrossFade>
+        </span>
+        <span
+          className={cx(
+            "flex w-11 items-center justify-center border-l border-black/10 transition",
+            "group-hover:bg-emerald-500/10 dark:border-white/10",
+          )}
+        >
           <IconChevronDown
-            size={20}
-            className={cx("transition-transform", open && "rotate-180")}
+            size={18}
+            stroke={1.4}
+            className={cx(
+              "text-emerald-800/50 transition-transform dark:text-emerald-400/60",
+              open && "rotate-180",
+            )}
           />
-        </button>
-      </span>
+        </span>
+      </button>
       {menu}
     </div>
   );
