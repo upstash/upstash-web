@@ -60,7 +60,7 @@ Because the agent runs inside the box, the platform can see what it does. That's
 
 On **pricing**, Box bills active CPU only and leaves memory free. Agent work spends most of its time waiting on the model, so not paying for that idle time makes it clearly cheaper than wall-clock billing.
 
-The **free plan** is real: ten concurrent boxes, five CPU-hours a month, and a small managed model budget, with no platform fee. A box also auto-pauses when idle and wakes weeks later with its files intact, so a long-lived box per user costs almost nothing between sessions.
+The **free plan** is real: ten concurrent boxes and five CPU-hours a month, with no platform fee. Agents use your own model provider key (Anthropic, OpenAI, OpenRouter, ...). A box also auto-pauses when idle and wakes weeks later with its files intact, so a long-lived box per user costs almost nothing between sessions.
 
 **When to use it:** when you care about shipping fast, seeing what the agent does, and not paying for idle time, whether you lean on the built-in agent or point your own loop at the box. The easiest, and usually cheapest, starting point for coding agents and per-user agents.
 

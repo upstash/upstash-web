@@ -18,11 +18,11 @@
     },
     {
       "question": "What are the free tier limits?",
-      "answer": "The free tier includes up to 10 concurrent boxes, 5 CPU hours per month, and $1 of LLM token usage per month. After the token limit, the API returns 400 Bad Request."
+      "answer": "The free tier includes up to 10 concurrent boxes and 5 CPU hours per month. Agents use your own model provider key."
     },
     {
-      "question": "How does LLM token usage work?",
-      "answer": "Each box includes Upstash-provided LLM token usage for the built-in AI agent. On the Free plan, this is capped at $1 per month. On Pay as you go, the cap is $100 per month. After the limit is reached, you can either contact us to increase it or bring your own key (BYOK) for any LLM provider, which is available on all plans."
+      "question": "How is model usage billed?",
+      "answer": "Agents use your own model provider key (Anthropic, OpenAI, OpenRouter, ...). Set it on the box or save it on your account. Upstash does not provide or bill model usage. Agent runs, scheduled runs and browser AI calls need a key. Shell, files, git, SSH, previews and browser CDP work without one."
     },
     {
       "question": "Can I run more than 1,000 concurrent boxes?",

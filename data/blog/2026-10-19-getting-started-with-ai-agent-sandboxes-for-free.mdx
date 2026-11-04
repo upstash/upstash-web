@@ -48,7 +48,7 @@ Setup takes a few minutes:
 npm install @upstash/box dotenv
 ```
 
-3. Make a file called `.env` and paste your key into it. The Anthropic key is optional and only used in the bring-your-own-key variant of the agent example:
+3. Make a file called `.env` and paste your key into it. The Anthropic key is only needed for the coding agent example, since agents run on your own model provider key:
 
 ```text
 UPSTASH_BOX_API_KEY=box_xxxxxxxxxxxxxxxxxxxxxxxx
@@ -67,10 +67,10 @@ Here's what the [free plan](https://upstash.com/pricing/box) gives you:
 | CPU hours per month | 5 |
 | Size of each box | 2 CPU cores, 4 GB memory, 10 GB storage |
 | Idle timeout | 1 hour |
-| Built-in agent tokens | $1 per month (or bring your own key) |
+| Agent model usage | Your own provider key (Anthropic, OpenAI, OpenRouter, ...) |
 | Languages | Node.js, Python, Go, Ruby, Rust |
 
-After you consume the $1 of built-in agent tokens for a month, the agent API will return a 400 error until the next month. If you provide your own Anthropic or OpenAI key, it bypasses the built-in allowance, but you are still subject to your provider's charges and limits.
+Agents use your own model provider key (Anthropic, OpenAI, OpenRouter, ...), so model usage is billed by your provider and subject to its limits. Shell commands, files, git and previews work without a model key.
 
 ## Create a box and run your first command
 
@@ -168,7 +168,7 @@ While we have so far been driving the code that’s being run, a coding agent ca
 
 ![](https://cdn.bydefault.so/drawing-Pvwlcz5BLmhRwVRhS6d1S.png)
 
-Box can start popular coding agents for you, like [Claude Code, Codex, or OpenCode](https://upstash.com/docs/box/overall/agent). You pick the harness and model when you create the box. This example uses Claude Code with Claude Haiku 4.5 on the free plan's built-in tokens, so no model key is needed:
+Box can start popular coding agents for you, like [Claude Code, Codex, or OpenCode](https://upstash.com/docs/box/overall/agent). You pick the harness and model when you create the box. This example uses Claude Code with Claude Haiku 4.5 and your Anthropic key:
 
 ```ts
 import "dotenv/config"
@@ -179,6 +179,7 @@ const box = await Box.create({
   agent: {
     harness: Agent.ClaudeCode,
     model: ClaudeCode.Haiku_4_5,
+    apiKey: process.env.ANTHROPIC_API_KEY,
   },
 })
 
@@ -237,11 +238,9 @@ Fizz
 Box deleted
 ```
 
-This task ran for about 8 seconds, costing under 6 cents of the $1 monthly allowance, and our script then read the file and ran it with a plain shell command. We can see that the agent left some work in the box.
+This task ran for about 8 seconds, costing under 6 cents of Anthropic usage, and our script then read the file and ran it with a plain shell command. We can see that the agent left some work in the box.
 
-Notice the token counts: about 108K cached input tokens versus 26 fresh ones, on a 15-line task. This size of task would fit the free allowance about 17 times a month, roughly. Larger tasks will cost more.
-
-To use your own model key instead, add `apiKey: process.env.ANTHROPIC_API_KEY` to the agent config. This switches billing to Anthropic, and the built-in allowance is no longer applied.
+Notice the token counts: about 108K cached input tokens versus 26 fresh ones, on a 15-line task. A dollar of model usage covers this size of task about 17 times, roughly. Larger tasks will cost more.
 
 ## Pause, snapshot, and clean up
 
@@ -331,7 +330,7 @@ The free plan stops fitting when you need more than 10 concurrent boxes, more th
 | CPU hours | 5 per month | Unlimited | Unlimited, included |
 | Storage | 10 GB per box, free | $0.10 per GB per month, snapshots included | Included |
 | Idle timeout | 1 hour | 6 hours | Never |
-| LLM token budget | $1 per month | Up to $100 per month | Up to $100 per month |
+| Model usage | Your own provider key | Your own provider key | Your own provider key |
 
 Our **Pay as you go** pricing model is billed for active CPU, and memory is free. If you use 100% of 2 cores for an hour, it will cost $0.20. It's intended for agents that wake up, perform some activity, and then quiet down, such as those described in this article.
 

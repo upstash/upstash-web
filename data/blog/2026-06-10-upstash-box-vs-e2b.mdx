@@ -135,9 +135,9 @@ The billing models reflect the two designs. E2B charges per-second wall-clock fo
 | Memory | Free | $0.0162 / GiB-hr, wall-clock |
 | Storage | $0.10 / GB-month (snapshots included) | included up to plan disk limit (10 GiB Hobby, 20+ GiB Pro) |
 | Continuous runtime | Keep-alive, flat $8 / $16 / $32 per month | up to 24 hr on Pro; paused sandboxes resume later |
-| Free tier | 10 concurrent, 5 CPU-hrs/mo, $1 LLM budget | $100 one-time credit, 20 concurrent, 1 hr max |
+| Free tier | 10 concurrent, 5 CPU-hrs/mo | 20 concurrent, 1 hr max |
 
-Because the agent lives in the box, Box also meters LLM tokens for you, capped at $1/month on Free and a $100/month budget on Pay as you go. Full numbers live on the [Box pricing page](https://upstash.com/pricing/box).
+Agents in the box use your own model provider key (Anthropic, OpenAI, OpenRouter, ...), so model usage is billed by your provider. Full numbers live on the [Box pricing page](https://upstash.com/pricing/box).
 
 A `small` Box (2 vCPU, 4 GB) against a custom, matched E2B sandbox (2 vCPU, 4 GiB ≈ $0.166/hr wall-clock here), for a task that idles on I/O. These are usage-only figures, excluding E2B's $150/mo Pro base fee:
 

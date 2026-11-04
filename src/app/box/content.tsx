@@ -165,7 +165,7 @@ export const WHAT_IS: SectionWhatIsProps = {
 export const CTA: SectionCtaProps = {
   title: "Run your first agent in minutes",
   description:
-    "Start on the free tier with 10 concurrent boxes, 5 CPU hours a month and $1 of model usage. No credit card required.",
+    "Start on the free tier with 10 concurrent boxes and 5 CPU hours a month. No credit card required.",
   gradient: "to-sky-500",
   primaryAction: {
     href: "https://console.upstash.com/box",

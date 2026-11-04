@@ -217,8 +217,8 @@ List prices, pay-as-you-go. Many providers have a plan with no monthly fee but g
 
 | Provider | Billing basis | CPU | Memory | Free tier | Idle cost |
 | --- | --- | --- | --- | --- | --- |
-| **Upstash Box** | **Active core-hours only** | **$0.10 / $0.20 / $0.40 per active CPU-hour** for small (2 vCPU), medium (4), large (8) | **Free** | 10 boxes, 5 CPU-h/mo, $1 LLM budget, no card | Paused: $0 compute, $0.10/GB-mo storage. Keep-alive flat $8 / $16 / $32 per month |
-| E2B | Wall-clock per second | $0.0504/vCPU-h | $0.0162/GiB-h | $100 one-time credit, 20 concurrent, 1h sessions | Paused: $0 |
+| **Upstash Box** | **Active core-hours only** | **$0.10 / $0.20 / $0.40 per active CPU-hour** for small (2 vCPU), medium (4), large (8) | **Free** | 10 boxes, 5 CPU-h/mo, no card | Paused: $0 compute, $0.10/GB-mo storage. Keep-alive flat $8 / $16 / $32 per month |
+| E2B | Wall-clock per second | $0.0504/vCPU-h | $0.0162/GiB-h | 20 concurrent, 1h sessions | Paused: $0 |
 | Daytona | Wall-clock per second | $0.0504/vCPU-h | $0.0162/GiB-h | $200 credit | Stopped: disk only |
 | Modal | Wall-clock, max(request, actual) | ~$0.142 per physical core-h (2 vCPU); 3x its Function rate | ~$0.024/GiB-h | $30/mo credit | No pause state |
 | Vercel Sandbox | Active CPU + provisioned memory | $0.128/active vCPU-h | $0.0212/GB-h | 5 active CPU-h, 420 GB-h, 10 concurrent | Stopped: snapshot storage only |
@@ -289,7 +289,7 @@ const run = await box.agent.run({
 console.log(run.result, run.cost.totalUsd)
 ```
 
-The free tier is 10 concurrent boxes, 5 CPU-hours a month, and a $1 model budget, with no card and no platform fee. The [quickstart](https://upstash.com/docs/box/overall/quickstart) takes a few minutes.
+The free tier is 10 concurrent boxes and 5 CPU-hours a month, with no card and no platform fee. Agents use your own model provider key (Anthropic, OpenAI, OpenRouter, ...). The [quickstart](https://upstash.com/docs/box/overall/quickstart) takes a few minutes.
 
 ## Sources
 
