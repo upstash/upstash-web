@@ -171,9 +171,9 @@ Box charges **active CPU only, in core-hours**, and leaves **memory free**. The 
 | Memory | Free | $0.0162 / GiB-hr, wall-clock |
 | Storage | $0.10 / GB-month (snapshots included) | $0.000108 / GiB-hr, 5 GB free |
 | GPU | Not available | H100 $2.27/hr, RTX PRO 6000 $1.74/hr (preemptible) |
-| Free tier | 10 concurrent, 5 CPU-hrs/mo, $1 LLM budget | $200 one-time credits |
+| Free tier | 10 concurrent, 5 CPU-hrs/mo | $200 one-time credits |
 
-Because the agent lives in the box, Box also meters LLM tokens for you, capped at $1/month on Free and a $100/month budget on Pay as you go. Full numbers are on the [Box pricing page](https://upstash.com/pricing/box).
+Agents in the box use your own model provider key (Anthropic, OpenAI, OpenRouter, ...), so model usage is billed by your provider. Full numbers are on the [Box pricing page](https://upstash.com/pricing/box).
 
 The key difference isn't the platform fee (neither has one here), it's **what gets metered**. Daytona bills every second the sandbox is up, for both vCPU and memory. Box bills only the core-hours your code actually burns, and never bills memory. Agent work spends most of its wall-clock *waiting*, on model inference or a slow API, so this matters a lot.
 

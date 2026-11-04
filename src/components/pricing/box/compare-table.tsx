@@ -370,8 +370,8 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
-            <Tooltip content="Bring Your Own Key — use your own API keys from any LLM provider like OpenAI, Anthropic, etc.">
-              LLM BYOK
+            <Tooltip content="Agents use your own model provider key (Anthropic, OpenAI, OpenRouter, ...). Upstash does not provide or bill model usage.">
+              Own Model Provider Key
             </Tooltip>
           </th>
           <Col plan={showFree}>

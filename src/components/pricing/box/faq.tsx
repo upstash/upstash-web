@@ -90,30 +90,21 @@ export default function FAQ() {
             <li>
               <b>5 CPU hours</b> per month.
             </li>
-            <li>
-              <b>$1</b> of LLM token usage per month. After that, the API
-              returns <code>400 Bad Request</code>.
-            </li>
           </ul>
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-7">
-        <AccordionTrigger>How does LLM token usage work?</AccordionTrigger>
+        <AccordionTrigger>How is model usage billed?</AccordionTrigger>
         <AccordionContent>
           <ul className="mt-4 list-disc space-y-2 pl-6">
             <li>
-              Each box includes Upstash-provided LLM token usage for the
-              built-in AI agent. On the Free plan, this is capped at{" "}
-              <b>$1 per month</b>. On Pay as you go, the cap is{" "}
-              <b>$100 per month</b>.
+              Agents use your own model provider key (Anthropic, OpenAI,
+              OpenRouter, ...). Set it on the box or save it on your account.
+              Upstash does not provide or bill model usage.
             </li>
             <li>
-              After the limit is reached, you can either contact us to increase
-              it or bring your own key (BYOK).
-            </li>
-            <li>
-              You can also <b>bring your own key (BYOK)</b> for any LLM
-              provider, which is available on all plans.
+              Agent runs, scheduled runs and browser AI calls need a key. Shell,
+              files, git, SSH, previews and browser CDP work without one.
             </li>
           </ul>
         </AccordionContent>
