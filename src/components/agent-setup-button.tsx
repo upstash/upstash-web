@@ -343,7 +343,7 @@ export default function AgentSetupButton({
             swapped={isPrimaryCopied}
             alt={<span className="text-primary">Copied</span>}
           >
-            Set up your agent
+            Copy agent prompt
           </CrossFade>
         </span>
         <span
