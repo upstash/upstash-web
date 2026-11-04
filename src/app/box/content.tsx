@@ -36,7 +36,6 @@ export const HERO: SectionHeroProps = {
     </>
   ),
   gradient: "to-sky-400",
-  titleClassName: "pb-[0.15em]",
   primaryAction: {
     href: "https://console.upstash.com/box",
     label: "Create Box",
@@ -168,7 +167,6 @@ export const CTA: SectionCtaProps = {
   description:
     "Start on the free tier with 10 concurrent boxes, 5 CPU hours a month and $1 of model usage. No credit card required.",
   gradient: "to-sky-500",
-  titleClassName: "pb-[0.15em]",
   primaryAction: {
     href: "https://console.upstash.com/box",
     label: "Create Box",
