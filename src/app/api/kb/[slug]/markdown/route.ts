@@ -10,7 +10,7 @@ import { SITE_URL } from "@/utils/const";
 export const dynamic = "force-dynamic";
 
 export async function GET(
-  request: Request,
+  _request: Request,
   props: { params: Promise<{ slug: string }> },
 ): Promise<Response> {
   const { slug } = await props.params;
@@ -25,10 +25,11 @@ export async function GET(
     return kbUnavailable();
   }
   if (blogSlug) {
-    return Response.redirect(
-      new URL(`/blog/${blogSlug}.md`, request.url),
-      308,
-    );
+    // Relative, so a preview stays on its own host.
+    return new Response(null, {
+      status: 308,
+      headers: { Location: `/blog/${blogSlug}.md` },
+    });
   }
 
   if (!article) {
