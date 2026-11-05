@@ -39,7 +39,11 @@ module.exports = {
     return { loc: path, changefreq: config.changefreq, priority: config.priority, lastmod: new Date().toISOString() };
   },
   robotsTxtOptions: {
-    additionalSitemaps: ["https://upstash.com/docs/sitemap.xml"],
+    additionalSitemaps: [
+      "https://upstash.com/docs/sitemap.xml",
+      // read from ByDefault on request: src/app/kb/sitemap.xml/route.ts
+      "https://upstash.com/kb/sitemap.xml",
+    ],
     policies: [
       { userAgent: "Twitterbot", allow: "/" },
       {
