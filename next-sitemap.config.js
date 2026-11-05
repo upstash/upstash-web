@@ -10,6 +10,11 @@ module.exports = {
   // a sitemap of its own, listed below; its pages stay here too
   exclude: ["/kb/sitemap.xml"],
   transform: async (config, path) => {
+    // listed here as a fallback; /kb/sitemap.xml has their real lastmod
+    if (path === "/kb" || path.startsWith("/kb/")) {
+      return { loc: path, changefreq: config.changefreq, priority: config.priority };
+    }
+
     if (path === "/") {
       return { loc: path, changefreq: "daily", priority: 1.0, lastmod: new Date().toISOString() };
     }

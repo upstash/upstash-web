@@ -6,11 +6,10 @@ import { SITE_URL } from "@/utils/const";
 // deploy at the next one; this one is cached like the articles themselves
 // (an hour, and ByDefault's webhook refreshes it on publish).
 //
-// When ByDefault is down nothing is lost: a failed hourly refresh throws,
-// so the last good copy keeps being served; a failed build leaves this route
-// to render on request instead; and the deploy-time sitemap still lists
-// every article it was built with, so crawlers keep those URLs even when
-// this one errors.
+// When ByDefault is down: a failed hourly refresh throws, so the last good
+// copy keeps being served, and a failed build leaves this route to render
+// on request instead. After a successful build the deploy-time sitemap lists
+// the same pages too, so crawlers keep them even when this one errors.
 
 export const revalidate = 3600;
 
