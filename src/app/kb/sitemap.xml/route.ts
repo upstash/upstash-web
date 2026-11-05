@@ -3,12 +3,15 @@ import { SITE_URL } from "@/utils/const";
 
 // The knowledge base's own sitemap, listed in /sitemap.xml and robots.txt.
 // The deploy-time sitemap only learns of articles published since the last
-// deploy at the next one; this one reads ByDefault on request, so a new
-// article is listed within a minute of its webhook. The deploy-time sitemap
-// keeps listing the articles it was built with, so when ByDefault is down
-// search engines lose nothing they knew.
+// deploy at the next one; this one is cached like the articles themselves
+// (an hour, and ByDefault's webhook refreshes it on publish).
+//
+// When ByDefault is down nothing is lost: a failed refresh throws, so the
+// last good copy keeps being served; a failed build leaves this route to
+// render on request instead; and the deploy-time sitemap still lists every
+// article it was built with.
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 const xml = (value: string) =>
   value
@@ -31,15 +34,7 @@ const entry = (path: string, lastmod: string | null) =>
   }</url>`;
 
 export async function GET(): Promise<Response> {
-  const articles = await getKbArticles().catch(() => null);
-  if (!articles) {
-    // Crawlers retry a failed sitemap and keep the URLs they already have;
-    // an empty one would tell them nothing is here.
-    return new Response("Knowledge base unavailable, try again later.\n", {
-      status: 503,
-      headers: { "Content-Type": "text/plain", "Retry-After": "600" },
-    });
-  }
+  const articles = await getKbArticles();
 
   const urls = [
     entry("/kb", newest(articles)),
@@ -57,10 +52,7 @@ export async function GET(): Promise<Response> {
   return new Response(
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`,
     {
-      headers: {
-        "Content-Type": "application/xml; charset=utf-8",
-        "Cache-Control": "public, max-age=0, s-maxage=60",
-      },
+      headers: { "Content-Type": "application/xml; charset=utf-8" },
     },
   );
 }
