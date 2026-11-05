@@ -15,6 +15,7 @@ export function notFoundMarkdown(): string {
     `- ${SITE_URL}/sitemap.xml`,
     `- ${SITE_URL}/docs`,
     `- ${SITE_URL}/blog.md`,
+    `- ${SITE_URL}/kb.md`,
     "",
   ].join("\n");
 }

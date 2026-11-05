@@ -113,7 +113,7 @@ const nextConfig = {
         ],
       },
       {
-        // Blog, home and pricing HTML responses are content-negotiated
+        // Blog, knowledge base, home and pricing HTML responses are content-negotiated
         // against text/markdown, so caches must differentiate by Accept.
         source: "/",
         headers: [{ key: "Vary", value: "Accept" }],
@@ -128,6 +128,14 @@ const nextConfig = {
       },
       {
         source: "/blog/:slug",
+        headers: [{ key: "Vary", value: "Accept" }],
+      },
+      {
+        source: "/kb",
+        headers: [{ key: "Vary", value: "Accept" }],
+      },
+      {
+        source: "/kb/:slug",
         headers: [{ key: "Vary", value: "Accept" }],
       },
       {

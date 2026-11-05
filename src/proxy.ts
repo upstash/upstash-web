@@ -17,6 +17,32 @@ function isBlogPath(pathname: string): boolean {
 
 const BLOG_MD_POST = /^\/blog\/([^/]+)\.md$/;
 
+// Knowledge base articles negotiate like blog posts.
+function isKbPath(pathname: string): boolean {
+  return pathname === "/kb" || /^\/kb\/[^/.]+$/.test(pathname);
+}
+
+const KB_MD_ARTICLE = /^\/kb\/([^/]+)\.md$/;
+
+function kbMarkdownUrl(slug: string | null, base: string): URL {
+  return new URL(
+    slug === null
+      ? "/api/kb/markdown"
+      : `/api/kb/${encodeURIComponent(slug)}/markdown`,
+    base,
+  );
+}
+
+function markdownRewrite(url: URL, aiAgent: string | null): NextResponse {
+  const res = NextResponse.rewrite(url);
+  res.headers.set("Vary", "Accept");
+  res.headers.set("x-content-bucket", "md");
+  if (aiAgent) {
+    res.headers.set("x-ai-agent", aiAgent);
+  }
+  return res;
+}
+
 const AI_BOT_REGEX =
   /GPTBot|OAI-SearchBot|ChatGPT-User|ClaudeBot|Claude-User|Claude-SearchBot|claude-code|PerplexityBot|Perplexity-User|Google-Extended|GoogleOther|Google-CloudVertexBot|Google-NotebookLM|Amazonbot|CCBot|Applebot|Applebot-Extended|meta-externalagent|Meta-ExternalAgent|DuckAssistBot|MistralAI-User|Bytespider|cohere-ai|Diffbot|AI2Bot/i;
 
@@ -31,7 +57,7 @@ function applyBlogHtmlHeaders(
 ): NextResponse {
   response.headers.append("Vary", "Accept");
   response.headers.set("x-content-bucket", "html");
-  if (pathname !== "/blog") {
+  if (pathname !== "/blog" && pathname !== "/kb") {
     response.headers.set("Link", markdownAlternateLink(pathname));
   }
   if (aiAgent) response.headers.set("x-ai-agent", aiAgent);
@@ -122,7 +148,36 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
     return res;
   }
 
+  if (pathname === "/kb.md") {
+    return markdownRewrite(kbMarkdownUrl(null, request.url), aiAgent);
+  }
+  const mdKbArticle = pathname.match(KB_MD_ARTICLE);
+  if (mdKbArticle) {
+    return markdownRewrite(
+      kbMarkdownUrl(mdKbArticle[1], request.url),
+      aiAgent,
+    );
+  }
+
   const accept = request.headers.get("accept") ?? "";
+
+  if (isKbPath(pathname) && accept) {
+    const decision = negotiate(accept);
+
+    if (decision === "unacceptable") {
+      return unacceptableResponse();
+    }
+
+    if (decision === "markdown") {
+      return markdownRewrite(
+        kbMarkdownUrl(
+          pathname === "/kb" ? null : pathname.slice("/kb/".length),
+          request.url,
+        ),
+        aiAgent,
+      );
+    }
+  }
 
   if (isBlogPath(pathname) && accept) {
     const decision = negotiate(accept);
@@ -201,7 +256,7 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
       sameSite: true,
     });
   }
-  if (isBlogPath(pathname)) {
+  if (isBlogPath(pathname) || isKbPath(pathname)) {
     return applyBlogHtmlHeaders(response, pathname, aiAgent);
   }
   // HTML variants of content-negotiated pages must vary on Accept so caches

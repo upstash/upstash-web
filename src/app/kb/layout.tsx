@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   description: KB_DESCRIPTION,
   alternates: {
     canonical: "/kb",
+    types: { "text/markdown": "/kb.md" },
   },
   openGraph: {
     title,
