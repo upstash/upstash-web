@@ -4,6 +4,11 @@ import { SITE_URL } from "@/utils/const";
 
 const day = (iso: string) => iso.slice(0, 10);
 
+// Articles change without a deploy, and ByDefault's webhook only refreshes
+// the fetch cache, not the CDN's copy of these responses: keep that copy
+// short.
+export const KB_MARKDOWN_CACHE = "public, max-age=0, s-maxage=60";
+
 // ByDefault is down and nothing is cached: tell agents to come back.
 export function kbUnavailable(): Response {
   return new Response(
@@ -34,8 +39,7 @@ export function renderKbIndex(articles: KbArticle[]): string {
     "",
     ASK_NOTE,
     "",
-    "## Articles",
-    "",
+    ...(articles.length > 0 ? ["## Articles", ""] : []),
     ...articles.flatMap((article) => {
       const excerpt = kbExcerpt(article);
       return [

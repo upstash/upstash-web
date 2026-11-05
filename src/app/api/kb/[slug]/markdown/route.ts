@@ -1,5 +1,9 @@
 import { getKbArticle, kbBlogSlug } from "@/lib/kb";
-import { kbUnavailable, renderKbArticle } from "@/lib/kb-markdown";
+import {
+  KB_MARKDOWN_CACHE,
+  kbUnavailable,
+  renderKbArticle,
+} from "@/lib/kb-markdown";
 import { notFoundMarkdown } from "@/lib/not-found-markdown";
 import { SITE_URL } from "@/utils/const";
 
@@ -45,7 +49,7 @@ export async function GET(
       Vary: "Accept",
       "X-Robots-Tag": "noindex",
       "X-Content-Type-Options": "nosniff",
-      "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+      "Cache-Control": KB_MARKDOWN_CACHE,
       Link: `<${canonicalUrl}.md>; rel="alternate"; type="text/markdown", <${canonicalUrl}>; rel="canonical"`,
       "X-Markdown-Tokens": String(Math.max(1, Math.ceil(body.length / 4))),
     },
