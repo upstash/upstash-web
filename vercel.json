@@ -41,6 +41,38 @@
       "destination": "/trust/terms.pdf"
     },
     {
+      "source": "/privacy",
+      "destination": "/trust/privacy"
+    },
+    {
+      "source": "/trust",
+      "destination": "/trust/privacy"
+    },
+    {
+      "source": "/trust/privacy.html",
+      "destination": "/trust/privacy"
+    },
+    {
+      "source": "/static/legal/privacy.html",
+      "destination": "/trust/privacy"
+    },
+    {
+      "source": "/trust/security.pdf",
+      "destination": "/trust/security-measures.pdf"
+    },
+    {
+      "source": "/support",
+      "destination": "https://upstash.com/docs/common/help/support"
+    },
+    {
+      "source": "/blog/introducing-upstash-blob",
+      "destination": "/blog/upstash-blob"
+    },
+    {
+      "source": "/search",
+      "destination": "https://upstash.com/docs/search/overall/whatisupstashsearch"
+    },
+    {
       "source": "/blog/nextjs-edge-functions",
       "destination": "/blog/getstarted-nextjs-edge-with-redis"
     },
