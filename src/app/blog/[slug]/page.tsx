@@ -1,6 +1,7 @@
 import Bg from "@/components/bg";
 import Container from "@/components/container";
 import PageBodyGradient from "@/components/page-body-gradient";
+import BackToTop from "@/components/post/back-to-top";
 import Clap from "@/components/post/claps";
 import PostHeader from "@/components/post/header";
 import { Mdx } from "@/components/post/mdx";
@@ -47,7 +48,9 @@ type Props = {
   }>;
 };
 
-export async function generateStaticParams(): Promise<Awaited<Props["params"]>[]> {
+export async function generateStaticParams(): Promise<
+  Awaited<Props["params"]>[]
+> {
   return allPosts
     .filter((post) => !post.draft)
     .map((post) => ({
@@ -103,7 +106,7 @@ export default async function BlogPage(props: Props) {
   const isRedisPost = post.tags?.some((tag) => tag.toLowerCase() === "redis");
 
   return (
-    <main className="relative z-0">
+    <main id="blog-top" tabIndex={-1} className="relative z-0 outline-none">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -130,6 +133,8 @@ export default async function BlogPage(props: Props) {
 
           <Container className="max-w-screen-md">
             <Mdx code={post.mdx} />
+
+            <BackToTop />
 
             {isRedisPost && <RelatedRedis />}
 
