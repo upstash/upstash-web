@@ -51,7 +51,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     title: article.title,
     description,
     authors: article.authors.map((author) => ({ name: author.name })),
-    alternates: { canonical: `/kb/${article.slug}` },
+    alternates: {
+      canonical: `/kb/${article.slug}`,
+      types: { "text/markdown": `/kb/${article.slug}.md` },
+    },
     openGraph: {
       type: "article",
       title: article.title,
