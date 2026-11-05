@@ -1,0 +1,99 @@
+---
+authors: [arda]
+title: "Step-Level Flow Control and Retries in Upstash Workflow"
+slug: step-level-flow-control-in-upstash-workflow
+tags: [workflow, qstash]
+description: "Upstash Workflow steps can now set their own flow control, retries and retry delay. Rate limit the one step that calls a fragile API without slowing down the rest of the run."
+draft: true
+---
+
+Until now, flow control in Upstash Workflow was a property of the run. You set a key, a rate and a parallelism limit when you triggered the workflow, and every step of that run inherited them.
+
+That works when the whole workflow is the bottleneck. It usually isn't. A typical workflow has one step that talks to a payment provider or an LLM API with a strict rate limit, and five steps that read from a database. Limiting the whole run to protect one step slows everything else down for no reason.
+
+The workaround was to move the sensitive step into its own workflow and call it with `context.invoke`, which accepts its own flow control. It works, but you end up with a second endpoint and a second run for every step you want to protect.
+
+Starting with this release, you can set flow control and retries on a single step instead.
+
+## The API
+
+`context.run` takes an optional third argument:
+
+```ts
+import { serve } from "@upstash/workflow/nextjs";
+
+export const { POST } = serve<{ orderId: string }>(async (context) => {
+  const order = await context.run("load order", () => loadOrder(context.requestPayload.orderId));
+
+  await context.run(
+    "charge customer",
+    () => chargeCustomer(order),
+    {
+      flowControl: { key: "payment-provider", parallelism: 3 },
+      retries: 5,
+      retryDelay: "1000",
+    }
+  );
+
+  await context.run("send receipt", () => sendReceipt(order));
+});
+```
+
+Only `charge customer` is limited by the `payment-provider` key. Since the key is shared, at most three charges run at the same time across all runs of this workflow, and of any other workflow that uses the same key. `load order` and `send receipt` keep the configuration the run was triggered with.
+
+Anything you leave unset falls back to the run's configuration. Set only `retries`, and the step still uses the run's flow control.
+
+## How it works
+
+QStash applies flow control and retries when it delivers a message. So a step's settings have to be on the message whose delivery runs that step. By the time your endpoint is executing the step, it is too late to ask for anything.
+
+The problem is that the SDK only finds out a step exists by replaying your workflow function, and that replay happens inside a delivery that was published before the step was known.
+
+Our first attempt tried to predict the next step at publish time. Branches, loops and anything non-deterministic between steps made that impossible to get right, so we dropped it.
+
+The SDK now corrects course instead of predicting. On every delivery, QStash reports which flow control and retry configuration it applied. Right before running a step, the SDK compares the step's settings with that configuration:
+
+- If they match, the step runs.
+- If they don't, the SDK publishes a small hidden request that carries only the step's settings, and stops. When QStash delivers that request, the delivery has the right settings, and the step runs there.
+
+These hidden requests don't show up in your workflow logs.
+
+### When there is no extra request
+
+Most of the time you don't pay for that extra request.
+
+When a `context.run`, `context.sleep` or `context.sleepUntil` step finishes, the SDK now keeps its result for a moment and lets your function continue until the next step is known. If that next step has settings, they are attached to the message the SDK was going to publish anyway. In the example above, `charge customer` comes right after `load order`, so it costs nothing extra.
+
+Steps in a parallel group also carry their own settings, so they never need the extra request either. The extra request only happens when the step is the first in the run, or comes right after a step like `context.call` or `context.invoke`.
+
+### Loop safety
+
+A hidden request that asks for a configuration the SDK then fails to recognize would ask again, and nobody would see it. We guarded against that in several places:
+
+- QStash marks every delivery that carried a step's own settings. If the SDK sees that marker and the settings still don't match, it runs the step anyway and reports a warning instead of asking again.
+- Hidden requests are deduplicated by content, so asking twice for the same step publishes nothing new.
+- QStash rejects two hidden requests in a row for the same run.
+- Every run has an upper limit on how many messages it can have, so even an SDK bug can't keep a run going forever.
+
+To test this, we built an SDK that ignores the marker and loops on purpose. The run stopped after ten endpoint calls.
+
+## Reading the applied configuration
+
+Since the SDK reads the applied configuration anyway, you can read it too:
+
+```ts
+await context.run("charge customer", () => {
+  console.log(context.flowControl); // { key: "payment-provider", parallelism: 3, ... }
+  console.log(context.retries); // 5
+  console.log(context.retryDelay); // "1000"
+  return chargeCustomer(order);
+}, { flowControl: { key: "payment-provider", parallelism: 3 }, retries: 5, retryDelay: "1000" });
+```
+
+These values show what QStash applied to the current request.
+
+## Try it
+
+Update `@upstash/workflow` to the latest version and pass the third argument to any `context.run`. The [flow control docs](https://upstash.com/docs/workflow/features/flow-control#step-level-flow-control) and [retry docs](https://upstash.com/docs/workflow/features/retries#configure-retries-for-a-single-step) have the details.
+
+If you were using `context.invoke` only to rate limit a single step, you can move that step back into the parent workflow.
