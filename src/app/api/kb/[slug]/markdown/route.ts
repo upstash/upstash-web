@@ -1,23 +1,32 @@
 import { getKbArticle, kbBlogSlug } from "@/lib/kb";
-import { renderKbArticle } from "@/lib/kb-markdown";
+import { kbUnavailable, renderKbArticle } from "@/lib/kb-markdown";
 import { notFoundMarkdown } from "@/lib/not-found-markdown";
 import { SITE_URL } from "@/utils/const";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   props: { params: Promise<{ slug: string }> },
 ): Promise<Response> {
   const { slug } = await props.params;
 
   // Same as the HTML page: an article that is on the blog lives there.
-  const blogSlug = await kbBlogSlug(slug);
+  let blogSlug: string | null;
+  let article: Awaited<ReturnType<typeof getKbArticle>>;
+  try {
+    blogSlug = await kbBlogSlug(slug);
+    article = blogSlug ? null : await getKbArticle(slug);
+  } catch {
+    return kbUnavailable();
+  }
   if (blogSlug) {
-    return Response.redirect(`${SITE_URL}/blog/${blogSlug}.md`, 308);
+    return Response.redirect(
+      new URL(`/blog/${blogSlug}.md`, request.url),
+      308,
+    );
   }
 
-  const article = await getKbArticle(slug);
   if (!article) {
     return new Response(notFoundMarkdown(), {
       status: 404,

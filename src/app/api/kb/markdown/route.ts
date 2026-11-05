@@ -1,10 +1,14 @@
 import { getKbArticles } from "@/lib/kb";
-import { renderKbIndex } from "@/lib/kb-markdown";
+import { kbUnavailable, renderKbIndex } from "@/lib/kb-markdown";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(): Promise<Response> {
-  return new Response(renderKbIndex(await getKbArticles()), {
+  const articles = await getKbArticles().catch(() => null);
+  if (!articles) {
+    return kbUnavailable();
+  }
+  return new Response(renderKbIndex(articles), {
     headers: {
       "Content-Type": "text/markdown; charset=utf-8",
       Vary: "Accept",

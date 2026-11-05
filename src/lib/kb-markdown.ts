@@ -4,6 +4,21 @@ import { SITE_URL } from "@/utils/const";
 
 const day = (iso: string) => iso.slice(0, 10);
 
+// ByDefault is down and nothing is cached: tell agents to come back.
+export function kbUnavailable(): Response {
+  return new Response(
+    `# Knowledge base unavailable\n\nTry again in a minute, or read the blog: ${SITE_URL}/blog.md\n`,
+    {
+      status: 503,
+      headers: {
+        "Content-Type": "text/markdown; charset=utf-8",
+        Vary: "Accept",
+        "Retry-After": "60",
+      },
+    },
+  );
+}
+
 export function renderKbIndex(articles: KbArticle[]): string {
   return [
     "# Upstash Knowledge Base",
@@ -13,7 +28,9 @@ export function renderKbIndex(articles: KbArticle[]): string {
     "",
     "---",
     "",
-    `${KB_DESCRIPTION} ${articles.length} articles. Every article is also available as markdown at its URL plus \`.md\`.`,
+    articles.length > 0
+      ? `${KB_DESCRIPTION} Every article is also available as markdown at its URL plus \`.md\`.`
+      : `${KB_DESCRIPTION} Nothing here yet; the blog has everything we've written so far: ${SITE_URL}/blog.md`,
     "",
     ASK_NOTE,
     "",
