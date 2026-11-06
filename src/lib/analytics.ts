@@ -16,7 +16,8 @@ export function trackEvent(name: string, params?: Record<string, unknown>) {
 }
 
 /**
- * Updates Consent Mode v2 after the user accepts the cookie banner.
+ * Updates Consent Mode v2 after the user accepts the cookie banner. Ad signals
+ * stay denied: Upstash runs no ads, as the privacy policy says.
  */
 export function grantAnalyticsConsent() {
   if (typeof window === "undefined" || typeof window.gtag !== "function") {
@@ -24,9 +25,9 @@ export function grantAnalyticsConsent() {
   }
   window.gtag("consent", "update", {
     analytics_storage: "granted",
-    ad_storage: "granted",
-    ad_user_data: "granted",
-    ad_personalization: "granted",
+    ad_storage: "denied",
+    ad_user_data: "denied",
+    ad_personalization: "denied",
   });
 }
 
