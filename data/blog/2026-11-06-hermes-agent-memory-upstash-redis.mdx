@@ -24,13 +24,17 @@ What's cool about this integration is that Hermes will use both its built-in mem
 
 ## How it works
 
+Hermes calls its memory provider [at fixed points in every turn](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory-providers). Before each turn, Hermes searches your memories in Upstash Redis with your message and adds the top 5 to the prompt. After the turn, it saves the new messages to the session's transcript. Here is one turn:
+
+![](https://cdn.bydefault.so/drawing-jLl3gElVI1nnwU7GyKYwy.png)
+
+Around that loop:
+
 - **Memory isolation:** Subagents, cron jobs and context flushes can read memories, but your main agent is the only one who writes. No background job cluttering up your agent's memory.
 - **Single-turn persistence:** After each turn, we append any new messages to the session's chat transcript in Redis. This is one small write the size of that turn, which means weeks-long chats have the exact same overhead as brand-new ones.
 - **Synced built-in memory:** Whenever Hermes's built-in memory tool decides to persist a fact, the Upstash integration saves a copy to Redis. When Hermes later corrects or removes it, we update the Redis copy too, so it won't sneak back in.
 - **Model tools:** The Upstash integration gives the model four tools during any turn: `upstash_memory_save`, `upstash_memory_search`, `upstash_memory_forget`, `upstash_chat_search`.
 - **Search:** Memory and chat search run on Upstash Redis Search, using fuzzy full-text matching, so you don't need any embeddings model or separate vector database. All you need is a single Redis database.
-
-All of this happens [at fixed points in Hermes's turn execution](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory-providers): we search your memories with your message and inject the top 5 into the prompt, before the turn starts, and update the session's chat transcript in Redis after the turn finishes.
 
 ## Set it up
 
