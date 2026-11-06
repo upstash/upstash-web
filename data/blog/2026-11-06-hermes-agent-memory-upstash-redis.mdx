@@ -1,0 +1,74 @@
+---
+authors: [arda]
+slug: hermes-agent-memory-upstash-redis
+tags: [redis, agents, ai, search]
+title: Give Hermes Agent a Long-Term Memory on Upstash Redis
+description: upstash-hermes-memory gives Hermes Agent long-term memory and searchable chat history on Upstash Redis. It recalls related memories on every turn and runs on the Free plan.
+---
+
+We built `upstash-hermes-memory`, a Hermes memory provider that stores your agent’s memories and chat history in Upstash Redis. It is now in the [Hermes plugin catalog](https://hermes-agent.nousresearch.com/docs/plugins/upstash) so you can install it with a simple command.
+
+Hermes Agent keeps memories in two small Markdown files: MEMORY.md for the agent's notes and USER.md for your profile. Together, they hold [about 3,500 characters](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory). This works great for simple preferences like "prefers short answers" or "the API is located in \~/code/myapi", but is too short to store everything about months of projects, people, and decisions.
+
+## Why you would want it
+
+There are several benefits of enabling it:
+
+- **Built-in memory files have a size limit.** [An error is returned](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory) from the memory tool if the files are full. The agent has to delete or merge entries to make space. This doesn't happen with the memory stored in Redis; only the 5 most related memories are included in the prompt when those are being recalled.
+- **Built-in memories are only loaded at the beginning of a session.** With Upstash Redis as the memory provider, Hermes searches your memories in Redis on each incoming message, meaning that if you have a long chat on Telegram or Discord, Hermes gets memories related to the latest message.
+- **Each session is stored as a transcript in Redis.** The agent can search those transcripts using a tool if you ask questions like "what did we decide about the deploy last week?".
+- **Built-in memory is** [**per profile**](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory)**.** You can configure multiple Hermes profiles (or even run Hermes on multiple machines) with the same database and user id to have them share the same memory.
+- Memories and chats are stored in a single Redis Search index. This lets the Upstash integration **run on the Upstash Free plan** (which allows one index per database).
+
+What's cool about this integration is that Hermes will use both its built-in memory storage and the external provider you configure, so it's a net benefit to turn this on.
+
+## How it works
+
+Hermes calls its memory provider [at fixed points in every turn](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory-providers). Before each turn, Hermes searches your memories in Upstash Redis with your message and adds the top 5 to the prompt. After the turn, it saves the new messages to the session's transcript. Here is one turn:
+
+![](https://cdn.bydefault.so/tOnKDR67ICJIVypJ0Lgyk.png)
+
+Around that loop:
+
+- **Memory isolation:** Subagents, cron jobs and context flushes can read memories, but your main agent is the only one who writes. No background job cluttering up your agent's memory.
+- **Single-turn persistence:** After each turn, we append any new messages to the session's chat transcript in Redis. This is one small write the size of that turn, which means weeks-long chats have the exact same overhead as brand-new ones.
+- **Synced built-in memory:** Whenever Hermes's built-in memory tool decides to persist a fact, the Upstash integration saves a copy to Redis. When Hermes later corrects or removes it, we update the Redis copy too, so it won't sneak back in.
+- **Model tools:** The Upstash integration gives the model four tools during any turn: `upstash_memory_save`, `upstash_memory_search`, `upstash_memory_forget`, `upstash_chat_search`.
+- **Search:** Memory and chat search run on Upstash Redis Search, using fuzzy full-text matching, so you don't need any embeddings model or separate vector database. All you need is a single Redis database.
+
+## Set it up
+
+First, create a Redis database on [Upstash console](https://console.upstash.com/redis) and get its REST URL and token.
+
+Then install the plugin and pick it as the memory provider:
+
+```bash
+hermes plugins install upstash
+hermes memory setup
+```
+
+`hermes memory setup` asks for the URL and token and writes them to `~/.hermes/.env`. If you prefer to do it by hand, install the package into the Python environment Hermes runs in with `pip install upstash-hermes-memory`, then set the provider in `~/.hermes/config.yaml`:
+
+```yaml
+memory:
+  provider: upstash
+```
+
+These are the settings it reads:
+
+| Variable | What it does |
+| --- | --- |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Required. Your database. |
+| `UPSTASH_HERMES_USER_ID` | Whose memories these are. Defaults to the chat platform user, then the Hermes profile name. |
+| `UPSTASH_HERMES_NAMESPACE` | Key prefix, `agentkit` by default. |
+| `UPSTASH_HERMES_TELEMETRY` | Set to `1` to send telemetry. It is off by default. |
+
+To check it, tell your agent something about yourself, start a new session with `/new`, and ask about it. You can also open the Data Browser in the Upstash console and see the memories under `agentkit:memory:`.
+
+## Share memory with your other apps
+
+The Upstash integration writes the same keys and search index as `AgentMemory` and `ChatHistory` in [`@upstash/agentkit-sdk`](https://github.com/upstash/agentkit). A fact your Hermes agent saves can be recalled by a TypeScript agent built with the Vercel AI SDK on the same database, and the other way round. Using both on one database needs a plan with more than one search index, since the TypeScript side creates its own memory index.
+
+The Python classes work outside Hermes too, so you can import `AgentMemory` from `upstash_hermes_memory` in any Python app.
+
+The code is open source in the [AgentKit repo](https://github.com/upstash/agentkit). If you try it, we'd love to hear how your agent's memory holds up.
