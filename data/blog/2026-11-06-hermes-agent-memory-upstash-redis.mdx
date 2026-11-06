@@ -8,7 +8,7 @@ description: upstash-hermes-memory gives Hermes Agent long-term memory and searc
 
 We built `upstash-hermes-memory`, a Hermes memory provider that stores your agent’s memories and chat history in Upstash Redis. It is now in the [Hermes plugin catalog](https://hermes-agent.nousresearch.com/docs/plugins/upstash) so you can install it with a simple command.
 
-Hermes Agent keeps memories in two small Markdown files: MEMORY.md for the agent's notes and USER.md for your profile. Together, they hold [about 3,500 characters](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory). This works great for simple preferences like "prefers short answers" or "the API is located in ~/code/myapi", but is too short to store everything about months of projects, people, and decisions.
+Hermes Agent keeps memories in two small Markdown files: MEMORY.md for the agent's notes and USER.md for your profile. Together, they hold [about 3,500 characters](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory). This works great for simple preferences like "prefers short answers" or "the API is located in \~/code/myapi", but is too short to store everything about months of projects, people, and decisions.
 
 ## Why you would want it
 
@@ -17,7 +17,7 @@ There are several benefits of enabling it:
 - **Built-in memory files have a size limit.** [An error is returned](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory) from the memory tool if the files are full. The agent has to delete or merge entries to make space. This doesn't happen with the memory stored in Redis; only the 5 most related memories are included in the prompt when those are being recalled.
 - **Built-in memories are only loaded at the beginning of a session.** With Upstash Redis as the memory provider, Hermes searches your memories in Redis on each incoming message, meaning that if you have a long chat on Telegram or Discord, Hermes gets memories related to the latest message.
 - **Each session is stored as a transcript in Redis.** The agent can search those transcripts using a tool if you ask questions like "what did we decide about the deploy last week?".
-- **Built-in memory is [per profile](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory).** You can configure multiple Hermes profiles (or even run Hermes on multiple machines) with the same database and user id to have them share the same memory.
+- **Built-in memory is** [**per profile**](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory)**.** You can configure multiple Hermes profiles (or even run Hermes on multiple machines) with the same database and user id to have them share the same memory.
 - Memories and chats are stored in a single Redis Search index. This lets the Upstash integration **run on the Upstash Free plan** (which allows one index per database).
 
 What's cool about this integration is that Hermes will use both its built-in memory storage and the external provider you configure, so it's a net benefit to turn this on.
@@ -26,7 +26,7 @@ What's cool about this integration is that Hermes will use both its built-in mem
 
 Hermes calls its memory provider [at fixed points in every turn](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory-providers). Before each turn, Hermes searches your memories in Upstash Redis with your message and adds the top 5 to the prompt. After the turn, it saves the new messages to the session's transcript. Here is one turn:
 
-![](https://cdn.bydefault.so/drawing-jLl3gElVI1nnwU7GyKYwy.png)
+![](https://cdn.bydefault.so/tOnKDR67ICJIVypJ0Lgyk.png)
 
 Around that loop:
 
