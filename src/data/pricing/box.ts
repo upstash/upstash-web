@@ -22,7 +22,6 @@ export interface BoxPlan {
   // Capacity
   maxConcurrentBoxes: number | string;
   cpuHoursPerMonth: number | string;
-  llmBudgetPerMonth: string;
 
   // Pricing
   storagePrice: string | null;
@@ -77,7 +76,6 @@ export const BOX_FREE_PLAN: BoxPlan = {
   priceSubtext: "-",
   maxConcurrentBoxes: 10,
   cpuHoursPerMonth: 5,
-  llmBudgetPerMonth: "$1",
   storagePrice: null,
   cpuHourPricing: null,
   keepAlivePricing: null,
@@ -96,7 +94,6 @@ export const BOX_PAYG_PLAN: BoxPlan = {
   priceSubtext: "per active CPU hour",
   maxConcurrentBoxes: 1000,
   cpuHoursPerMonth: "Unlimited",
-  llmBudgetPerMonth: "$100",
   storagePrice: "$0.10 per GB/month",
   cpuHourPricing:
     "Small: $0.10, Medium: $0.20, Large: $0.40 per active CPU hour",
@@ -117,7 +114,6 @@ export const BOX_KEEPALIVE_PLAN: BoxPlan = {
   priceSubtext: "per box / month",
   maxConcurrentBoxes: 1000,
   cpuHoursPerMonth: "Unlimited",
-  llmBudgetPerMonth: "$100",
   storagePrice: "Included",
   cpuHourPricing: "Included in the fixed monthly price",
   keepAlivePricing: "Small: $8, Medium: $16, Large: $32 per box / month",

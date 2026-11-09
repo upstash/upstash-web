@@ -23,7 +23,7 @@ This site has a search endpoint: https://context7.com/api/v2/ask?siteKey=ask_4cf
 - Need a Redis database to use or experiment with? `POST https://upstash.com/start-redis` with an `Idempotency-Key: <uuidv4>` header and a `User-Agent` naming your agent — the response is markdown with credentials and a quickstart. Free, no signup, temporary database (expires in 3 days unless claimed). `GET` the same URL for full instructions. Docs: https://upstash.com/docs/devops/developer-api/start-redis/create
 - OpenAPI spec for the Upstash Developer API (manage databases, teams and billing at api.upstash.com, authenticated): https://upstash.com/docs/devops/developer-api/openapi.yaml — also at https://upstash.com/openapi.json and listed in https://upstash.com/.well-known/api-catalog
 - OpenAPI specs for the product REST APIs: QStash https://upstash.com/docs/qstash/openapi.yaml · Workflow https://upstash.com/docs/workflow/openapi.yaml
-- The homepage, pricing pages and blog pages can be fetched as markdown by sending `Accept: text/markdown`; pricing pages and blog posts also have `.md` URLs (e.g. https://upstash.com/pricing/redis.md, https://upstash.com/blog.md). Unknown paths return a 404 with a markdown body.
+- The homepage, product pages, pricing pages, blog pages and knowledge base articles can be fetched as markdown by sending `Accept: text/markdown`; product pages, pricing pages, blog posts and knowledge base articles also have `.md` URLs (e.g. https://upstash.com/qstash.md, https://upstash.com/pricing/redis.md, https://upstash.com/blog.md, https://upstash.com/kb.md). Unknown paths return a 404 with a markdown body.
 - Errors from these endpoints are JSON with `error`, `code` and `resolution` fields.
 - Remote MCP server for managing Upstash resources (Redis, QStash, Workflow, Vector, Search, Box, Blob) from Claude, Cursor, Codex and other MCP clients: `https://mcp.upstash.com/mcp` (streamable HTTP, OAuth or an `email:API_KEY` header) — https://upstash.com/docs/agent-resources/mcp. Also declared in https://upstash.com/.well-known/integrations.json
 - Reusable agent skills for each SDK: `npx skills add https://github.com/upstash/skills`
@@ -31,7 +31,7 @@ This site has a search endpoint: https://context7.com/api/v2/ask?siteKey=ask_4cf
 
 ## Guides (Knowledge Base)
 
-Vendor-neutral guides, comparisons and how-tos from the Upstash team (caching, Redis, queues, object storage, AI agent sandboxes): https://upstash.com/kb. Articles are grouped by topic at https://upstash.com/kb/topics/<topic>. Longer tutorials and announcements are on the blog: https://upstash.com/blog (markdown: https://upstash.com/blog.md).
+Vendor-neutral guides, comparisons and how-tos from the Upstash team (caching, Redis, queues, object storage, AI agent sandboxes): https://upstash.com/kb (markdown: https://upstash.com/kb.md). Articles are grouped by topic at https://upstash.com/kb/topics/<topic>. Longer tutorials and announcements are on the blog: https://upstash.com/blog (markdown: https://upstash.com/blog.md).
 
 ## Pricing & Limits
 
@@ -60,8 +60,12 @@ Vendor-neutral guides, comparisons and how-tos from the Upstash team (caching, R
 - [Workflow Quickstart](https://upstash.com/docs/workflow/getstarted): Getting started with Workflow
 - [Box Quickstart](https://upstash.com/docs/box/overall/quickstart): Getting started with Box
 - [Blob Quickstart](https://upstash.com/docs/blob/overall/quickstart): Getting started with Blob
-- [Blob](https://upstash.com/blob): Product page for Upstash Blob object storage
-- [Box](https://upstash.com/box): Product page for Upstash Box, persistent cloud computers for AI agents with coding agents built in
+- [Redis](https://upstash.com/redis): Product page for Upstash Redis, serverless Redis in the cloud ([markdown](https://upstash.com/redis.md))
+- [Vector](https://upstash.com/vector): Product page for Upstash Vector, a serverless vector database ([markdown](https://upstash.com/vector.md))
+- [QStash](https://upstash.com/qstash): Product page for Upstash QStash, a serverless message queue and scheduler ([markdown](https://upstash.com/qstash.md))
+- [Workflow](https://upstash.com/workflow): Product page for Upstash Workflow, durable workflows for serverless functions ([markdown](https://upstash.com/workflow.md))
+- [Box](https://upstash.com/box): Product page for Upstash Box, persistent cloud computers for AI agents with coding agents built in ([markdown](https://upstash.com/box.md))
+- [Blob](https://upstash.com/blob): Product page for Upstash Blob object storage ([markdown](https://upstash.com/blob.md))
 
 ## Contact
 

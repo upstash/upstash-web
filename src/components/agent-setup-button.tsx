@@ -19,8 +19,23 @@ import { createPortal } from "react-dom";
  * tells the agent to run `upstash setup` itself rather than hand the reader a
  * command to run.
  */
-export const AGENT_SETUP_PROMPT =
-  "Set up Upstash in my coding agent using the official Upstash instructions, and run the commands yourself instead of asking me to. Run `npx -y upstash setup --yes` with the flag for the agent you are (`--claude`, `--codex`, `--cursor`, `--gemini`, `--vscode`, `--copilot` or `--opencode`). It installs the Upstash plugin where your agent supports plugins, and otherwise adds the remote MCP server https://mcp.upstash.com/mcp plus the Upstash skills (https://upstash.com/docs/agent-resources/skills); the MCP server authenticates over OAuth on first use. If you are not one of those agents, install the skills with `npx -y skills add upstash/skills --global` and add the remote MCP server to your MCP config; see https://upstash.com/docs/agent-resources/clients for the exact location. When done, tell me what was installed and whether I need to restart or reload (in Claude Code, `/reload-plugins`).";
+export const AGENT_SETUP_PROMPT = [
+  "Set up Upstash in my coding agent using the official Upstash instructions, and run the commands yourself instead of asking me to.",
+  "",
+  "1. Run `npx -y upstash setup --yes` with the flag for the agent you are (`--claude`, `--codex`, `--cursor`, `--gemini`, `--vscode`, `--copilot` or `--opencode`). It installs the Upstash plugin where your agent supports plugins, and otherwise adds the remote MCP server https://mcp.upstash.com/mcp (OAuth on first use) and the Upstash skills.",
+  "2. For any other agent, install the skills with `npx -y skills add upstash/skills --global` and add https://mcp.upstash.com/mcp to your MCP config (see https://upstash.com/docs/agent-resources/clients).",
+  "3. Tell me what was installed and whether I need to restart or reload (in Claude Code, `/reload-plugins`).",
+  "",
+  "The skills cover:",
+  "",
+  "- SDKs for Redis, Ratelimit, QStash, Workflow, Vector, Search, Blob and Box",
+  "- The `upstash` CLI",
+  "- Running work in Box cloud sandboxes",
+  "",
+  "If I need a Redis database before I have an account, POST https://upstash.com/start-redis for a free one with no signup (it lasts 3 days unless I claim it).",
+  "",
+  "For anything else, read the docs at https://upstash.com/docs/introduction (every page is listed in https://upstash.com/docs/llms.txt).",
+].join("\n");
 
 type SetupOption = {
   id: string;
@@ -30,20 +45,20 @@ type SetupOption = {
 
 /**
  * The first entry is what the button itself copies, so the dropdown never
- * changes what a plain click does. Per-client commands live in the docs the
- * last menu row links to.
+ * changes what a plain click does. Same rows as the console's agent setup
+ * menu; per-client commands live in the docs the last menu row links to.
  */
 const SETUP_OPTIONS: SetupOption[] = [
+  { id: "prompt", label: "Copy prompt", value: AGENT_SETUP_PROMPT },
   {
-    id: "command",
-    // The command itself, so the reader sees what they are copying.
-    label: <code className="font-mono">npx upstash</code>,
-    value: "npx upstash",
+    id: "mcp_url",
+    label: "Copy remote MCP URL",
+    value: "https://mcp.upstash.com/mcp",
   },
   {
-    id: "prompt",
-    label: "Copy setup prompt",
-    value: AGENT_SETUP_PROMPT,
+    id: "skills",
+    label: "Copy skills command",
+    value: "npx skills add upstash/skills",
   },
 ];
 
@@ -286,19 +301,25 @@ export default function AgentSetupButton({
         }
       }}
     >
-      {/* The 2px emerald-to-amber border is the wrapper's gradient showing
-          through a 2px inset, so the inner radius is the outer 12px minus it. */}
-      <span className="inline-flex rounded-xl bg-gradient-to-r from-emerald-400 to-amber-300 p-0.5">
-        <button
-          type="button"
-          aria-haspopup="menu"
-          aria-expanded={open}
-          onClick={() => onCopy(PRIMARY_OPTION)}
+      {/* The console's agent setup split button (Figma cr5vFlRDSA4fKuI3ql1dUz,
+          node 1762:2515), kept at 44px to line up with "Start for Free". One
+          button for both segments, so the hover covers the whole control. */}
+      <button
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => onCopy(PRIMARY_OPTION)}
+        className={cx(
+          "group flex h-11 items-stretch overflow-hidden rounded-lg border border-emerald-500",
+          // A 10% emerald-to-yellow wash over the page colour, per the design.
+          "bg-[linear-gradient(90deg,rgba(16,185,129,0.1),rgba(234,179,8,0.1)),linear-gradient(white,white)]",
+          "dark:bg-[linear-gradient(90deg,rgba(16,185,129,0.1),rgba(234,179,8,0.1)),linear-gradient(#18181b,#18181b)]",
+        )}
+      >
+        <span
           className={cx(
-            // Same 20px inset as "Start for Free" beside it.
-            "flex h-10 items-center gap-2.5 rounded-[10px] bg-white px-5",
-            "text-base font-medium text-emerald-800 transition hover:bg-emerald-50",
-            "dark:bg-zinc-900 dark:text-emerald-400 dark:hover:bg-zinc-800",
+            "flex items-center gap-2.5 px-4 text-base font-medium text-emerald-800 transition",
+            "group-hover:bg-emerald-500/10 dark:text-emerald-400",
           )}
         >
           <span className="flex items-center" aria-hidden="true">
@@ -322,14 +343,25 @@ export default function AgentSetupButton({
             swapped={isPrimaryCopied}
             alt={<span className="text-primary">Copied</span>}
           >
-            Set up your agent
+            Copy agent prompt
           </CrossFade>
+        </span>
+        <span
+          className={cx(
+            "flex w-11 items-center justify-center border-l border-black/10 transition",
+            "group-hover:bg-emerald-500/10 dark:border-white/10",
+          )}
+        >
           <IconChevronDown
-            size={20}
-            className={cx("transition-transform", open && "rotate-180")}
+            size={18}
+            stroke={1.4}
+            className={cx(
+              "text-emerald-800/50 transition-transform dark:text-emerald-400/60",
+              open && "rotate-180",
+            )}
           />
-        </button>
-      </span>
+        </span>
+      </button>
       {menu}
     </div>
   );
