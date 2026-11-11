@@ -71,7 +71,8 @@ This site has a search endpoint: https://context7.com/api/v2/ask?siteKey=ask_4cf
 - [Pricing (Markdown)](https://upstash.com/pricing/box.md): Machine-readable full pricing
 
 **Quick reference (serverless compute, AWS us-east-1):**
-- Free: $0, 10 concurrent boxes, 5 CPU hours/month, $1 LLM budget
+- Free: $0, 10 concurrent boxes, 5 CPU hours/month
+- Agents use your own model provider key (Anthropic, OpenAI, OpenRouter, ...)
 - Pay as You Go (usage): Small $0.10, Medium $0.20, Large $0.40 per active CPU hour + $0.10/GB/month storage
 - Pay as You Go (keep-alive): Small $8, Medium $16, Large $32/month
 - Enterprise: Custom — contact sales@upstash.com

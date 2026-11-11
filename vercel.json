@@ -1,24 +1,12 @@
 {
   "redirects": [
     {
-      "source": "/qstash",
-      "destination": "https://upstash.com/docs/qstash"
+      "source": "/qstash/:path+",
+      "destination": "https://upstash.com/docs/qstash/:path+"
     },
     {
-      "source": "/qstash/:path*",
-      "destination": "https://upstash.com/docs/qstash/:path*"
-    },
-    {
-      "source": "/workflow",
-      "destination": "https://upstash.com/docs/workflow"
-    },
-    {
-      "source": "/workflow/:path*",
-      "destination": "https://upstash.com/docs/workflow/:path*"
-    },
-    {
-      "source": "/vector",
-      "destination": "https://upstash.com/docs/vector"
+      "source": "/workflow/:path+",
+      "destination": "https://upstash.com/docs/workflow/:path+"
     },
     {
       "source": "/box/:path+",
@@ -51,6 +39,38 @@
     {
       "source": "/legal/terms",
       "destination": "/trust/terms.pdf"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/trust/privacy"
+    },
+    {
+      "source": "/trust",
+      "destination": "/trust/privacy"
+    },
+    {
+      "source": "/trust/privacy.html",
+      "destination": "/trust/privacy"
+    },
+    {
+      "source": "/static/legal/privacy.html",
+      "destination": "/trust/privacy"
+    },
+    {
+      "source": "/trust/security.pdf",
+      "destination": "/trust/security-measures.pdf"
+    },
+    {
+      "source": "/support",
+      "destination": "https://upstash.com/docs/common/help/support"
+    },
+    {
+      "source": "/blog/introducing-upstash-blob",
+      "destination": "/blog/upstash-blob"
+    },
+    {
+      "source": "/search",
+      "destination": "https://upstash.com/docs/search/overall/whatisupstashsearch"
     },
     {
       "source": "/blog/nextjs-edge-functions",

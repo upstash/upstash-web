@@ -1,13 +1,14 @@
-import SectionCta from "@/app/redis/section-cta";
-import SectionFaq from "@/app/redis/section-faq";
-import SectionFeatures from "@/app/redis/section-features";
-import SectionHero from "@/app/redis/section-hero";
-import SectionSkills from "@/app/redis/section-skills";
-import SectionUseCases from "@/app/redis/section-use-cases";
-import SectionWhatIs from "@/app/redis/section-what-is";
+import { CTA, FEATURES, HERO, USE_CASES, WHAT_IS } from "@/app/redis/content";
 import { REDIS_FAQ } from "@/app/redis/faq";
+import SectionSkills from "@/app/redis/section-skills";
+import SectionCta from "@/components/product-page/section-cta";
+import SectionFaq from "@/components/product-page/section-faq";
+import SectionFeatures from "@/components/product-page/section-features";
+import SectionHero from "@/components/product-page/section-hero";
+import SectionUseCases from "@/components/product-page/section-use-cases";
+import SectionWhatIs from "@/components/product-page/section-what-is";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 const title = "Redis Database";
 const description =
@@ -51,13 +52,13 @@ export default function RedisPage() {
       />
 
       <main className="text-center">
-        <SectionHero />
-        <SectionFeatures />
-        <SectionUseCases />
+        <SectionHero {...HERO} />
+        <SectionFeatures {...FEATURES} />
+        <SectionUseCases {...USE_CASES} />
         <SectionSkills />
-        <SectionWhatIs />
+        <SectionWhatIs {...WHAT_IS} />
         <SectionFaq items={REDIS_FAQ} />
-        <SectionCta />
+        <SectionCta {...CTA} />
       </main>
     </>
   );
