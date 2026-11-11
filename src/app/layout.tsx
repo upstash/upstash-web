@@ -87,7 +87,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                           var consent = 'pending';
                           try {
                             var stored = JSON.parse(localStorage.getItem('global-store'));
-                            if (stored && stored.state && stored.state.cookieConsent) {
+                            // Before v3 a grant may have skipped the banner (see global-store).
+                            if (stored && stored.version >= 3 && stored.state && stored.state.cookieConsent) {
                               consent = stored.state.cookieConsent;
                             }
                           } catch (e) {}
