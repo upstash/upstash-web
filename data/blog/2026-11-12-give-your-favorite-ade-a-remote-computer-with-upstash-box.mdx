@@ -1,0 +1,189 @@
+---
+authors: [alitarik]
+slug: give-your-favorite-ade-a-remote-computer-with-upstash-box
+tags: [box, ai, agents]
+title: "Give Your Favorite ADE a Remote Computer: Run Coding Agents on Upstash Box"
+---
+
+You start a two-hour refactor in your agentic development environment (ADE), close the laptop, and the agent stops with it. While it ran, it could also reach every token and dotfile on your machine. Both problems go away when the agent runs on a remote computer and your ADE connects to it over SSH.
+
+An [Upstash Box](https://upstash.com/box) is a throwaway Linux computer in the cloud for this. You log in to it with a normal SSH key, and you delete it when the task is done.
+
+Here is how to connect over SSH, followed by setup options for T3 Code, Orca, Herdr and other ADEs.
+
+## What goes wrong when agents run on your laptop
+
+Remote agent sessions run only as long as the machine hosting them is [awake and online](https://code.visualstudio.com/docs/agents/run/remote-agent-sessions). If that machine is your laptop, shutting the lid shuts down your long-running refactor. Running parallel agents also means competing with your browser, editor, and dev server for the same CPU, memory, and ports.
+
+A local agent can reach the files and credentials its permissions and sandbox allow. Codex runs in an [OS-enforced sandbox](https://learn.chatgpt.com/docs/agent-approvals-security) limited to the workspace by default. Claude Code has a [shell sandbox](https://code.claude.com/docs/en/sandboxing), but it is off by default and covers shell commands only. When those limits are loose, [every mistake lands on your local filesystem](https://upstash.com/blog/box-remote-development).
+
+A Cursor agent running Claude Opus 4.6 [deleted the production database for PocketOS in 9 seconds](https://zenity.io/blog/ai-agent-database-deletion-pocketos). The agent found a Railway API token stored on the user's machine, and that token had account-wide access. Railway [later recovered the database with all the customer's data](https://blog.railway.com/p/your-ai-wants-to-nuke-your-database). The delete was possible because a full-access token was within the agent's reach. Running the agent in a separate environment adds one more wall around what it can reach.
+
+## What a remote computer adds
+
+A remote agent changes the game in a few ways:
+
+- **Isolated State:** Upstash Boxes are [isolated containers](https://upstash.com/docs/box/overall/how-it-works) with their own filesystem, shell, and network stack. Your home folder, browser cookies and cloud tokens stay on your laptop unless you copy them in.
+- **Persistence:** Orca's SSH sessions [run on a server on the remote host and survive Orca closing on your laptop](https://www.onorca.dev/docs/ssh). With Herdr, [the remote server owns the running panes](https://herdr.dev/docs/persistence-remote/). This depends on the setup: an editor that runs its agent on your laptop and only the terminal on the box stops when the laptop does.
+- **Parallelization:** Separate environments keep parallel agents from getting in each other's way. The Orca plugin allocates a new box for each workspace. They don't have to fight over port 3000 or shared `node_modules`. With the free plan, you can have up to [10 boxes running at once](https://upstash.com/pricing/box).
+- **Ephemeral Environments:** You can start each task with a fresh box and delete it when the branch is merged. If you have a known good starting state, you can take a [snapshot](https://upstash.com/docs/box/overall/snapshots) of the workspace and restore it to a new box.
+
+## Upstash Box in one minute
+
+A box automatically pauses after some time of inactivity - 1 hour for free boxes, 6 hours for paid boxes. During a pause, your processes will be stopped, but the files will persist, and the box will resume on its next activity (e.g. running a command, reconnecting to the box). To bring a server back after a pause, set an [init command](https://upstash.com/docs/box/overall/quickstart#init-command). The box runs it on every start, including each resume. If you really need a box to never pause, you can use a [keep-alive box](https://upstash.com/docs/box/overall/keep-alive) for a fixed monthly price.
+
+Upstash Boxes run on Debian OS inside the cloud, and come with [their own filesystem, shell and network](https://upstash.com/docs/box/overall/how-it-works). They are especially customized for AI workloads, pre-installed with tools like Claude Code, Codex, git and Node.js.
+
+By default, you will be logged in as `boxuser`. Keep your project files under `/workspace/home`, the workspace that survives pauses.
+
+You pay for the CPU the box uses, so a paused or idle box costs nothing for compute. [Running 2 cores at 100% for one hour costs $0.20](https://upstash.com/pricing/box). The sizes:
+
+| Size | CPU | Memory | Disk | Pay as you go | Keep-alive |
+| --- | --- | --- | --- | --- | --- |
+| Small | 2 vCPU | 4 GB | 10 GB | $0.10 per active CPU hour | $8 per month |
+| Medium | 4 vCPU | 8 GB | 20 GB | $0.20 per active CPU hour | $16 per month |
+| Large | 8 vCPU | 16 GB | 30 GB | $0.40 per active CPU hour | $32 per month |
+
+The free plan gives you 10 boxes at a time and 5 CPU hours per month. Pay-as-you-go boxes also pay $0.10 per GB per month for storage. The keep-alive price already includes CPU and storage. For now, we run boxes in AWS us-east-1. Upstash doesn’t bill for model usage; use your own provider key or subscription for Claude Code and Codex.
+
+## How do you SSH into an Upstash Box?
+
+You can [add an SSH key](https://upstash.com/docs/box/overall/shell) which will let you SSH into any of your account/team's boxes. To SSH into a box, you use the box's ID and then the domain `us-east-1.box.upstash.com`. For example: `ssh relative-gator-50819@us-east-1.box.upstash.com`. Box also accepts your API key as the SSH password, but a key is safer for daily use.
+
+The shell runs as `boxuser` inside the box. When you ssh in, the box ID as the username just helps the gateway determine which box to send you to.
+
+The ADE on your laptop talks to the box like this:
+
+![](https://cdn.bydefault.so/drawing-LZjvsTfpwPHAa47X3aRat.png)
+
+We ran these steps against a real box:
+
+1. Create a box. The console has a button for it, or you can do it from code with `npm install @upstash/box` and your API key in `UPSTASH_BOX_API_KEY`:
+
+```js
+import { Box } from '@upstash/box'
+
+const box = await Box.create({ runtime: 'node' })
+
+console.log(box.id)
+```
+
+```text
+relative-gator-50819
+```
+
+2. Make a key pair just for boxes:
+
+```bash
+mkdir -p ~/.ssh && chmod 700 ~/.ssh
+ssh-keygen -t ed25519 -f ~/.ssh/upstash_box
+```
+
+3. Add the public key to Box. In the [Upstash Console](https://console.upstash.com/box?tab=settings&section=ssh-keys), navigate to Box → Settings → SSH Keys. Select New SSH Key and paste the contents of `~/.ssh/upstash_box.pub`. Supported key types are ed25519, ECDSA, their security-key equivalents, and RSA >= 2048, up to 20 keys per account.
+4. Give the box a short name in `~/.ssh/config`:
+
+```text
+Host upstash-box
+  HostName us-east-1.box.upstash.com
+  User relative-gator-50819
+  IdentityFile ~/.ssh/upstash_box
+  IdentitiesOnly yes
+  ServerAliveInterval 30
+```
+
+5. Test it:
+
+```bash
+ssh upstash-box 'whoami; pwd; which claude codex git node'
+```
+
+```text
+boxuser
+/workspace/home
+/opt/runner/bin/claude
+/opt/runner/bin/codex
+/usr/bin/git
+/usr/local/bin/node
+```
+
+6. Forward a port when the agent starts a dev server. We served a test page on port 3000 inside the box and opened it from the laptop:
+
+```bash
+ssh -N -L 3000:127.0.0.1:3000 upstash-box &
+curl -s localhost:3000
+```
+
+```text
+Hello through SSH forwarding
+```
+
+To share the page, you can [create a public URL for a port](https://upstash.com/docs/box/overall/preview) in the console or with `box.getPublicURL(3000)`. It can require a bearer token or basic auth.
+
+Adding keys also works from a script. Our test registered a key with a POST to `/v2/box/settings/ssh-keys` on the same host, sending the API key in an `X-Box-Api-Key` header, which is what the [Upstash Orca plugin](https://github.com/upstash/box-orca-plugin) does.
+
+## Which ADEs can use a remote computer?
+
+Once `ssh upstash-box` connects, most ADEs only need that alias. You add the box the same way you'd add any remote server, and the ADE starts its agents there. The setting is in a different place in each app:
+
+| ADE | Where you add the box | Where the agent runs |
+| --- | --- | --- |
+| T3 Code | [Settings → Environments → Add environment → SSH](https://github.com/pingdotgg/t3code/blob/main/docs/user/remote-access.md), enter `upstash-box` | On the box |
+| Orca | [Settings → SSH → Add Target](https://www.onorca.dev/docs/ssh), pick `upstash-box` from the OpenSSH config picker | On the box |
+| Herdr | `herdr --remote upstash-box` in your terminal | On the box |
+| VS Code | Agents window → New Session → Environment → [SSH](https://code.visualstudio.com/docs/agents/run/remote-agent-sessions), pick `upstash-box` | On the remote host |
+| Cursor | Remote-SSH, pick `upstash-box` | Depends on the agent |
+| Zed | Connect New Server, enter `ssh upstash-box` | [On your laptop](https://zed.dev/docs/remote-development); code and terminals run on the box |
+| Conductor | No SSH target for agents; Conductor Cloud [shuts down on November 20, 2026](https://www.conductor.build/changelog) | Not supported |
+
+The last column decides whether work keeps going when you close the laptop. Zed runs its UI and talks to the model from your laptop, so its agent stops when the laptop sleeps.
+
+**T3 Code.** In the desktop app, open Settings → Environments → Add environment, choose SSH, and enter `upstash-box`. T3 Code then [starts a server on the box and opens the port forward for you](https://github.com/pingdotgg/t3code/blob/main/docs/user/remote-access.md). Your projects, provider logins and agent work stay on the box. The first connect downloads T3 Code's server, so it takes longer than later ones.
+
+T3 Code needs Linux with `curl`, `tar` and `sha256sum` on the host, and the agent CLIs on the PATH of a login shell. A box has all of them. We checked on a fresh box:
+
+```bash
+ssh upstash-box 'uname -sm; sh -lc "command -v claude; command -v codex"'
+```
+
+```text
+Linux aarch64
+/opt/runner/bin/claude
+/opt/runner/bin/codex
+```
+
+The basic flow is to SSH into the box once (`ssh upstash-box`), authenticate with the agent (`claude auth login` or `codex login`), and clone your repo under `/workspace/home`.
+
+The tools use boxes like this:
+
+**Orca.** Go to Settings → SSH → Add Target. In the same dialog, use the OpenSSH config picker to select `upstash-box`. On first connect, Orca installs its server on the box; it uses local port forwarding for that, which is allowed. Closing Orca locally does not stop the agents; reopening it [restores the sessions to their tabs](https://www.onorca.dev/docs/ssh). If you’d prefer to use one box per workspace, the [experimental Upstash plugin](https://upstash.com/docs/box/guides/orca-setup) creates them for you.
+
+**Herdr.** Run `herdr --remote upstash-box`. When running remotely, Herdr keeps the agent panes in the server on the box, using your local Herdr only to [draw the UI](https://herdr.dev/docs/persistence-remote/). Herdr needs the Herdr binary on the box, which it will offer to install if missing. We ran its installer in a box, and `herdr --version` gave `herdr 0.9.5`. Alternatively, the [Upstash plugin](https://upstash.com/docs/box/guides/herdr-setup) uploads your worktree to a new box and downloads changes as a patch.
+
+For running T3 Code inside the box and opening it in a browser, Upstash has a [separate guide](https://upstash.com/docs/box/guides/t3-code-setup).
+
+For an ADE that isn't in the table, such as cloudroom, look for a field that takes an SSH host or command. If there isn't one, you can still SSH into the box and run Claude Code or Codex in that terminal.
+
+## Is it safe to give a coding agent a remote box?
+
+Is it safe? Well, safety is a relative term. The agent can still interact with external systems using any credentials and network access you have provisioned to the environment in which it's running. But by putting it on a separate machine, it will be isolated from your laptop, which may have irrelevant credentials the agent doesn't need to know about.
+
+![](https://cdn.bydefault.so/drawing-e4T6qWZoi_Zr1eMOMIOed.png)
+
+This controls the agent’s blast radius:
+
+- The agent can’t get on your computer. An agent in a box [can’t access the host, other boxes, or Upstash’s internal systems](https://upstash.com/docs/box/overall/how-it-works), and it can’t access private networks or cloud metadata services.
+- The agent doesn’t have access to your full-access token. The PocketOS agent stumbled upon the full-access token in a completely unrelated file. Unless you copy a full-access token into the box, it won’t have that file. (And if you use the Herdr plugin, it excludes `.env` files and credentials.)
+- If the agent mucks up the box, you can just delete the box, which also stops everything running in it.
+
+You can delete your SSH key over the API, which we tested and can confirm then fails with a "Permission denied" error when you try to log in with that key again. Note, though, that the SSH key only lets someone start an SSH session on the box,  not what the agent actually does once it gets there. This is more of an access management mechanism for your laptop and teammates.
+
+Here’s what you should watch out for:
+
+- Box comes with full outbound network access, but you can restrict which hosts the agent can access with a [network policy](https://upstash.com/docs/box/overall/network-policy).
+- Your Box API key also works as the SSH password for any box in your account. Keep it off the box and out of the agent's reach, and use your SSH key for daily logins.
+- If you connect GitHub via the console, all boxes will have access to your GitHub credentials. Limit the damage by creating a token scoped only to the repos the agent will use.
+- Anything you pass in as an environment variable can be [accessed by any code in the box](https://upstash.com/docs/box/overall/security), including the agent. [Attach Headers](https://upstash.com/docs/box/overall/attach-headers) adds a key to outbound HTTPS requests from outside the container, so the agent can't read it. The agent can still make requests with it, so the key itself should only allow what the agent needs.
+
+## Try it with one agent first
+
+Give it a try! If there's a long task you need to do, but aren't comfortable leaving running overnight, create a box, set up your SSH key on the [console](https://console.upstash.com/box?tab=settings&section=ssh-keys), add `upstash-box` as an SSH host in your ADE, and start the agent with a scoped GitHub token. Close your laptop, open the ADE again an hour later, and pick up where the agent is. Then delete the box when the branch is merged.
