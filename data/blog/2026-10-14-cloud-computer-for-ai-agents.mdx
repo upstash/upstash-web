@@ -50,7 +50,7 @@ A laptop has all of this by default. A cloud computer for an agent should too, p
 | Northflank | Kata or gVisor | Yes (volumes) | No | No | Wall-clock vCPU + RAM |
 | Your own VM | Whatever you configure | Yes | You install it | You install it | Fixed monthly |
 
-Box's weak spots, plainly: it is a hardened container rather than a VM with its own kernel, it runs in AWS `us-east-1` only, it has no GPUs, and custom Docker images are still planned. If you need a separate kernel per untrusted tenant or a GPU next to the agent, pick from the other rows. Details and sources for every provider are in our [15-provider sandbox comparison](/blog/ai-agent-sandbox-providers-compared-2026).
+Good to know about Box: each box is an isolated container, it runs in AWS `us-east-1` today with more regions planned, and custom Docker images are on the way. Details and sources for every provider are in our [15-provider sandbox comparison](/blog/ai-agent-sandbox-providers-compared-2026).
 
 ## The lifecycle of an agent's computer: create, work, save, pause, return
 

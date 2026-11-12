@@ -4,11 +4,11 @@ title: "Upstash Box vs Daytona: A Comparison of AI Agent Sandboxes"
 authors: [alitarik]
 tags: [box, ai, serverless]
 description: "Upstash Box and Daytona both give AI agents a real computer to work in, and both are containers that keep their state. The difference is where the agent lives and how you pay. A look at the numbers, with a focus on cost and developer experience."
-updated: "2026-10-14"
+updated: "2026-11-12"
 ---
 
 <Summary>
-**Upstash Box** puts the coding agent *inside* the sandbox. You create a box, send it a prompt, and a built-in harness (Claude Code, Codex, OpenCode, or your own) drives the shell, files, and git for you. A box auto-pauses when idle and wakes up later with its state intact. You pay for **active CPU only**, and memory is free.
+**Upstash Box** puts the coding agent *inside* the sandbox. You create a box, send it a prompt, and a built-in harness (Claude Code, Codex, OpenCode, or your own) drives the shell, files, and git for you. You can also skip the built-in agent and drive the same box from your own loop over the SDK, CLI, MCP, or SSH. A box auto-pauses when idle and wakes up later with its state intact. You pay for **active CPU only**, and memory is free.
 
 **Daytona** gives you the sandbox and the integration primitives, and you assemble the agent yourself. You create a sandbox, wire up your own model loop (its docs have guides for OpenCode, Codex, and Claude-style harnesses), and run code in it. It keeps state too (stop, archive, snapshot), and bills **vCPU + memory by wall-clock** with no platform fee.
 
@@ -249,7 +249,7 @@ For idle-heavy agent work, roughly 5 to 10 times cheaper: about $0.02 against $0
 
 ### Does Daytona have GPUs?
 
-Yes, preemptible GPUs from an RTX 4090 at $0.57/hr up to a B300 at $4.08/hr. Upstash Box has no GPUs.
+Yes, preemptible GPUs from an RTX 4090 at $0.57/hr up to a B300 at $4.08/hr. Upstash Box is CPU-only.
 
 ### Is Daytona still open source?
 
