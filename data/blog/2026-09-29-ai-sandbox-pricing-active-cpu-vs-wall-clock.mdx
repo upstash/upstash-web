@@ -4,7 +4,7 @@ slug: ai-sandbox-pricing-active-cpu-vs-wall-clock
 tags: [box, ai, agents, sandbox]
 title: "AI Sandbox Pricing Compared: Active CPU vs Wall-Clock Billing, Which Costs Less?"
 description: "AI agent sandbox pricing compared: active CPU vs wall-clock billing across Upstash Box, Vercel, Cloudflare, Fly Sprites, E2B and more, with provider rates, worked examples, and break-even points for agent workloads."
-updated: "2026-10-14"
+updated: "2026-11-12"
 ---
 
 A lower CPU rate on a pricing page doesn't always mean you'll pay less for a sandbox. Some providers charge for every second the sandbox runs, based on how many CPUs it has. Others only charge for the CPU time your code uses.
@@ -27,7 +27,7 @@ In late 2025 Cloudflare [moved to billing only active CPU](https://developers.cl
 
 ## Which sandbox providers bill CPU time, and which bill wall-clock time?
 
-E2B, Daytona, Modal and Upstash Box keep-alive charge for CPU and memory on wall-clock time. Upstash Box pay as you go, Vercel Sandbox and Cloudflare Sandbox only charge for CPU while it's busy, and Fly Sprites charge for both CPU and memory by how much you use. These are their CPU and memory rates as of September 2026. Storage, network, plan fees and credits are left out, and Vercel's rates are for its default `iad1` region, since its prices vary by region:
+E2B, Daytona, Modal and Upstash Box keep-alive charge for CPU and memory on wall-clock time. Upstash Box pay as you go, Vercel Sandbox and Cloudflare Sandbox only charge for CPU while it's busy, and Fly Sprites charge for both CPU and memory by how much you use. These are their CPU and memory rates as of November 2026. Storage, network, plan fees and credits are left out, and Vercel's rates are for its default `iad1` region, since its prices vary by region:
 
 | Provider | CPU meter | CPU rate | Memory |
 | --- | --- | --- | --- |
@@ -35,7 +35,7 @@ E2B, Daytona, Modal and Upstash Box keep-alive charge for CPU and memory on wall
 | [Upstash Box - Keep-alive](https://upstash.com/docs/box/overall/keep-alive) (fixed) | Wall-clock | $8 per month for a small box (2 vCPU), about $0.011 per hour | Included |
 | [Vercel Sandbox](https://vercel.com/docs/sandbox/pricing) | Active CPU | $0.128 per active CPU hour | $0.0212 per GB-hour, wall-clock |
 | [Cloudflare Sandbox](https://developers.cloudflare.com/containers/platform/pricing/) | Active CPU | $0.072 per vCPU-hour | $0.009 per GiB-hour, wall-clock |
-| [Fly Sprites](https://sprites.dev/pricing) | CPU used | $0.07 per CPU-hour | $0.04375 per GB-hour used |
+| [Fly Sprites](https://fly.io/pricing/) | CPU used | $0.0385 per CPU-hour | $0.021875 per GB-hour used |
 | [E2B](https://e2b.dev/pricing) | Wall-clock | $0.0504 per vCPU-hour | $0.0162 per GiB-hour, wall-clock |
 | [Daytona](https://www.daytona.io/pricing) | Wall-clock | $0.0504 per vCPU-hour | $0.0162 per GiB-hour, wall-clock |
 | [Modal Sandboxes](https://modal.com/pricing) | Wall-clock, or actual use if higher | $0.1419 per physical core-hour (2 vCPU) | $0.024 per GiB-hour |

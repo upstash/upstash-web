@@ -4,11 +4,11 @@ title: "Upstash Box vs E2B: Two Takes on Computers for AI Agents"
 authors: [alitarik]
 tags: [box, ai, serverless]
 description: "Upstash Box and E2B both give AI a sandbox to work in, but they draw the line in different places. A look at where the agent lives, how state persists, isolation, and what each costs."
-updated: "2026-10-14"
+updated: "2026-11-12"
 ---
 
 <Summary>
-**Upstash Box** puts the coding agent *inside* the sandbox. You create a box, hand it a prompt, and a built-in harness (Claude Code, Codex, or OpenCode) drives the shell, filesystem, and git for you. It's built for durable, per-tenant agent environments that sleep when idle and wake up with their state intact.
+**Upstash Box** puts the coding agent *inside* the sandbox. You create a box, hand it a prompt, and a built-in harness (Claude Code, Codex, or OpenCode) drives the shell, filesystem, and git for you. You can also skip the built-in agent and drive the same box from your own loop over the SDK, CLI, MCP, or SSH. It's built for durable, per-tenant agent environments that sleep when idle and wake up with their state intact.
 
 **E2B** keeps the agent *outside* and gives you a sandbox to run code in, with a Jupyter-based Code Interpreter, Firecracker microVM isolation, and memory-state pause/resume. You bring the orchestration.
 
@@ -135,7 +135,7 @@ The billing models reflect the two designs. E2B charges per-second wall-clock fo
 | Memory | Free | $0.0162 / GiB-hr, wall-clock |
 | Storage | $0.10 / GB-month (snapshots included) | included up to plan disk limit (10 GiB Hobby, 20+ GiB Pro) |
 | Continuous runtime | Keep-alive, flat $8 / $16 / $32 per month | up to 24 hr on Pro; paused sandboxes resume later |
-| Free tier | 10 concurrent, 5 CPU-hrs/mo | 20 concurrent, 1 hr max |
+| Free tier | 10 concurrent, 5 CPU-hrs/mo | $100 one-time credit, 10 concurrent, 1 hr max |
 
 Agents in the box use your own model provider key (Anthropic, OpenAI, OpenRouter, ...), so model usage is billed by your provider. Full numbers live on the [Box pricing page](https://upstash.com/pricing/box).
 
@@ -154,9 +154,9 @@ The spread comes from two places: Box doesn't bill the I/O-wait time and doesn't
 
 Both products run agent and harness workloads well, whether you lean on a built-in agent or wire up your own. The deciding factor is usually what you optimize for.
 
-Reach for **E2B** when isolation is the priority. Firecracker microVMs give each tenant its own kernel, and you can self-host or deploy into your own cloud, which is what you want under strict kernel-isolation or data-residency requirements. It's also the stronger pick if you specifically need notebook-style execution with stateful `runCode`, charts and tables out of the box, memory that survives a pause, or a desktop over VNC.
+Reach for **E2B** when isolation is the priority. Firecracker microVMs give each tenant its own kernel, and you can self-host or deploy into your own cloud, which is what you want under strict kernel-isolation requirements. It's also the stronger pick if you specifically need notebook-style execution with stateful `runCode`, charts and tables out of the box, memory that survives a pause, or a desktop over VNC.
 
-Reach for **Upstash Box** when cost and developer experience matter most. The agent, git, and PR flow are built in, so you have option to ship an agent in a few lines instead of assembling a harness, and a Box stays durable per tenant: it sleeps cheaply and wakes with its state. Active-CPU billing with free memory keeps bursty, I/O-heavy agent work cheap at scale, while secrets stay off the container and egress tightens at runtime.
+Reach for **Upstash Box** when feature set, cost, and developer experience matter most. It is a persistent computer you can plug your own agent into, and the agent, git, and PR flow are also built in, so you have the option to ship an agent in a few lines instead of assembling a harness. A Box stays durable per tenant: it sleeps cheaply and wakes with its state. Active-CPU billing with free memory keeps bursty, I/O-heavy agent work cheap at scale, while secrets stay off the container and egress tightens at runtime.
 
 Plenty of teams will reach for both. They're not the same tool wearing different prices; they weigh isolation, cost, and developer experience differently.
 
@@ -185,7 +185,7 @@ The free tier is 10 concurrent boxes and 5 CPU-hours a month, no platform fee. T
 
 ### What is the difference between Upstash Box and E2B?
 
-Box puts the coding agent inside the sandbox: you send a prompt and get back a result, a commit or a pull request. E2B gives you a Firecracker microVM and a code interpreter, and you run your own agent loop against it. E2B has the stronger isolation and memory snapshots; Box has more agent tooling and bills active CPU only.
+Box is a persistent computer that can run the coding agent inside it: you send a prompt and get back a result, a commit or a pull request, or you drive it from your own loop. E2B gives you a Firecracker microVM and a code interpreter, and you run your own agent loop against it. E2B has the stronger isolation and memory snapshots; Box has more agent tooling and bills active CPU only.
 
 ### Is Upstash Box cheaper than E2B?
 
