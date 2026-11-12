@@ -118,7 +118,7 @@ Good to know: a box is an isolated container, snapshots capture the disk rather 
 
 ## 6. Northflank: cheapest wall-clock compute, self-serve BYOC
 
-[Northflank](https://northflank.com) is a full platform with sandboxes on Kata or gVisor, no session cap, the lowest wall-clock rates in our comparison, and self-serve BYOC on AWS, GCP, Azure and others. There is no agent tooling; it is driven through its API and CLI.
+[Northflank](https://northflank.com) is a full platform with sandboxes on Kata or gVisor, no session cap, some of the lowest wall-clock rates in our comparison, and self-serve BYOC on AWS, GCP, Azure and others. There is no agent tooling; it is driven through its API and CLI.
 
 **Switch to it if** you need to run in your own cloud without an enterprise contract, or want databases and services next to the sandboxes.
 
@@ -156,7 +156,7 @@ For most agent workloads, Upstash Box: a persistent computer with no session cap
 
 ### Is there a cheaper alternative to E2B?
 
-For agents that spend most of their time waiting on the model, yes: active-CPU billing. An hour on a small Upstash Box with 10 core-minutes of real CPU is about $0.017 in compute, against about $0.166 on E2B for a 2 vCPU / 4 GB sandbox. Northflank has the lowest wall-clock rates if the CPU is busy all hour.
+For agents that spend most of their time waiting on the model, yes: active-CPU billing. An hour on a small Upstash Box with 10 core-minutes of real CPU is about $0.017 in compute, against about $0.166 on E2B for a 2 vCPU / 4 GB sandbox. Northflank has some of the lowest wall-clock rates if the CPU is busy all hour.
 
 ### Which E2B alternative has no session limit?
 
