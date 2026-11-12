@@ -1,0 +1,282 @@
+---
+authors: [Josh]
+slug: upstash-for-agents
+tags: [redis, agents, ai, mcp]
+title: "Redis for AI Agents: The Easiest Way for Agents to Share Memory"
+description: "How AI agents use a free Upstash Redis database as shared memory: continue a task after a crash, split a job queue between sub-agents, lock a file, and cache slow API calls. With code and the output of each run."
+---
+
+An agent loses its memory when a session crashes or the context is compacted, and sub-agents can't see each other's work. A free Upstash Redis database solves both problems. An agent can [create one with a single HTTP request](https://upstash.com/blog/redis-database-for-agents), no account or API key required, and every agent that has the database ID can read and write the same data.
+
+This post shows how agents use that database to save progress on long tasks, split work between sub-agents without duplicating it, lock files to avoid race conditions, and cache slow API calls.
+
+These examples were tested from an agent sandbox, with a newly created database. The output from the run is included below each code block.
+
+## Get a free Redis database without an account or API key
+
+The agent creates the database by sending a UUID it generated as the `Idempotency-Key` header. That UUID becomes the database ID. Sending it again returns the same database with the same credentials, so the agent only needs to save the ID in a file:
+
+```bash
+node -e 'console.log(crypto.randomUUID())' > db-id.txt
+
+curl -X POST https://upstash.com/start-redis \
+  -H "Idempotency-Key: $(cat db-id.txt)" \
+  -H "User-Agent: claude-code"
+```
+
+The response is a markdown document with the endpoint, the token and a quickstart:
+
+```text
+# Your Redis is ready
+
+**Database ID:** db9e5b59-4f46-40c6-...
+**Endpoint:** https://ethical-duckling-84612.upstash.io
+**Token:** gQAAAAAA...
+**Expires:** 2026-11-15 (3 days from creation).
+```
+
+An agent that starts fresh has lost the token, but it still has the file. This helper reads the ID, asks for the credentials again and returns a client from the [TypeScript SDK](https://upstash.com/docs/redis/sdks/ts):
+
+![](https://cdn.bydefault.so/drawing-hbIpD6WV6YJhATxzJ1fqq.png)
+
+```ts
+import { Redis } from "@upstash/redis";
+import { readFileSync } from "node:fs";
+
+export async function connect() {
+  const id = readFileSync("db-id.txt", "utf8").trim();
+
+  const res = await fetch("https://upstash.com/start-redis", {
+    method: "POST",
+    headers: { "Idempotency-Key": id, "User-Agent": "claude-code" },
+  });
+  const text = await res.text();
+
+  const url = text.match(/\*\*Endpoint:\*\* (\S+)/)![1];
+  const token = text.match(/\*\*Token:\*\* (\S+)/)![1];
+
+  return new Redis({ url, token });
+}
+```
+
+Any [person with the id can view, edit or claim](https://upstash.com/blog/redis-database-for-agents#a-note-on-data) the database if it hasn't been claimed yet, so we have added the `db-id.txt` to the `.gitignore` and did not store personal data/secrets in it.
+
+The helper above is included in the beginning of all the scripts below.
+
+## Continue a long task after a crash or a context reset
+
+In this example the agent migrates four test files. After each file, it writes the list of finished files into a Redis hash. To show a crash, the script stops itself after the second file on its first run:
+
+```ts
+import { connect } from "./connect.js";
+
+const redis = await connect();
+const key = "task:migrate-tests";
+
+const saved = await redis.hgetall<{ done: string[]; notes: string }>(key);
+const done = saved?.done ?? [];
+console.log("already done:", done);
+
+const files = ["auth.test.ts", "cart.test.ts", "search.test.ts", "user.test.ts"];
+
+for (const file of files) {
+  if (done.includes(file)) continue;
+
+  // ...the agent migrates the file here...
+  done.push(file);
+  await redis.hset(key, { done, notes: `last finished ${file}` });
+  console.log("migrated", file);
+
+  if (done.length === 2 && !saved) process.exit(1); // the run dies here
+}
+```
+
+The first run stops after two files:
+
+```text
+already done: []
+migrated auth.test.ts
+migrated cart.test.ts
+```
+
+The second run is a new process that remembers nothing. It reads the hash, skips the two finished files and does the rest:
+
+```text
+already done: [ 'auth.test.ts', 'cart.test.ts' ]
+migrated search.test.ts
+migrated user.test.ts
+```
+
+An agent can also use this same hash to remember where it was if the context gets compacted. It can look up the hash and then pick back up where it left off. Since the notes field is free form, it can also use it to record other notes, such as failing tests it wants to revisit.
+
+## How do multiple agents share state with Redis?
+
+Redis runs commands one by one, which lets multiple agents coordinate through common Redis keys. For example, agents could use a list as a job queue: as the agents pop from the list they’ll always get different jobs. They could also use a key with an expiry as a lock.
+
+![](https://cdn.bydefault.so/drawing-lw9caaqvbcoFpA1sv6o7n.png)
+
+Here a main agent puts 12 files on a list. Three sub-agents take jobs from it at the same time until the list is empty:
+
+```ts
+import { connect } from "./connect.js";
+
+const redis = await connect();
+
+const files = Array.from({ length: 12 }, (_, i) => `src/file-${i + 1}.ts`);
+await redis.lpush("jobs", ...files);
+
+async function worker(name: string) {
+  const mine: string[] = [];
+  while (true) {
+    const job = await redis.rpop<string>("jobs");
+    if (!job) return { name, mine };
+    mine.push(job); // ...the sub-agent reviews the file here...
+  }
+}
+
+const results = await Promise.all([worker("agent-a"), worker("agent-b"), worker("agent-c")]);
+
+for (const { name, mine } of results) console.log(name, mine.length, "jobs");
+
+const all = results.flatMap((r) => r.mine);
+console.log("total", all.length, "unique", new Set(all).size);
+```
+
+Each of the 12 jobs went to one agent:
+
+```text
+agent-a 4 jobs
+agent-b 4 jobs
+agent-c 4 jobs
+total 12 unique 12
+```
+
+This example uses one process for workers to keep things succinct, but sub-agents can be separate processes, in which case they make the same call with the same database ID.
+
+A queue hands out jobs, but two agents can still want the same file, like `package.json`. For that, an agent sets a key only if the key does not exist yet. The first agent to set it holds the lock:
+
+```ts
+import { connect } from "./connect.js";
+
+const redis = await connect();
+
+async function claim(agent: string, file: string) {
+  const ok = await redis.set(`lock:${file}`, agent, { nx: true, ex: 300 });
+  return ok === "OK";
+}
+
+console.log("agent-a:", await claim("agent-a", "package.json"));
+console.log("agent-b:", await claim("agent-b", "package.json"));
+console.log("held by:", await redis.get("lock:package.json"));
+
+await redis.del("lock:package.json");
+console.log("agent-b after release:", await claim("agent-b", "package.json"));
+```
+
+The second agent gets a no until the first one deletes the key:
+
+```text
+agent-a: true
+agent-b: false
+held by: agent-a
+agent-b after release: true
+```
+
+A 300 second lock expiration is also set so that the other agents can take the file after five minutes should an agent die after acquiring the lock.
+
+## Stop sub-agents from repeating the same slow API calls
+
+Sub-agents often read the same pages. When one of them has fetched a page, it can save the text in Redis with an expiry of one hour, and the others read it from there:
+
+```ts
+import { connect } from "./connect.js";
+
+const redis = await connect();
+
+async function readPage(url: string) {
+  const hit = await redis.get<string>(`page:${url}`);
+  if (hit) return hit;
+
+  const text = await (await fetch(url)).text();
+  await redis.set(`page:${url}`, text, { ex: 3600 });
+  return text;
+}
+
+for (const run of [1, 2]) {
+  const start = performance.now();
+  const page = await readPage("https://upstash.com/docs/llms.txt");
+  console.log(`run ${run}: ${page.length} chars in ${Math.round(performance.now() - start)} ms`);
+}
+```
+
+The second read came from Redis:
+
+```text
+run 1: 188997 chars in 110 ms
+run 2: 188997 chars in 16 ms
+```
+
+This page is fast, saving 94 ms. For a tool that is more expensive (a search API, a model call), that takes seconds or costs money to execute, these few lines make more of a difference.
+
+## See what your agent stored in the database
+
+After a run like this, both the agent and you want to know what is in the database. The agent can list the keys and read one back:
+
+```ts
+import { connect } from "./connect.js";
+
+const redis = await connect();
+
+console.log(await redis.keys("*"));
+console.log(await redis.hgetall("task:migrate-tests"));
+```
+
+The keys from the three examples are there:
+
+```text
+[
+  'lock:package.json',
+  'page:https://upstash.com/docs/llms.txt',
+  'task:migrate-tests'
+]
+{
+  done: [ 'auth.test.ts', 'cart.test.ts', 'search.test.ts', 'user.test.ts' ],
+  notes: 'last finished user.test.ts'
+}
+```
+
+Each database also has a metrics URL that returns usage as JSON, with no token needed. For this database it counted 32 commands and 189,235 bytes of memory.
+
+The metrics arrive a few minutes late. Right after the runs above, the endpoint still showed zero commands, and the real numbers appeared about four minutes after I created the database. An agent that wants to know if a write worked gets a faster answer by reading the key back.
+
+For you, the response has a console URL. The agent is told to pass it on to you. You can open it to see the keys, and click Claim to move the database into your Upstash account. A claimed database [has no expiry and gets the full free-tier quota](https://upstash.com/blog/redis-database-for-agents#every-db-includes-metrics-and-a-way-to-claim). Without a claim, Upstash deletes it after three days.
+
+![](https://cdn.bydefault.so/image-sfd6U0_3CRg6xMfyOu2Eu.png)
+
+## Connect your coding agents to your Upstash account with one command
+
+A scratch database covers state. Once you have an Upstash account, the agent can also work with the rest of your resources. One command sets that up for the coding agents on your machine:
+
+```bash
+npx upstash
+```
+
+It finds Claude Code, Codex, Cursor, Gemini CLI, VS Code, GitHub Copilot CLI and OpenCode, and [gives each one the Upstash skills and the MCP server](https://upstash.com/docs/agent-resources/overview). MCP (Model Context Protocol) is a protocol that hands tools to an agent. The skills are instructions for each Upstash SDK that the agent loads when a task needs them.
+
+![](https://cdn.bydefault.so/image-7MAx-TjrfLmigdlyUAmop.png)
+
+The [remote MCP server](https://upstash.com/docs/agent-resources/mcp) has 76 tools. These are the needs they cover:
+
+| The agent needs to | Upstash product | Example tool |
+| --- | --- | --- |
+| Keep state, queues and locks | Redis | `redis_run_command` |
+| Run code away from your machine | Box | `box_exec` |
+| Run something on a schedule | QStash | `qstash_manage_schedule` |
+| Find documents by meaning | Vector and Search | `search_query` |
+| Hand a file back as a URL | Blob | `blob_upload_url` |
+
+The server signs in with OAuth on the first tool call, and the consent page lets you make the connection read-only. On a read-only connection the server refuses the tools that change something. Running Redis commands still works there, but only for commands on a list of read-only ones.
+
+The agent also works without seeing your tokens. The server looks up the credentials of a resource on its side and calls the endpoint itself. A tool returns credentials only when the agent asks for them with `include_credentials`.
+
+So an agent can start with a database it made itself, and move to your account when the work is worth keeping.
