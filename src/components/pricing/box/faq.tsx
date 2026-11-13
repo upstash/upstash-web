@@ -58,16 +58,13 @@ export default function FAQ() {
           </p>
           <ul className="mt-4 list-disc space-y-2 pl-6">
             <li>
-              <b>Small</b> Keep Alive box: <b>$0.0111/hour</b> (about $8 per
-              month)
+              <b>Small</b> Keep Alive box: <b>$0.0111/hour</b> ($8 per month)
             </li>
             <li>
-              <b>Medium</b> Keep Alive box: <b>$0.0222/hour</b> (about $16 per
-              month)
+              <b>Medium</b> Keep Alive box: <b>$0.0222/hour</b> ($16 per month)
             </li>
             <li>
-              <b>Large</b> Keep Alive box: <b>$0.0444/hour</b> (about $32 per
-              month)
+              <b>Large</b> Keep Alive box: <b>$0.0444/hour</b> ($32 per month)
             </li>
           </ul>
         </AccordionContent>

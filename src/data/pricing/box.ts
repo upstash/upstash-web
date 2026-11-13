@@ -120,7 +120,7 @@ export const BOX_KEEPALIVE_PLAN: BoxPlan = {
   cpuHoursPerMonth: "Unlimited",
   storagePrice: "Included",
   cpuHourPricing: "Included in the fixed rate",
-  keepAlivePricing: "Small: $0.0111, Medium: $0.0222, Large: $0.0444 per box / hour (about $8, $16, $32 per month)",
+  keepAlivePricing: "Small: $0.0111, Medium: $0.0222, Large: $0.0444 per box / hour ($8, $16, $32 per month)",
   communitySupport: true,
   emailSupport: true,
   dedicatedSupport: false,

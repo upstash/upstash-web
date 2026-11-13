@@ -402,7 +402,7 @@ export default function CompareTable() {
           </Col>
           <Col plan={showKeepAlive}>
             <CompareValue>
-              {keepAliveSpec.keepAlivePrice} / box per hour (about{" "}
+              {keepAliveSpec.keepAlivePrice} / box per hour (
               {keepAliveSpec.keepAliveMonthly} / month)
             </CompareValue>
           </Col>
