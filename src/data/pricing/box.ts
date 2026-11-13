@@ -9,6 +9,7 @@ export interface BoxSize {
   storageLimit: string;
   cpuHourPrice: number;
   keepAlivePrice: number;
+  keepAliveMonthlyApprox: number;
 }
 
 export interface BoxPlan {
@@ -44,6 +45,7 @@ export const BOX_SIZES: BoxSize[] = [
     storageLimit: "10 GB",
     cpuHourPrice: 0.1,
     keepAlivePrice: 0.0111,
+    keepAliveMonthlyApprox: 8,
   },
   {
     id: "medium",
@@ -54,6 +56,7 @@ export const BOX_SIZES: BoxSize[] = [
     storageLimit: "30 GB",
     cpuHourPrice: 0.2,
     keepAlivePrice: 0.0222,
+    keepAliveMonthlyApprox: 16,
   },
   {
     id: "large",
@@ -64,6 +67,7 @@ export const BOX_SIZES: BoxSize[] = [
     storageLimit: "30 GB",
     cpuHourPrice: 0.4,
     keepAlivePrice: 0.0444,
+    keepAliveMonthlyApprox: 32,
   },
 ];
 
@@ -116,7 +120,7 @@ export const BOX_KEEPALIVE_PLAN: BoxPlan = {
   cpuHoursPerMonth: "Unlimited",
   storagePrice: "Included",
   cpuHourPricing: "Included in the fixed rate",
-  keepAlivePricing: "Small: $0.0111, Medium: $0.0222, Large: $0.0444 per box / hour",
+  keepAlivePricing: "Small: $0.0111, Medium: $0.0222, Large: $0.0444 per box / hour (about $8, $16, $32 per month)",
   communitySupport: true,
   emailSupport: true,
   dedicatedSupport: false,

@@ -10,7 +10,7 @@ updated: "2026-11-13"
 <Summary>
 [Upstash Box](/blog/upstash-box) has three kinds of boxes, because not all agent work is the same. **Ephemeral boxes** start fast, run one quick task, and go away. **Default boxes** pause when they are idle and wake up with their state still there, so you only pay for the CPU you use. **Keep-alive boxes** never pause. They stay on all the time, so a long-running agent or server always has a warm machine to run in.
 
-This post is about keep-alive boxes. The idea is simple: an agent that keeps working does not want a sandbox it has to rebuild every time. It wants a computer. Keep-alive boxes give it one, with the coding agent already inside, at a rate of **$0.0111 per hour**.
+This post is about keep-alive boxes. The idea is simple: an agent that keeps working does not want a sandbox it has to rebuild every time. It wants a computer. Keep-alive boxes give it one, with the coding agent already inside, at a rate of **$0.0111 per hour** (about $8 per month).
 </Summary>
 
 ## Three modes, one platform
@@ -92,9 +92,9 @@ Keep-alive boxes are billed at a fixed rate per hour instead, and it **replaces*
 
 | Size | CPU | Memory | Keep-alive price |
 | --- | --- | --- | --- |
-| Small | 2 vCPU | 4 GB | **$0.0111 / hour** |
-| Medium | 4 vCPU | 8 GB | $0.0222 / hour |
-| Large | 8 vCPU | 16 GB | $0.0444 / hour |
+| Small | 2 vCPU | 4 GB | **$0.0111 / hour** (about $8 per month) |
+| Medium | 4 vCPU | 8 GB | $0.0222 / hour (about $16 per month) |
+| Large | 8 vCPU | 16 GB | $0.0444 / hour (about $32 per month) |
 
 That is about a cent an hour, billed per second, for an always-on 2 vCPU / 4 GB computer with a coding agent already inside. No usage math, no surprise idle bill. It is cheap enough to leave one running per agent and not think about it.
 

@@ -10,7 +10,7 @@
     },
     {
       "question": "How much do Keep Alive boxes cost?",
-      "answer": "Keep Alive boxes are billed for the time they exist, at a fixed rate by size, billed per second. This is the only charge for that Keep Alive box, so you are not billed separately for CPU or storage on it. The rate is $0.0111 per hour for Small, $0.0222 per hour for Medium, and $0.0444 per hour for Large."
+      "answer": "Keep Alive boxes are billed for the time they exist, at a fixed rate by size, billed per second. This is the only charge for that Keep Alive box, so you are not billed separately for CPU or storage on it. The rate is $0.0111 per hour (about $8 per month) for Small, $0.0222 per hour (about $16 per month) for Medium, and $0.0444 per hour (about $32 per month) for Large."
     },
     {
       "question": "What is included in storage billing?",

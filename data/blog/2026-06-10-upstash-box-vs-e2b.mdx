@@ -134,7 +134,7 @@ The billing models reflect the two designs. E2B charges per-second wall-clock fo
 | CPU | Active only: $0.10/hr (`small`, 2 vCPU), $0.20 (`medium`), $0.40 (`large`) | $0.0504 / vCPU-hr, wall-clock |
 | Memory | Free | $0.0162 / GiB-hr, wall-clock |
 | Storage | $0.10 / GB-month (snapshots included) | included up to plan disk limit (10 GiB Hobby, 20+ GiB Pro) |
-| Continuous runtime | Keep-alive at $0.0111 / $0.0222 / $0.0444 per hour | up to 24 hr on Pro; paused sandboxes resume later |
+| Continuous runtime | Keep-alive at $0.0111 / $0.0222 / $0.0444 per hour (about $8 / $16 / $32 per month) | up to 24 hr on Pro; paused sandboxes resume later |
 | Free tier | 10 concurrent, 5 CPU-hrs/mo | $100 one-time credit, 10 concurrent, 1 hr max |
 
 Agents in the box use your own model provider key (Anthropic, OpenAI, OpenRouter, ...), so model usage is billed by your provider. Full numbers live on the [Box pricing page](https://upstash.com/pricing/box).

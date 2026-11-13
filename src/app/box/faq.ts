@@ -34,7 +34,7 @@ export const BOX_FAQ = [
   {
     question: "Can a box stay on all the time?",
     answer:
-      "Yes. A keep-alive box never pauses, so a personal agent, a bot or a server always has a warm machine. Keep-alive boxes are billed at a fixed rate by size: $0.0111 per hour for Small, $0.0222 for Medium and $0.0444 for Large, billed per second. An init command can start your process every time the box boots.",
+      "Yes. A keep-alive box never pauses, so a personal agent, a bot or a server always has a warm machine. Keep-alive boxes are billed at a fixed rate by size: $0.0111 per hour for Small, $0.0222 for Medium and $0.0444 for Large (about $8, $16 and $32 per month), billed per second. An init command can start your process every time the box boots.",
   },
   {
     question: "How much does Upstash Box cost?",

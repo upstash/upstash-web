@@ -39,7 +39,7 @@ function generateMarkdown(): string {
     "|------|------|--------|------|-------------|-----------------|",
     ...BOX_SIZES.map(
       (s) =>
-        `| ${s.label} | ${s.cpu} | ${s.memory} | ${s.storage} | $${s.cpuHourPrice}/active CPU hour | $${s.keepAlivePrice}/hour |`,
+        `| ${s.label} | ${s.cpu} | ${s.memory} | ${s.storage} | $${s.cpuHourPrice}/active CPU hour | $${s.keepAlivePrice}/hour (about $${s.keepAliveMonthlyApprox}/month) |`,
     ),
     "",
     "**Storage:** $0.10 per GB/month (billed separately on Pay as You Go)",
@@ -71,7 +71,7 @@ function generateMarkdown(): string {
     "|------|------|--------|------|------|",
     ...BOX_SIZES.map(
       (s) =>
-        `| ${s.label} | ${s.cpu} | ${s.memory} | ${s.storage} | $${s.keepAlivePrice}/box/hour |`,
+        `| ${s.label} | ${s.cpu} | ${s.memory} | ${s.storage} | $${s.keepAlivePrice}/box/hour (about $${s.keepAliveMonthlyApprox}/month) |`,
     ),
     "",
     "- Enabled per box on a Pay as You Go account; shares the same concurrent box quota",

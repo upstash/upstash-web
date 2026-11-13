@@ -63,7 +63,7 @@ Clone, fix, test, open a pull request, with no agent loop of your own to wire up
 
 It's **agent friendly** in the details too: secrets can be injected into outbound requests without ever entering the box, schedules run a command or a prompt on a cron, and every run records its cost with searchable logs and full history.
 
-On **pricing**, Box is the lowest-cost option in this list for typical agent workloads. It bills active CPU only, at $0.10 per active CPU-hour, and leaves memory free. Agent work spends most of its time waiting on the model, so that idle time isn't charged. If you need a box that stays on all the time, a keep-alive box is billed at a rate of $0.0111 per wall-clock hour for 2 vCPU and 4 GB.
+On **pricing**, Box is the lowest-cost option in this list for typical agent workloads. It bills active CPU only, at $0.10 per active CPU-hour, and leaves memory free. Agent work spends most of its time waiting on the model, so that idle time isn't charged. If you need a box that stays on all the time, a keep-alive box is billed at a rate of $0.0111 per wall-clock hour (about $8 per month) for 2 vCPU and 4 GB.
 
 The **free plan** is ten concurrent boxes and five CPU-hours a month, with no platform fee. Agents use your own model provider key (Anthropic, OpenAI, OpenRouter, ...). A box also auto-pauses when idle and wakes weeks later with its files intact, so a long-lived box per user costs almost nothing between sessions.
 

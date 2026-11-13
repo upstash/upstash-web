@@ -11,7 +11,7 @@ updated: "2026-11-13"
 A side-by-side comparison of 15 AI agent sandboxes, last checked in November 2026 against each provider's docs and pricing pages (sources at the end).
 
 - **Upstash Box is the best overall option on feature set and price.** It has the broadest agent tooling of the fifteen (a built-in coding agent, git-to-PR, a managed browser, cron, secret injection, MCP) on a persistent computer that is quick to set up and easy to plug into your own agent. A few hard filters point elsewhere: a separate kernel per tenant, a GPU, your own cloud, or memory that survives a pause. The table below maps each need to the providers that meet it.
-- **Billing is the biggest hidden difference.** Most providers bill wall-clock CPU and memory, while Cloudflare, Fly Sprites, Tensorlake, Upstash Box, and Vercel meter CPU by actual use. Box also leaves memory free and offers an always-on box at a rate of $0.0111 per hour, which puts it among the lowest-cost rows in the worked example below.
+- **Billing is the biggest hidden difference.** Most providers bill wall-clock CPU and memory, while Cloudflare, Fly Sprites, Tensorlake, Upstash Box, and Vercel meter CPU by actual use. Box also leaves memory free and offers an always-on box at a rate of $0.0111 per hour (about $8 per month), which puts it among the lowest-cost rows in the worked example below.
 - **Isolation is three designs, not a ranking.** Hardware VMs with their own kernel (Blaxel, Cloudflare, E2B, Fly Sprites, Freestyle, Koyeb, Namespace, Tensorlake, Vercel, Kata on Northflank for CPU sandboxes), gVisor's userspace kernel (Beam, Modal), and hardened containers (Daytona by default, Upstash Box).
 </Summary>
 
@@ -218,7 +218,7 @@ List prices, pay-as-you-go. Many providers have a plan with no monthly fee but g
 
 | Provider | Billing basis | CPU | Memory | Free tier | Idle cost |
 | --- | --- | --- | --- | --- | --- |
-| Upstash Box | Active core-hours only | $0.10 / $0.20 / $0.40 per active CPU-hour for small (2 vCPU), medium (4), large (8) | Free | 10 boxes, 5 CPU-h/mo, no card | Paused: $0 compute, $0.10/GB-mo storage. Keep-alive at $0.0111 / $0.0222 / $0.0444 per hour |
+| Upstash Box | Active core-hours only | $0.10 / $0.20 / $0.40 per active CPU-hour for small (2 vCPU), medium (4), large (8) | Free | 10 boxes, 5 CPU-h/mo, no card | Paused: $0 compute, $0.10/GB-mo storage. Keep-alive at $0.0111 / $0.0222 / $0.0444 per hour (about $8 / $16 / $32 per month) |
 | Daytona | Wall-clock per second | $0.0504/vCPU-h | $0.0162/GiB-h | $200 credit (not for GPU) | Stopped: disk only |
 | E2B | Wall-clock per second | $0.0504/vCPU-h | $0.0162/GiB-h | $100 one-time credit, 10 concurrent, 1h sessions | Paused: $0 |
 | Vercel Sandbox | Active CPU + provisioned memory | $0.128/active vCPU-h | $0.0212/GB-h | 5 active CPU-h, 420 GB-h, 10 concurrent | Stopped: snapshot storage only |

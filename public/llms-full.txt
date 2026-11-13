@@ -74,7 +74,7 @@ This site has a search endpoint: https://context7.com/api/v2/ask?siteKey=ask_4cf
 - Free: $0, 10 concurrent boxes, 5 CPU hours/month
 - Agents use your own model provider key (Anthropic, OpenAI, OpenRouter, ...)
 - Pay as You Go (usage): Small $0.10, Medium $0.20, Large $0.40 per active CPU hour + $0.10/GB/month storage
-- Pay as You Go (keep-alive): Small $0.0111, Medium $0.0222, Large $0.0444 per hour
+- Pay as You Go (keep-alive): Small $0.0111, Medium $0.0222, Large $0.0444 per hour (about $8, $16, $32 per month)
 - Enterprise: Custom — contact sales@upstash.com
 
 ---

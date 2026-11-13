@@ -23,6 +23,7 @@ const BOX_SIZES = {
     storage: "10",
     usagePrice: "$0.1",
     keepAlivePrice: "$0.0111",
+    keepAliveMonthly: "$8",
   },
   medium: {
     shortLabel: "M",
@@ -32,6 +33,7 @@ const BOX_SIZES = {
     storage: "20",
     usagePrice: "$0.2",
     keepAlivePrice: "$0.0222",
+    keepAliveMonthly: "$16",
   },
   large: {
     shortLabel: "L",
@@ -41,6 +43,7 @@ const BOX_SIZES = {
     storage: "30",
     usagePrice: "$0.4",
     keepAlivePrice: "$0.0444",
+    keepAliveMonthly: "$32",
   },
 } as const;
 
@@ -399,7 +402,8 @@ export default function CompareTable() {
           </Col>
           <Col plan={showKeepAlive}>
             <CompareValue>
-              {keepAliveSpec.keepAlivePrice} / box per hour
+              {keepAliveSpec.keepAlivePrice} / box per hour (about{" "}
+              {keepAliveSpec.keepAliveMonthly} / month)
             </CompareValue>
           </Col>
         </tr>

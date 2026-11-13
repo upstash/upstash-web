@@ -155,7 +155,8 @@ export default function PricingTable() {
             ${keepAliveSize.keepAlivePrice}
           </h5>
           <p className="text-sm text-text-mute">
-            {BOX_KEEPALIVE_PLAN.priceSubtext}
+            {BOX_KEEPALIVE_PLAN.priceSubtext} (about $
+            {keepAliveSize.keepAliveMonthlyApprox} / month)
           </p>
         </div>
 
