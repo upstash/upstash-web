@@ -11,7 +11,7 @@ updated: "2026-11-13"
 A side-by-side comparison of 15 AI agent sandboxes, last checked in November 2026 against each provider's docs and pricing pages (sources at the end).
 
 - **Upstash Box is the best overall option on feature set and price.** It has the broadest agent tooling of the fifteen (a built-in coding agent, git-to-PR, a managed browser, cron, secret injection, MCP) on a persistent computer that is quick to set up and easy to plug into your own agent. A few hard filters point elsewhere: a separate kernel per tenant, a GPU, your own cloud, or memory that survives a pause. The table below maps each need to the providers that meet it.
-- **Billing is the biggest hidden difference.** Most providers bill wall-clock CPU and memory, while Cloudflare, Fly Sprites, Tensorlake, Upstash Box, and Vercel meter CPU by actual use. Box also leaves memory free and offers a flat $0.0111 an hour for an always-on box, which puts it among the lowest-cost rows in the worked example below.
+- **Billing is the biggest hidden difference.** Most providers bill wall-clock CPU and memory, while Cloudflare, Fly Sprites, Tensorlake, Upstash Box, and Vercel meter CPU by actual use. Box also leaves memory free and offers an always-on box at a rate of $0.0111 per hour, which puts it among the lowest-cost rows in the worked example below.
 - **Isolation is three designs, not a ranking.** Hardware VMs with their own kernel (Blaxel, Cloudflare, E2B, Fly Sprites, Freestyle, Koyeb, Namespace, Tensorlake, Vercel, Kata on Northflank for CPU sandboxes), gVisor's userspace kernel (Beam, Modal), and hardened containers (Daytona by default, Upstash Box).
 </Summary>
 
@@ -25,7 +25,7 @@ A side-by-side comparison of 15 AI agent sandboxes, last checked in November 202
 | Memory that survives a pause | Blaxel, E2B, Freestyle, Tensorlake | Memory snapshots |
 | A persistent computer for an agent that is quick to set up and easy to plug in | Upstash Box | TypeScript and Python SDKs, CLI, MCP server, and SSH; works with your own agent loop or runs Claude Code, Codex, or OpenCode for you |
 | The lowest cost for agent work that mostly waits on a model | Upstash Box, then Beam (Shared), Cloudflare | Active-CPU billing with memory free: about $0.017 for the hour in the worked example below |
-| The lowest cost for an always-on or CPU-bound sandbox | Upstash Box (keep-alive), then Beam (Shared), Koyeb | Flat $0.0111 per wall-clock hour for a 2 vCPU / 4 GB box |
+| The lowest cost for an always-on or CPU-bound sandbox | Upstash Box (keep-alive), then Beam (Shared), Koyeb | $0.0111 per wall-clock hour for a 2 vCPU / 4 GB box |
 
 This post compares 15 popular AI agent sandbox providers side by side, from the same angles for each: capabilities, agent-native features, deployment, developer experience, and cost. Every row has a source at the end.
 
@@ -218,7 +218,7 @@ List prices, pay-as-you-go. Many providers have a plan with no monthly fee but g
 
 | Provider | Billing basis | CPU | Memory | Free tier | Idle cost |
 | --- | --- | --- | --- | --- | --- |
-| Upstash Box | Active core-hours only | $0.10 / $0.20 / $0.40 per active CPU-hour for small (2 vCPU), medium (4), large (8) | Free | 10 boxes, 5 CPU-h/mo, no card | Paused: $0 compute, $0.10/GB-mo storage. Keep-alive flat $0.0111 / $0.0222 / $0.0444 per hour |
+| Upstash Box | Active core-hours only | $0.10 / $0.20 / $0.40 per active CPU-hour for small (2 vCPU), medium (4), large (8) | Free | 10 boxes, 5 CPU-h/mo, no card | Paused: $0 compute, $0.10/GB-mo storage. Keep-alive at $0.0111 / $0.0222 / $0.0444 per hour |
 | Daytona | Wall-clock per second | $0.0504/vCPU-h | $0.0162/GiB-h | $200 credit (not for GPU) | Stopped: disk only |
 | E2B | Wall-clock per second | $0.0504/vCPU-h | $0.0162/GiB-h | $100 one-time credit, 10 concurrent, 1h sessions | Paused: $0 |
 | Vercel Sandbox | Active CPU + provisioned memory | $0.128/active vCPU-h | $0.0212/GB-h | 5 active CPU-h, 420 GB-h, 10 concurrent | Stopped: snapshot storage only |
@@ -242,7 +242,7 @@ The rate card is the wrong thing to compare. Agent work comes in bursts: the CPU
 
 | Provider | Formula (mostly idle) | Mostly idle | CPU busy |
 | --- | --- | --- | --- |
-| Upstash Box (small) | 0.167 core-h × $0.10; keep-alive is a flat $0.0111/hour | ~$0.017 | $0.0111 on a keep-alive box; ~$0.20 pay-as-you-go |
+| Upstash Box (small) | 0.167 core-h × $0.10; keep-alive is $0.0111/hour | ~$0.017 | $0.0111 on a keep-alive box; ~$0.20 pay-as-you-go |
 | Daytona, E2B | 2 × $0.0504 + 4 × $0.0162 | ~$0.166 | ~$0.166 |
 | Vercel Sandbox | 0.167 × $0.128 + 4 × $0.0212 | ~$0.106 | ~$0.341 |
 | Modal (1 physical core / 4 GiB requested) | 1 × $0.142 + 4 × $0.024 | ~$0.238 | ~$0.238 |
@@ -261,7 +261,7 @@ Examples computed from list prices, not quotes. Storage is excluded except where
 
 In these configurations Box is the lowest fixed-size row in the mostly idle hour at ~$0.017, because only the 10 active core-minutes are billed and memory is free. Next are Beam on its Shared tier (~$0.044), Cloudflare (~$0.052), Tensorlake Pro (~$0.053), and Koyeb (~$0.058), and the highest are Modal and Runloop. Fly Sprites is the one that depends on your process: it bills memory actually in use, so a light process can come in under Box and a memory-heavy one well above it.
 
-For a sandbox that is busy or simply up all the time, a Box keep-alive box is a flat $0.0111 per wall-clock hour for 2 vCPU / 4 GB with CPU and storage included. The next lowest are Beam Shared (~$0.044/h, about $32 a month always on), Koyeb (~$0.058/h, about $42), and Northflank (~$0.067/h, about $49). A single CPU-saturated hour on a pay-as-you-go box, without keep-alive, is ~$0.20.
+For a sandbox that is busy or simply up all the time, a Box keep-alive box is billed at a rate of $0.0111 per wall-clock hour for 2 vCPU / 4 GB with CPU and storage included. The next lowest are Beam Shared (~$0.044/h, about $32 a month always on), Koyeb (~$0.058/h, about $42), and Northflank (~$0.067/h, about $49). A single CPU-saturated hour on a pay-as-you-go box, without keep-alive, is ~$0.20.
 
 Wall-clock providers cost the same in both columns, so the more time your agent spends waiting on a model, the more active-CPU billing saves.
 
@@ -280,7 +280,7 @@ For most agent workloads, start with Upstash Box: it is the best overall option 
 5. **The sandbox has to live inside your platform.** Cloudflare, Modal, or Vercel Sandbox.
 6. **A persistent computer for your agent that is quick to set up and easy to plug in.** Upstash Box: TypeScript and Python SDKs, a CLI, an MCP server, and SSH, with your own agent loop or a built-in coding agent, plus git-to-PR, a browser, and cron when you want them.
 7. **An agent that mostly waits on a model.** An active-CPU provider: Upstash Box (memory free as well), Cloudflare, Fly Sprites, Tensorlake, or Vercel.
-8. **An always-on sandbox for your own agent.** An Upstash Box keep-alive box at a flat $0.0111/hour (2 vCPU / 4 GB), or Beam (Shared tier), Koyeb, or Northflank on per-hour rates.
+8. **An always-on sandbox for your own agent.** An Upstash Box keep-alive box at a rate of $0.0111 per hour (2 vCPU / 4 GB), or Beam (Shared tier), Koyeb, or Northflank on per-hour rates.
 
 ## Try Box
 
@@ -311,7 +311,7 @@ Last checked in November 2026 (first published September 2026). Compliance cells
 
 ### What is the cheapest sandbox for AI agents?
 
-In the 2 vCPU / 4 GB configurations we priced, Upstash Box. For an hour that mostly waits on a model (about 10 core-minutes of real work) it is about $0.017, because it bills active CPU only and leaves memory free; the next lowest are Beam's Shared tier at about $0.044 and Cloudflare at about $0.052. Fly Sprites bills memory actually in use, so a light process there can cost less. For a sandbox that stays on all the time, a keep-alive box is a flat $0.0111 per wall-clock hour, against about $0.044 on Beam Shared and $0.058 on Koyeb.
+In the 2 vCPU / 4 GB configurations we priced, Upstash Box. For an hour that mostly waits on a model (about 10 core-minutes of real work) it is about $0.017, because it bills active CPU only and leaves memory free; the next lowest are Beam's Shared tier at about $0.044 and Cloudflare at about $0.052. Fly Sprites bills memory actually in use, so a light process there can cost less. For a sandbox that stays on all the time, a keep-alive box is billed at a rate of $0.0111 per wall-clock hour, against about $0.044 on Beam Shared and $0.058 on Koyeb.
 
 ### How do AI sandbox providers bill?
 

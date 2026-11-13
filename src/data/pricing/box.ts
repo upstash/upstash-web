@@ -98,7 +98,7 @@ export const BOX_PAYG_PLAN: BoxPlan = {
   cpuHourPricing:
     "Small: $0.10, Medium: $0.20, Large: $0.40 per active CPU hour",
   keepAlivePricing:
-    "Available per box at a fixed hourly price. See the Fixed plan.",
+    "Available per box at a fixed rate per hour. See the Fixed plan.",
   communitySupport: true,
   emailSupport: true,
   dedicatedSupport: false,
@@ -109,13 +109,13 @@ export const BOX_KEEPALIVE_PLAN: BoxPlan = {
   name: "Fixed",
   type: "keepalive",
   description:
-    "Always-on boxes. One hourly price, no usage charges.",
+    "Always-on boxes. One rate per hour, no usage charges.",
   priceDisplay: "$0.0111–$0.0444",
   priceSubtext: "per box / hour",
   maxConcurrentBoxes: 1000,
   cpuHoursPerMonth: "Unlimited",
   storagePrice: "Included",
-  cpuHourPricing: "Included in the fixed hourly price",
+  cpuHourPricing: "Included in the fixed rate",
   keepAlivePricing: "Small: $0.0111, Medium: $0.0222, Large: $0.0444 per box / hour",
   communitySupport: true,
   emailSupport: true,

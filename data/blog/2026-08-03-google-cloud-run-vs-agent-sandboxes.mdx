@@ -180,7 +180,7 @@ console.log(publicUrl.url)
 
 Google's framing is that sandboxes add **no extra cost**, because they run on the CPU and memory your Cloud Run service already has. That's true as far as it goes: there is no sandbox surcharge. The cost is the Cloud Run service itself. With the default request-based billing, you pay for the allocated CPU and memory while the service handles a request, and a long agent call is one long request: the meter runs the whole time, including the minutes spent waiting on a model. With instance-based billing, you pay for the instance's whole lifecycle instead. Either way, sandboxes share the host container's allocation, so you size the service for your app plus every sandbox that may run at the same time.
 
-Box meters differently: **active CPU only**, at **$0.10 per active core-hour**. Memory has no separate charge, and a paused box costs no active compute at all. Boxes with `keepAlive` use fixed hourly pricing instead. Agent workloads spend most of their wall-clock waiting on model inference or slow APIs, which is exactly the time Box does not bill.
+Box meters differently: **active CPU only**, at **$0.10 per active core-hour**. Memory has no separate charge, and a paused box costs no active compute at all. Boxes with `keepAlive` are billed at a fixed rate per hour instead. Agent workloads spend most of their wall-clock waiting on model inference or slow APIs, which is exactly the time Box does not bill.
 
 | | Cloud Run sandboxes | Upstash Box |
 | --- | --- | --- |

@@ -57,7 +57,7 @@ You can also use the box to run bots on top of OpenClaw. Because the box stays o
 
 ### Hermes
 
-Hermes has a bigger install, since it pulls substantial dependencies. The Small size (2 vCPU, 4 GB RAM, 10 GB disk) is enough to run it, and a keep-alive Small box is a flat $0.0111 an hour.
+Hermes has a bigger install, since it pulls substantial dependencies. The Small size (2 vCPU, 4 GB RAM, 10 GB disk) is enough to run it, and a keep-alive Small box is billed at a rate of $0.0111 per hour.
 
 You install Hermes once and it stays. The next time you connect, everything is exactly where you left it. The box holds its state between sessions until you decide to delete it.
 
@@ -88,7 +88,7 @@ The same way: install it in a box with the [Hermes guide](https://upstash.com/do
 
 ### How much does it cost to keep a personal agent always on?
 
-A keep-alive box is a flat $0.0111 an hour for the small size, and it's what a chat assistant needs. Gateways like Telegram's poll for new messages from inside the box, so a box that has paused can't receive a message or wake itself up. Use a default box, which pauses when idle and bills only active CPU, for work you start yourself, not for an assistant that has to answer messages.
+A keep-alive box is billed at a rate of $0.0111 per hour for the small size, and it's what a chat assistant needs. Gateways like Telegram's poll for new messages from inside the box, so a box that has paused can't receive a message or wake itself up. Use a default box, which pauses when idle and bills only active CPU, for work you start yourself, not for an assistant that has to answer messages.
 
 ### Is it safe to give OpenClaw or Hermes shell access?
 

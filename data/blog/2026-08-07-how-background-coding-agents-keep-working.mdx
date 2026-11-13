@@ -93,7 +93,7 @@ file=persistent hello package=true process_after_resume=stopped
 
 The file and the installed npm package came back after the pause. The background process did not. That field shows the limit of pause and resume: state comes back, a running process does not.
 
-For a box that has to stay on, a warm agent or a permanent webhook endpoint, setting `keepAlive: true` [turns off auto-pausing](https://upstash.com/docs/box/overall/keep-alive) and switches billing to a fixed price: [$0.0111 per hour for a small box, $0.0222 for medium, $0.0444 for large](https://upstash.com/pricing/box), replacing the CPU and storage charges.
+For a box that has to stay on, a warm agent or a permanent webhook endpoint, setting `keepAlive: true` [turns off auto-pausing](https://upstash.com/docs/box/overall/keep-alive) and switches billing to a fixed rate: [$0.0111 per hour for a small box, $0.0222 for medium, $0.0444 for large](https://upstash.com/pricing/box), replacing the CPU and storage charges.
 
 ## Do long-running agents need a separate workflow engine?
 

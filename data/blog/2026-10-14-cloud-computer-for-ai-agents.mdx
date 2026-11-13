@@ -165,7 +165,7 @@ const assistant = await Box.create({
 
 ### What it costs
 
-The free plan includes 10 concurrent boxes and 5 CPU-hours a month, with no card. Agents use your own model provider key (Anthropic, OpenAI, OpenRouter, ...). After that a default box bills $0.10 per active CPU-hour for the small size (2 vCPU, 4 GB) with memory free. As an example, an hour in which the agent uses 10 core-minutes of real CPU is about $0.017 in compute. A keep-alive box is a flat $0.0111 an hour, and paused boxes pay only for storage. See [Box pricing](https://upstash.com/pricing/box).
+The free plan includes 10 concurrent boxes and 5 CPU-hours a month, with no card. Agents use your own model provider key (Anthropic, OpenAI, OpenRouter, ...). After that a default box bills $0.10 per active CPU-hour for the small size (2 vCPU, 4 GB) with memory free. As an example, an hour in which the agent uses 10 core-minutes of real CPU is about $0.017 in compute. A keep-alive box is billed at a rate of $0.0111 per hour, and paused boxes pay only for storage. See [Box pricing](https://upstash.com/pricing/box).
 
 ## FAQ
 
@@ -187,7 +187,7 @@ It depends on the billing model more than the rate. Agents spend most of their t
 
 ### Can an AI agent's computer stay on 24/7?
 
-Yes. A keep-alive Upstash Box never pauses, for a flat $0.0111 an hour on the small size, and an init command restarts your server or gateway whenever the box boots. Personal agents like [OpenClaw and Hermes](/blog/openclaw-and-hermes-on-upstash-box) run this way.
+Yes. A keep-alive Upstash Box never pauses, at a rate of $0.0111 per hour on the small size, and an init command restarts your server or gateway whenever the box boots. Personal agents like [OpenClaw and Hermes](/blog/openclaw-and-hermes-on-upstash-box) run this way.
 
 ### Is it safe to let an AI agent run commands on a cloud computer?
 

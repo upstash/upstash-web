@@ -92,7 +92,7 @@ if (page.isDark) {
 
 On Daytona the same flow means installing and driving the agent CLI yourself, parsing its output, adding a browser (Computer Use gives you a VNC desktop, not a scripted browser API), and calling git and the GitHub API.
 
-Two operational differences: a box pauses when idle and resumes with its files weeks later, instead of stopping after 15 minutes, and stays on with `keepAlive: true` for a flat $0.0111 an hour; and the network is open from the first day, with your own allowlist when you want one. On cost, an hour in which the agent uses 10 core-minutes of CPU is about $0.02 in compute on a small box and about $0.17 on a 2 vCPU / 4 GB Daytona sandbox, because Box doesn't bill memory or idle CPU.
+Two operational differences: a box pauses when idle and resumes with its files weeks later, instead of stopping after 15 minutes, and stays on with `keepAlive: true` at a rate of $0.0111 per hour; and the network is open from the first day, with your own allowlist when you want one. On cost, an hour in which the agent uses 10 core-minutes of CPU is about $0.02 in compute on a small box and about $0.17 on a 2 vCPU / 4 GB Daytona sandbox, because Box doesn't bill memory or idle CPU.
 
 Good to know: Box is CPU-only Linux with SDKs in TypeScript and Python, plus a CLI, an MCP server and SSH for everything else. Boxes run in `us-east-1` today, with more regions planned. The [Box vs Daytona comparison](/blog/upstash-box-vs-daytona) goes deeper, and the [quickstart](https://upstash.com/docs/box/overall/quickstart) gets the example above running.
 

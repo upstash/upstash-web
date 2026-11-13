@@ -306,7 +306,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
-            <Tooltip content="Standard boxes auto-pause after inactivity. Keep-alive boxes stay on continuously and are billed separately with fixed hourly pricing.">
+            <Tooltip content="Standard boxes auto-pause after inactivity. Keep-alive boxes stay on continuously and are billed separately at a fixed rate per hour.">
               Idle Timeout
             </Tooltip>
           </th>
@@ -323,7 +323,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
-            <Tooltip content="Keep-alive boxes stay on continuously and are billed at a fixed hourly price by size instead of per active CPU hour.">
+            <Tooltip content="Keep-alive boxes stay on continuously and are billed at a fixed rate per hour by size instead of per active CPU hour.">
               Keep Alive
             </Tooltip>
           </th>
@@ -406,7 +406,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
-            <Tooltip content="Standard boxes are billed by active CPU usage. Keep-alive boxes are covered by their fixed hourly price.">
+            <Tooltip content="Standard boxes are billed by active CPU usage. Keep-alive boxes are covered by their fixed rate per hour.">
               CPU Price
             </Tooltip>
           </th>

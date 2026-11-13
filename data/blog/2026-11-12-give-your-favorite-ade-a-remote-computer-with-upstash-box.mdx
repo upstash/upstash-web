@@ -30,7 +30,7 @@ A remote agent changes the game in a few ways:
 
 ## Upstash Box in one minute
 
-A box automatically pauses after some time of inactivity - 1 hour for free boxes, 6 hours for paid boxes. During a pause, your processes will be stopped, but the files will persist, and the box will resume on its next activity (e.g. running a command, reconnecting to the box). To bring a server back after a pause, set an [init command](https://upstash.com/docs/box/overall/quickstart#init-command). The box runs it on every start, including each resume. If you really need a box to never pause, you can use a [keep-alive box](https://upstash.com/docs/box/overall/keep-alive) for a fixed hourly price.
+A box automatically pauses after some time of inactivity - 1 hour for free boxes, 6 hours for paid boxes. During a pause, your processes will be stopped, but the files will persist, and the box will resume on its next activity (e.g. running a command, reconnecting to the box). To bring a server back after a pause, set an [init command](https://upstash.com/docs/box/overall/quickstart#init-command). The box runs it on every start, including each resume. If you really need a box to never pause, you can use a [keep-alive box](https://upstash.com/docs/box/overall/keep-alive) at a fixed rate per hour.
 
 Upstash Boxes run on Debian OS inside the cloud, and come with [their own filesystem, shell and network](https://upstash.com/docs/box/overall/how-it-works). They are especially customized for AI workloads, pre-installed with tools like Claude Code, Codex, git and Node.js.
 
