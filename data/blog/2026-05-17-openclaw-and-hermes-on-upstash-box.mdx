@@ -4,7 +4,7 @@ title: "How to Host OpenClaw and Hermes 24/7 on Upstash Box"
 authors: [alitarik]
 tags: [ai, box, serverless]
 description: "How to host OpenClaw or Hermes Agent 24/7 without leaving your laptop on: run either one in an isolated Upstash Box that stays reachable from Telegram, WhatsApp or Slack, with snapshots for a clean restore."
-updated: "2026-10-14"
+updated: "2026-11-13"
 ---
 
 AI infrastructure is moving fast. New gateways, new agent frameworks, new runtimes. The hard part is no longer finding the right tool. It's finding a stable place to run it.
@@ -57,7 +57,7 @@ You can also use the box to run bots on top of OpenClaw. Because the box stays o
 
 ### Hermes
 
-Hermes has a bigger install, since it pulls substantial dependencies. The Small size (2 vCPU, 4 GB RAM, 10 GB disk) is enough to run it, and a keep-alive Small box is a flat $8 a month.
+Hermes has a bigger install, since it pulls substantial dependencies. The Small size (2 vCPU, 4 GB RAM, 10 GB disk) is enough to run it, and a keep-alive Small box is billed at a rate of $0.0111 per hour (about $8 per month).
 
 You install Hermes once and it stays. The next time you connect, everything is exactly where you left it. The box holds its state between sessions until you decide to delete it.
 
@@ -88,7 +88,7 @@ The same way: install it in a box with the [Hermes guide](https://upstash.com/do
 
 ### How much does it cost to keep a personal agent always on?
 
-A keep-alive box is a flat $8 a month for the small size, and it's what a chat assistant needs. Gateways like Telegram's poll for new messages from inside the box, so a box that has paused can't receive a message or wake itself up. Use a default box, which pauses when idle and bills only active CPU, for work you start yourself, not for an assistant that has to answer messages.
+A keep-alive box is billed at a rate of $0.0111 per hour for the small size, and it's what a chat assistant needs. Gateways like Telegram's poll for new messages from inside the box, so a box that has paused can't receive a message or wake itself up. Use a default box, which pauses when idle and bills only active CPU, for work you start yourself, not for an assistant that has to answer messages.
 
 ### Is it safe to give OpenClaw or Hermes shell access?
 

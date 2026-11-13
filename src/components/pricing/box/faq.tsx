@@ -21,8 +21,8 @@ export default function FAQ() {
             measured in core-hours. For example, using 100% of 2 cores for one
             hour costs <b>$0.2</b>, while using 10% of a single core for one
             hour costs <b>$0.01</b>. When a standard box is idle with no CPU
-            usage, no charges apply. Keep-alive boxes use fixed monthly pricing
-            by size instead.
+            usage, no charges apply. Keep-alive boxes are billed at a fixed rate
+            per hour by size instead.
           </p>
         </AccordionContent>
       </AccordionItem>
@@ -41,8 +41,8 @@ export default function FAQ() {
               intervention is needed.
             </li>
             <li>
-              Keep-alive boxes stay on continuously and use fixed monthly
-              pricing by size instead of auto-pause behavior.
+              Keep-alive boxes stay on continuously and are billed at a fixed
+              rate per hour by size instead of auto-pause behavior.
             </li>
           </ul>
         </AccordionContent>
@@ -51,19 +51,20 @@ export default function FAQ() {
         <AccordionTrigger>How much do Keep Alive boxes cost?</AccordionTrigger>
         <AccordionContent>
           <p className="mt-4">
-            Keep Alive boxes are billed with a fixed monthly price by size. This
-            is the only charge for that Keep Alive box, so you are not billed
-            separately for CPU or storage on it.
+            Keep Alive boxes are billed for the time they exist, at a fixed rate
+            by size, billed per second. This is the only charge for that Keep
+            Alive box, so you are not billed separately for CPU or storage on
+            it.
           </p>
           <ul className="mt-4 list-disc space-y-2 pl-6">
             <li>
-              <b>Small</b> Keep Alive box: <b>$8/month</b>
+              <b>Small</b> Keep Alive box: <b>$0.0111/hour</b> ($8 per month)
             </li>
             <li>
-              <b>Medium</b> Keep Alive box: <b>$16/month</b>
+              <b>Medium</b> Keep Alive box: <b>$0.0222/hour</b> ($16 per month)
             </li>
             <li>
-              <b>Large</b> Keep Alive box: <b>$32/month</b>
+              <b>Large</b> Keep Alive box: <b>$0.0444/hour</b> ($32 per month)
             </li>
           </ul>
         </AccordionContent>

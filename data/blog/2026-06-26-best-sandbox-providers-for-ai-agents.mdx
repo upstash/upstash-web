@@ -4,7 +4,7 @@ title: "The Best Sandbox Providers for AI Agents in 2026: Which One to Choose fo
 authors: [alitarik]
 tags: [box, ai, serverless]
 description: "The top ten sandbox providers for AI agents in 2026 and when to pick each: Upstash Box, Daytona, E2B, Vercel Sandbox, Modal, Cloudflare, Northflank, Freestyle, Fly.io and Runloop."
-updated: "2026-11-12"
+updated: "2026-11-13"
 ---
 
 <Summary>
@@ -63,7 +63,7 @@ Clone, fix, test, open a pull request, with no agent loop of your own to wire up
 
 It's **agent friendly** in the details too: secrets can be injected into outbound requests without ever entering the box, schedules run a command or a prompt on a cron, and every run records its cost with searchable logs and full history.
 
-On **pricing**, Box is the lowest-cost option in this list for typical agent workloads. It bills active CPU only, at $0.10 per active CPU-hour, and leaves memory free. Agent work spends most of its time waiting on the model, so that idle time isn't charged. If you need a box that stays on all the time, a keep-alive box is a flat $8 a month for 2 vCPU and 4 GB, which is about $0.011 per wall-clock hour.
+On **pricing**, Box is the lowest-cost option in this list for typical agent workloads. It bills active CPU only, at $0.10 per active CPU-hour, and leaves memory free. Agent work spends most of its time waiting on the model, so that idle time isn't charged. If you need a box that stays on all the time, a keep-alive box is billed at a rate of $0.0111 per wall-clock hour (about $8 per month) for 2 vCPU and 4 GB.
 
 The **free plan** is ten concurrent boxes and five CPU-hours a month, with no platform fee. Agents use your own model provider key (Anthropic, OpenAI, OpenRouter, ...). A box also auto-pauses when idle and wakes weeks later with its files intact, so a long-lived box per user costs almost nothing between sessions.
 
@@ -261,7 +261,7 @@ The category looks crowded, but the choice usually comes down to a couple of que
 
 **What's your hardest constraint?** Strong isolation → **E2B** or **Fly.io**. A GPU in the box → **Modal** or **Northflank**. Cold-start speed → **Daytona**. A long-lived VM with root → **Freestyle**. Your existing ecosystem → **Cloudflare** or **Vercel**. Self-hosting → **Northflank**.
 
-**What does the work spend its time doing?** If it mostly *waits* on the model (most agent work does), active-CPU billing saves real money over wall-clock pricing. **Upstash Box** bills active CPU only with memory free, while **Vercel Sandbox** and **Cloudflare** bill active CPU plus memory. If it has to stay on all the time, a Box keep-alive box is a flat $8 a month, below the per-hour rates of the wall-clock providers.
+**What does the work spend its time doing?** If it mostly *waits* on the model (most agent work does), active-CPU billing saves real money over wall-clock pricing. **Upstash Box** bills active CPU only with memory free, while **Vercel Sandbox** and **Cloudflare** bill active CPU plus memory. If it has to stay on all the time, a Box keep-alive box is billed at a rate of $0.0111 per hour, below the per-hour rates of the wall-clock providers.
 
 For most teams, **Upstash Box** is the best place to start: it covers the widest range of agent workloads, from a plain shell for your own loop to a built-in coding agent with git, a browser, and schedules, and it is priced low. Add or switch to another provider when you hit a constraint it can't move, such as a GPU or your own cloud.
 
@@ -281,7 +281,7 @@ An isolated environment where an AI agent runs the code it writes, with its own 
 
 ### Which AI sandbox is cheapest?
 
-For typical agent workloads, Upstash Box. For agents that spend most of their time waiting on the model, it bills active CPU only ($0.10 per active CPU-hour) and leaves memory free, while Vercel Sandbox and Cloudflare bill active CPU plus provisioned memory and the rest bill wall-clock time. For a sandbox that stays on all the time, a keep-alive box is a flat $8 a month for 2 vCPU and 4 GB, about $0.011 per wall-clock hour. The [15-provider comparison](/blog/ai-agent-sandbox-providers-compared-2026) works through the numbers.
+For typical agent workloads, Upstash Box. For agents that spend most of their time waiting on the model, it bills active CPU only ($0.10 per active CPU-hour) and leaves memory free, while Vercel Sandbox and Cloudflare bill active CPU plus provisioned memory and the rest bill wall-clock time. For a sandbox that stays on all the time, a keep-alive box is billed at a rate of $0.0111 per wall-clock hour for 2 vCPU and 4 GB. The [15-provider comparison](/blog/ai-agent-sandbox-providers-compared-2026) works through the numbers.
 
 ### Which sandbox can run Claude Code or Codex inside it?
 

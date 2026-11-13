@@ -88,7 +88,7 @@ if (run.result.testsPassed) {
 }
 ```
 
-Two more differences matter for long agent work. There is no session cap: a box pauses when idle and resumes with its files, or stays on with `keepAlive: true` for a flat $8 a month. And memory is free: an hour on a small box in which the agent uses 10 core-minutes of CPU is about $0.017 in compute, against about $0.166 for a 2 vCPU / 4 GB E2B sandbox running that hour ([worked example](/blog/ai-agent-sandbox-providers-compared-2026#cost)).
+Two more differences matter for long agent work. There is no session cap: a box pauses when idle and resumes with its files, or stays on with `keepAlive: true` at a rate of $0.0111 per hour (about $8 per month). And memory is free: an hour on a small box in which the agent uses 10 core-minutes of CPU is about $0.017 in compute, against about $0.166 for a 2 vCPU / 4 GB E2B sandbox running that hour ([worked example](/blog/ai-agent-sandbox-providers-compared-2026#cost)).
 
 Good to know: a box is an isolated container, snapshots capture the disk rather than memory, and code runs through `exec` rather than a Jupyter-style interpreter. Boxes run in `us-east-1` today, with more regions planned. The [Box vs E2B comparison](/blog/upstash-box-vs-e2b) goes deeper, and the [quickstart](https://upstash.com/docs/box/overall/quickstart) runs the code above in a few minutes.
 

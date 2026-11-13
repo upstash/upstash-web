@@ -9,6 +9,7 @@ export interface BoxSize {
   storageLimit: string;
   cpuHourPrice: number;
   keepAlivePrice: number;
+  keepAliveMonthlyApprox: number;
 }
 
 export interface BoxPlan {
@@ -43,7 +44,8 @@ export const BOX_SIZES: BoxSize[] = [
     storage: "10 GB",
     storageLimit: "10 GB",
     cpuHourPrice: 0.1,
-    keepAlivePrice: 8,
+    keepAlivePrice: 0.0111,
+    keepAliveMonthlyApprox: 8,
   },
   {
     id: "medium",
@@ -53,7 +55,8 @@ export const BOX_SIZES: BoxSize[] = [
     storage: "30 GB",
     storageLimit: "30 GB",
     cpuHourPrice: 0.2,
-    keepAlivePrice: 16,
+    keepAlivePrice: 0.0222,
+    keepAliveMonthlyApprox: 16,
   },
   {
     id: "large",
@@ -63,7 +66,8 @@ export const BOX_SIZES: BoxSize[] = [
     storage: "30 GB",
     storageLimit: "30 GB",
     cpuHourPrice: 0.4,
-    keepAlivePrice: 32,
+    keepAlivePrice: 0.0444,
+    keepAliveMonthlyApprox: 32,
   },
 ];
 
@@ -98,7 +102,7 @@ export const BOX_PAYG_PLAN: BoxPlan = {
   cpuHourPricing:
     "Small: $0.10, Medium: $0.20, Large: $0.40 per active CPU hour",
   keepAlivePricing:
-    "Available per box at a fixed monthly price. See the Fixed plan.",
+    "Available per box at a fixed rate per hour. See the Fixed plan.",
   communitySupport: true,
   emailSupport: true,
   dedicatedSupport: false,
@@ -109,14 +113,14 @@ export const BOX_KEEPALIVE_PLAN: BoxPlan = {
   name: "Fixed",
   type: "keepalive",
   description:
-    "Always-on boxes. One monthly price, no usage charges.",
-  priceDisplay: "$8–$32",
-  priceSubtext: "per box / month",
+    "Always-on boxes. One rate per hour, no usage charges.",
+  priceDisplay: "$0.0111–$0.0444",
+  priceSubtext: "per box / hour",
   maxConcurrentBoxes: 1000,
   cpuHoursPerMonth: "Unlimited",
   storagePrice: "Included",
-  cpuHourPricing: "Included in the fixed monthly price",
-  keepAlivePricing: "Small: $8, Medium: $16, Large: $32 per box / month",
+  cpuHourPricing: "Included in the fixed rate",
+  keepAlivePricing: "Small: $0.0111, Medium: $0.0222, Large: $0.0444 per box / hour ($8, $16, $32 per month)",
   communitySupport: true,
   emailSupport: true,
   dedicatedSupport: false,

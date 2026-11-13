@@ -30,7 +30,7 @@ A remote agent changes the game in a few ways:
 
 ## Upstash Box in one minute
 
-A box automatically pauses after some time of inactivity - 1 hour for free boxes, 6 hours for paid boxes. During a pause, your processes will be stopped, but the files will persist, and the box will resume on its next activity (e.g. running a command, reconnecting to the box). To bring a server back after a pause, set an [init command](https://upstash.com/docs/box/overall/quickstart#init-command). The box runs it on every start, including each resume. If you really need a box to never pause, you can use a [keep-alive box](https://upstash.com/docs/box/overall/keep-alive) for a fixed monthly price.
+A box automatically pauses after some time of inactivity - 1 hour for free boxes, 6 hours for paid boxes. During a pause, your processes will be stopped, but the files will persist, and the box will resume on its next activity (e.g. running a command, reconnecting to the box). To bring a server back after a pause, set an [init command](https://upstash.com/docs/box/overall/quickstart#init-command). The box runs it on every start, including each resume. If you really need a box to never pause, you can use a [keep-alive box](https://upstash.com/docs/box/overall/keep-alive) at a fixed rate per hour.
 
 Upstash Boxes run on Debian OS inside the cloud, and come with [their own filesystem, shell and network](https://upstash.com/docs/box/overall/how-it-works). They are especially customized for AI workloads, pre-installed with tools like Claude Code, Codex, git and Node.js.
 
@@ -40,9 +40,9 @@ You pay for the CPU the box uses, so a paused or idle box costs nothing for comp
 
 | Size | CPU | Memory | Disk | Pay as you go | Keep-alive |
 | --- | --- | --- | --- | --- | --- |
-| Small | 2 vCPU | 4 GB | 10 GB | $0.10 per active CPU hour | $8 per month |
-| Medium | 4 vCPU | 8 GB | 20 GB | $0.20 per active CPU hour | $16 per month |
-| Large | 8 vCPU | 16 GB | 30 GB | $0.40 per active CPU hour | $32 per month |
+| Small | 2 vCPU | 4 GB | 10 GB | $0.10 per active CPU hour | $0.0111 per hour (about $8 per month) |
+| Medium | 4 vCPU | 8 GB | 20 GB | $0.20 per active CPU hour | $0.0222 per hour (about $16 per month) |
+| Large | 8 vCPU | 16 GB | 30 GB | $0.40 per active CPU hour | $0.0444 per hour (about $32 per month) |
 
 The free plan gives you 10 boxes at a time and 5 CPU hours per month. Pay-as-you-go boxes also pay $0.10 per GB per month for storage. The keep-alive price already includes CPU and storage. For now, we run boxes in AWS us-east-1. Upstash doesn’t bill for model usage; use your own provider key or subscription for Claude Code and Codex.
 

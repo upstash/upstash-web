@@ -4,7 +4,7 @@ slug: ai-sandbox-pricing-active-cpu-vs-wall-clock
 tags: [box, ai, agents, sandbox]
 title: "AI Sandbox Pricing Compared: Active CPU vs Wall-Clock Billing, Which Costs Less?"
 description: "AI agent sandbox pricing compared: active CPU vs wall-clock billing across Upstash Box, Vercel, Cloudflare, Fly Sprites, E2B and more, with provider rates, worked examples, and break-even points for agent workloads."
-updated: "2026-11-12"
+updated: "2026-11-13"
 ---
 
 A lower CPU rate on a pricing page doesn't always mean you'll pay less for a sandbox. Some providers charge for every second the sandbox runs, based on how many CPUs it has. Others only charge for the CPU time your code uses.
@@ -32,7 +32,7 @@ E2B, Daytona, Modal and Upstash Box keep-alive charge for CPU and memory on wall
 | Provider | CPU meter | CPU rate | Memory |
 | --- | --- | --- | --- |
 | [Upstash Box](https://upstash.com/pricing/box) (pay as you go) | Active CPU | $0.10 per active CPU hour (small box) | Free |
-| [Upstash Box - Keep-alive](https://upstash.com/docs/box/overall/keep-alive) (fixed) | Wall-clock | $8 per month for a small box (2 vCPU), about $0.011 per hour | Included |
+| [Upstash Box - Keep-alive](https://upstash.com/docs/box/overall/keep-alive) (fixed) | Wall-clock | $0.0111 per hour (about $8 per month) for a small box (2 vCPU) | Included |
 | [Vercel Sandbox](https://vercel.com/docs/sandbox/pricing) | Active CPU | $0.128 per active CPU hour | $0.0212 per GB-hour, wall-clock |
 | [Cloudflare Sandbox](https://developers.cloudflare.com/containers/platform/pricing/) | Active CPU | $0.072 per vCPU-hour | $0.009 per GiB-hour, wall-clock |
 | [Fly Sprites](https://fly.io/pricing/) | CPU used | $0.0385 per CPU-hour | $0.021875 per GB-hour used |
@@ -85,7 +85,7 @@ Here are the CPU and memory costs for one hour on the same 2 vCPU, 4 GB sandbox,
 | Provider | Bursty agent hour (10 core-minutes busy) | Saturated hour (both cores busy) |
 | --- | --- | --- |
 | Upstash Box (pay as you go) | $0.017 | $0.20 |
-| Upstash Box - Keep-alive (fixed) | $0.011 | $0.011 |
+| Upstash Box - Keep-alive (fixed) | $0.0111 | $0.0111 |
 | Vercel Sandbox | $0.106 | $0.341 |
 | E2B or Daytona | $0.166 | $0.166 |
 
@@ -118,15 +118,15 @@ Here are the [rates for each box size](https://upstash.com/pricing/box):
 
 | Size | Resources | Pay as you go | Keep-alive |
 | --- | --- | --- | --- |
-| Small | 2 vCPU, 4 GB RAM, 10 GB disk | $0.10 per active CPU hour | $8 per month |
-| Medium | 4 vCPU, 8 GB RAM, 20 GB disk | $0.20 per active CPU hour | $16 per month |
-| Large | 8 vCPU, 16 GB RAM, 30 GB disk | $0.40 per active CPU hour | $32 per month |
+| Small | 2 vCPU, 4 GB RAM, 10 GB disk | $0.10 per active CPU hour | $0.0111 per hour (about $8 per month) |
+| Medium | 4 vCPU, 8 GB RAM, 20 GB disk | $0.20 per active CPU hour | $0.0222 per hour (about $16 per month) |
+| Large | 8 vCPU, 16 GB RAM, 30 GB disk | $0.40 per active CPU hour | $0.0444 per hour (about $32 per month) |
 
 Pay as you go measures the CPU your code uses in core-hours. Using 100% of both cores on a small box for an hour costs $0.20, and using 10% of one core for an hour costs $0.01. Memory is free, and storage costs $0.10 per GB per month (snapshots included). When a box has no running commands, it pauses after an [idle timeout of 6 hours](https://upstash.com/pricing/box) on pay as you go. A paused box keeps its files and wakes up on the next request.
 
-Keep-alive boxes never pause. Their rate covers CPU and storage. For a small box, $8 / 730 hours comes to about $0.011 per hour. That's about a fifteenth of E2B's $0.166 an hour for the same 2 vCPU, 4 GB allocation. You can turn it on with the `keepAlive` option when you [create a box](https://upstash.com/docs/box/overall/keep-alive), and it can run a startup command like `npm run dev` every time it starts.
+Keep-alive boxes never pause. Their rate covers CPU and storage. A small box is $0.0111 per hour. That's about a fifteenth of E2B's $0.166 an hour for the same 2 vCPU, 4 GB allocation. You can turn it on with the `keepAlive` option when you [create a box](https://upstash.com/docs/box/overall/keep-alive), and it can run a startup command like `npm run dev` every time it starts.
 
-Ignoring storage charges, both modes cost the same on a small box at 80 active core-hours a month ($8 / $0.10 = 80). A small box that runs all month has 2 x 730 = 1,460 core-hours. So keep-alive is cheaper once a box stays on and keeps its cores more than about 5.5% busy on average. Below that, pay as you go is cheaper, and the box can auto-pause after its idle timeout. Keep-alive includes storage and pay as you go does not, so with storage counted, the switch point comes a little earlier.
+Ignoring storage charges, both modes cost the same on a small box at about 0.11 active core-hours per hour ($0.0111 / $0.10). A small box has 2 core-hours available every hour. So keep-alive is cheaper once a box stays on and keeps its cores more than about 5.5% busy on average. Below that, pay as you go is cheaper, and the box can auto-pause after its idle timeout. Keep-alive includes storage and pay as you go does not, so with storage counted, the switch point comes a little earlier.
 
 Here's which workloads fit each mode:
 
