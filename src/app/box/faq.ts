@@ -34,7 +34,7 @@ export const BOX_FAQ = [
   {
     question: "Can a box stay on all the time?",
     answer:
-      "Yes. A keep-alive box never pauses, so a personal agent, a bot or a server always has a warm machine. Keep-alive boxes have a fixed monthly price by size: $8 for Small, $16 for Medium and $32 for Large. An init command can start your process every time the box boots.",
+      "Yes. A keep-alive box never pauses, so a personal agent, a bot or a server always has a warm machine. Keep-alive boxes have a fixed hourly price by size: $0.0111 for Small, $0.0222 for Medium and $0.0444 for Large. An init command can start your process every time the box boots.",
   },
   {
     question: "How much does Upstash Box cost?",

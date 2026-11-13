@@ -3,14 +3,14 @@ slug: keep-alive-boxes
 title: "Keep-Alive Boxes: Host a Long-Running AI Agent on an Always-On Server"
 authors: [alitarik]
 tags: [box, ai, serverless]
-description: "Some agent tasks are quick and throwaway. Others need to keep running. Keep-alive boxes give a long-running agent a real computer that stays on between sessions, with the coding agent already inside, for a flat $8 a month."
-updated: "2026-10-14"
+description: "Some agent tasks are quick and throwaway. Others need to keep running. Keep-alive boxes give a long-running agent a real computer that stays on between sessions, with the coding agent already inside, for a flat $0.0111 an hour."
+updated: "2026-11-13"
 ---
 
 <Summary>
 [Upstash Box](/blog/upstash-box) has three kinds of boxes, because not all agent work is the same. **Ephemeral boxes** start fast, run one quick task, and go away. **Default boxes** pause when they are idle and wake up with their state still there, so you only pay for the CPU you use. **Keep-alive boxes** never pause. They stay on all the time, so a long-running agent or server always has a warm machine to run in.
 
-This post is about keep-alive boxes. The idea is simple: an agent that keeps working does not want a sandbox it has to rebuild every time. It wants a computer. Keep-alive boxes give it one, with the coding agent already inside, for a flat **$8 a month**.
+This post is about keep-alive boxes. The idea is simple: an agent that keeps working does not want a sandbox it has to rebuild every time. It wants a computer. Keep-alive boxes give it one, with the coding agent already inside, for a flat **$0.0111 an hour**.
 </Summary>
 
 ## Three modes, one platform
@@ -84,7 +84,7 @@ const run = await box.agent.run({
 })
 ```
 
-### A flat $8 a month
+### A flat $0.0111 an hour
 
 Persistent VMs are usually billed by usage. With an always-on machine, that means you pay while it sits idle, and you have to watch the meter.
 
@@ -92,11 +92,11 @@ Keep-alive boxes have one flat price instead, and it **replaces** usage billing:
 
 | Size | CPU | Memory | Keep-alive price |
 | --- | --- | --- | --- |
-| Small | 2 vCPU | 4 GB | **$8 / month** |
-| Medium | 4 vCPU | 8 GB | $16 / month |
-| Large | 8 vCPU | 16 GB | $32 / month |
+| Small | 2 vCPU | 4 GB | **$0.0111 / hour** |
+| Medium | 4 vCPU | 8 GB | $0.0222 / hour |
+| Large | 8 vCPU | 16 GB | $0.0444 / hour |
 
-Eight dollars a month for an always-on 2 vCPU / 4 GB computer with a coding agent already inside. No usage math, no surprise idle bill. It is cheap enough to leave one running per agent and not think about it.
+About a cent an hour for an always-on 2 vCPU / 4 GB computer with a coding agent already inside. No usage math, no surprise idle bill. It is cheap enough to leave one running per agent and not think about it.
 
 ---
 
@@ -120,7 +120,7 @@ The [keep-alive docs](https://upstash.com/docs/box/overall/keep-alive) cover ini
 
 ### What is the best way to host a long-running AI agent?
 
-On a machine that stays on and keeps its state, isolated from your own systems. A keep-alive Upstash Box never pauses, keeps installed packages, the cloned repo and running processes, and has the coding agent already inside, for a flat $8 a month on the small size.
+On a machine that stays on and keeps its state, isolated from your own systems. A keep-alive Upstash Box never pauses, keeps installed packages, the cloned repo and running processes, and has the coding agent already inside, for a flat $0.0111 an hour on the small size.
 
 ### When should I use keep-alive instead of a default box?
 
@@ -128,7 +128,7 @@ Use keep-alive when every request has to be answered right away: an always-on se
 
 ### How much does a keep-alive box cost?
 
-$8 a month for small (2 vCPU, 4 GB), $16 for medium (4 vCPU, 8 GB) and $32 for large (8 vCPU, 16 GB), flat.
+$0.0111 an hour for small (2 vCPU, 4 GB), $0.0222 for medium (4 vCPU, 8 GB) and $0.0444 for large (8 vCPU, 16 GB), flat.
 
 ### How do I restart my server automatically after a keep-alive box boots?
 

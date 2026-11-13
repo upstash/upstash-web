@@ -74,7 +74,7 @@ export default function SeoPlanData() {
               <td>{size.memory}</td>
               <td>{size.storage}</td>
               <td>${size.cpuHourPrice}/active CPU hour</td>
-              <td>${size.keepAlivePrice}/month</td>
+              <td>${size.keepAlivePrice}/hour</td>
             </tr>
           ))}
         </tbody>

@@ -78,7 +78,7 @@ export const FEATURES: SectionFeaturesProps = {
     {
       icon: <IconClockPlay className="size-5" stroke={1.5} />,
       title: "Schedules and always-on",
-      desc: "Run a command or an agent prompt on a cron schedule inside the box, or keep a box on all the time for a flat monthly price.",
+      desc: "Run a command or an agent prompt on a cron schedule inside the box, or keep a box on all the time for a flat hourly price.",
     },
     {
       icon: <IconShieldLock className="size-5" stroke={1.5} />,

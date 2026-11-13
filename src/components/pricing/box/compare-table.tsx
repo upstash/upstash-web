@@ -22,7 +22,7 @@ const BOX_SIZES = {
     memory: "4",
     storage: "10",
     usagePrice: "$0.1",
-    keepAlivePrice: "$8",
+    keepAlivePrice: "$0.0111",
   },
   medium: {
     shortLabel: "M",
@@ -31,7 +31,7 @@ const BOX_SIZES = {
     memory: "8",
     storage: "20",
     usagePrice: "$0.2",
-    keepAlivePrice: "$16",
+    keepAlivePrice: "$0.0222",
   },
   large: {
     shortLabel: "L",
@@ -40,7 +40,7 @@ const BOX_SIZES = {
     memory: "16",
     storage: "30",
     usagePrice: "$0.4",
-    keepAlivePrice: "$32",
+    keepAlivePrice: "$0.0444",
   },
 } as const;
 
@@ -194,7 +194,7 @@ export default function CompareTable() {
               <h5 className="mt-1 flex items-baseline font-semibold">
                 {keepAliveSpec.keepAlivePrice}
                 <span className="ml-1 text-base font-normal opacity-40">
-                  / box per month
+                  / box per hour
                 </span>
               </h5>
             </div>
@@ -306,7 +306,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
-            <Tooltip content="Standard boxes auto-pause after inactivity. Keep-alive boxes stay on continuously and are billed separately with fixed monthly pricing.">
+            <Tooltip content="Standard boxes auto-pause after inactivity. Keep-alive boxes stay on continuously and are billed separately with fixed hourly pricing.">
               Idle Timeout
             </Tooltip>
           </th>
@@ -323,7 +323,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
-            <Tooltip content="Keep-alive boxes stay on continuously and are billed at a fixed monthly price by size instead of per active CPU hour.">
+            <Tooltip content="Keep-alive boxes stay on continuously and are billed at a fixed hourly price by size instead of per active CPU hour.">
               Keep Alive
             </Tooltip>
           </th>
@@ -390,7 +390,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal">Monthly Price</th>
+          <th className="px-0 py-4 text-left font-normal">Fixed Price</th>
           <Col plan={showFree}>
             <CompareValue>Free</CompareValue>
           </Col>
@@ -399,14 +399,14 @@ export default function CompareTable() {
           </Col>
           <Col plan={showKeepAlive}>
             <CompareValue>
-              {keepAliveSpec.keepAlivePrice} / box per month
+              {keepAliveSpec.keepAlivePrice} / box per hour
             </CompareValue>
           </Col>
         </tr>
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
-            <Tooltip content="Standard boxes are billed by active CPU usage. Keep-alive boxes are covered by their fixed monthly price.">
+            <Tooltip content="Standard boxes are billed by active CPU usage. Keep-alive boxes are covered by their fixed hourly price.">
               CPU Price
             </Tooltip>
           </th>
