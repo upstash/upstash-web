@@ -19,7 +19,7 @@ Without the second check, a token made for one service can be used on another. W
 
 | Who | What it does |
 | --- | --- |
-| MCP client | Sends a `resource` parameter, the MCP server's URL, when it asks for a token. |
+| MCP client | Sends a `resource` parameter, the MCP server's URL, when it starts sign-in and when it asks for a token. |
 | Authorization server | Writes that URL into the token's audience (`aud`). |
 | MCP server | Rejects any token whose audience is not its own URL. |
 
@@ -32,19 +32,27 @@ One more rule: an MCP server must never pass the token it received on to another
 ```ts
 import { createRemoteJWKSet, jwtVerify } from "jose";
 
-const jwks = createRemoteJWKSet(new URL(`${ISSUER}/.well-known/jwks.json`));
+// The authorization server's metadata (RFC 8414) says where its keys are.
+const metadata = await fetch(
+  `${ISSUER}/.well-known/oauth-authorization-server`,
+).then((res) => res.json());
+const jwks = createRemoteJWKSet(new URL(metadata.jwks_uri));
 
 const { payload } = await jwtVerify(token, jwks, {
   issuer: ISSUER,
   audience: "https://mcp.example.com",
+  typ: "at+jwt",
+  algorithms: ["RS256"],
 });
 ```
 
-The `audience` option does the audience check for you: a token made for another server fails.
+The `audience` option does the audience check for you: a token made for another server fails. `typ` keeps an ID token from passing as an access token, and `algorithms` accepts only the algorithm your authorization server signs with. Both checks come from RFC 9068.
 
 **2. Get the audience into tokens.** Turn on the authorization server's setting that copies `resource` into `aud`.
 
 **3. Turn the check on slowly.** First log every token whose audience doesn't match, and keep accepting it. Then reject tokens made for other servers. Last, reject tokens with no audience at all.
+
+The snippet above is the last stage: it also rejects tokens with no `aud`. For the earlier stages, leave `audience` out of `jwtVerify` and check `payload.aud` yourself.
 
 That's the whole plan. The rest of this post is about what can go wrong.
 
@@ -58,54 +66,49 @@ Checking tokens locally (step 1) keeps most requests away from the authorization
 
 ### Sign-in fails after you turn on audiences
 
-Some clients leave `resource` out when they start the sign-in and only send it later, when they ask for the token. Once audiences are on, the authorization server refuses that token request, because the resource was never part of the sign-in.
+The spec says clients must send `resource` both when they start sign-in and when they ask for the token. Some send it only the second time. Once audiences are on, the authorization server refuses that token request, because the resource was never part of the sign-in.
 
-You can fix this without waiting for the client. When a sign-in request arrives without `resource`, send it back to the authorization server with your MCP server's URL added, and mark it so a request that still has none gets an error instead of looping. The token request then works whether or not it repeats `resource`.
+If you control the sign-in step, you can fix this without waiting for the client. That needs a hook in your authorization server, or a consent page of your own that it redirects to. A plain MCP server can't do it. When a sign-in request arrives without `resource`, send it back to the authorization server with your MCP server's URL added, and mark it so a request that still has none gets an error instead of looping. The token request then works whether or not it repeats `resource`. This only adds a parameter and hands the request back. It doesn't issue tokens or register clients, so it isn't a proxy in front of your authorization server.
 
 ### Old sign-ins never get an audience
 
-The audience setting only applies to new sign-ins, and refresh tokens often live for months, so tokens without `aud` keep arriving long after you turn it on.
+On some authorization servers, the audience setting only applies to new sign-ins. Refresh tokens often live for months, so tokens without `aud` keep arriving long after you turn it on.
 
-Some authorization servers add the audience to an older sign-in when the client refreshes with a `resource`, so those clients fix themselves over time. The ones that refresh without it don't. Measure how many tokens still arrive without an audience, and only require one when that share is small. One caution: once a sign-in has an audience, it usually can't change, so only add a `resource` on a client's behalf when you know which one it should be.
+Some authorization servers add the audience to an older sign-in when the client refreshes with a `resource`, so those clients fix themselves over time. The ones that refresh without it don't. Accepting tokens with no audience breaks the spec, so treat it as a temporary window: measure how many still arrive, pick a date, and reject them after it. One caution: on some authorization servers, once a sign-in has an audience it can't change, so only add a `resource` on a client's behalf when you know which one it should be.
 
 ### The same server has several URLs
 
-Clients send the URL the user typed. `https://mcp.example.com`, `https://mcp.example.com/mcp`, a trailing slash and a `?client=…` query can all mean the same server. Decide which forms you accept before you start rejecting; the log from step 3 shows you which ones real clients send.
+Clients send the URL the user typed, so `https://mcp.example.com` and `https://mcp.example.com/mcp` may both show up. Pick one canonical URL and publish it as `resource` in your Protected Resource Metadata. The spec's form is a lowercase scheme and host, with no trailing slash unless it matters. RFC 8707 adds that it should not carry a query, so a `?client=…` doesn't belong in `aud`.
+
+If you serve more than one URL, `audience` also takes an array. List only the forms you serve, not every form a client happens to send. The log from step 3 shows you which ones real clients send.
 
 ### Users behind a gateway keep signing in again
 
 Some users reach you through an API gateway that runs its own sign-in, so their tokens carry the gateway's address. A correct check rejects them, but if the error only says "invalid token", the client signs in again, gets the same kind of token, and loops. Tell these users what to do instead, for example to use an API key with the gateway.
 
-### Two layers rejecting at once causes a loop
+### An API behind your server rejects you
 
-If your MCP server and an API behind it both check the audience, turn the stricter mode on at the MCP server first. If only the API rejects, the MCP server may read that as an expired token and keep asking the client to sign in again.
-
-### Users get logged out after a refresh
-
-Most authorization servers hand out a new refresh token on every refresh and treat reuse of an old one as theft, cancelling the whole sign-in. So a client that refreshes twice at the same moment, from two tabs or two processes, logs its own user out. Servers can't prevent this; clients should refresh one at a time and save the new refresh token before anything else uses it.
+If your MCP server calls another API, it gets its own token for that API, for example through token exchange or a token with that API's audience. It never forwards the client's token. When that API rejects your server's token, don't pass the 401 on to the client. The client would read it as an expired sign-in and keep signing in again. Answer 502 or 503 instead.
 
 ### You can't tell which clients will break
 
 Before you reject anything, log each mismatch with the client ID and the kind of mismatch: no audience, or someone else's. That tells you which clients a stricter rule would affect. Leave very busy endpoints such as health checks out of that log, or it will drown everything else.
-
-## Should clients register dynamically or use a metadata URL?
-
-Newer revisions of the spec prefer **Client ID Metadata Documents**: instead of registering, a client identifies itself with a URL that describes it. If your authorization server supports them, let it handle them, and list it first in your server's metadata. Don't build this into a proxy of your own in front of it. That leads to the "confused deputy" problem the spec warns about.
 
 ## Checklist
 
 **For your MCP server:**
 
 - Publish Protected Resource Metadata, so clients know where to sign in.
-- Check JWT access tokens yourself, including the audience.
+- Check JWT access tokens yourself, including the audience and the `at+jwt` type.
 - If the authorization server is down and you can't check a token, answer 503 ("try again later"), not 401.
-- Log mismatches first, then reject other servers' tokens, then tokens with no audience.
-- Add a default `resource` to sign-ins that leave it out.
+- Log mismatches first, then reject other servers' tokens, then tokens with no audience by a set date.
+- If you control the sign-in step, add a default `resource` to sign-ins that leave it out.
 - Explain every rejection in plain words.
 - Never forward a client's token to another API.
 
 **For your MCP client:**
 
 - Send the same `resource` when you sign in, get a token and refresh it.
-- Refresh one at a time, and save the new refresh token first.
+- Prefer Client ID Metadata Documents. Dynamic Client Registration is deprecated in revision 2026-07-28.
+- Refresh one at a time, and save the new refresh token first. Many authorization servers treat a reused refresh token as theft and end the sign-in.
 - Read 401 as "sign in again" and 503 as "try again later".
