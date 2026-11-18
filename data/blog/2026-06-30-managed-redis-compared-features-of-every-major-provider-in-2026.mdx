@@ -73,8 +73,6 @@ await redis.set("greeting", "hello");
 
 Every other provider in the table is TCP-only, and they split into two groups. ElastiCache, MemoryDB, and Memorystore live inside a private VPC with no public endpoint, so you connect from inside the same network and reach them from outside through a VPN, peering, or a bastion host. That's good for a locked-down backend and a dealbreaker for an edge function. Azure Cache, DigitalOcean, Aiven, and Redis Cloud do expose public TLS endpoints, so a normal server anywhere can connect, but they're still TCP.
 
-A POST to [https://upstash.com/start-redis](https://upstash.com/start-redis) returns a live database URL and token with no login and no API key. It expires in 72 hours unless you claim it, which is handy for a prototype or for handing an AI agent something to write against immediately.
-
 ## How do the providers go global?
 
 There are two kinds of multi-region, and they solve different problems.

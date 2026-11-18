@@ -65,6 +65,10 @@
       "destination": "https://upstash.com/docs/common/help/support"
     },
     {
+      "source": "/blog/redis-database-for-agents",
+      "destination": "/redis"
+    },
+    {
       "source": "/blog/introducing-upstash-blob",
       "destination": "/blog/upstash-blob"
     },

@@ -44,8 +44,6 @@ The cookie contains an ID, nothing else. Someone who steals it still can't read 
 
 Create a database in the Upstash console, then copy the REST URL and token into your environment. The Upstash Redis client is HTTP-based, so it works in serverless functions and on the edge without a connection pool.
 
-Tip: You can just make a request to https://upstash.com/start-redis to create a free Upstash Redis database with out sign-in or API key required. Great to start fast and you can claim it later.
-
 ```ts
 import { Redis } from "@upstash/redis";
 
