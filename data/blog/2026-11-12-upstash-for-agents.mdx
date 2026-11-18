@@ -6,7 +6,7 @@ title: "Redis for AI Agents: The Easiest Way for Agents to Share Memory"
 description: "How AI agents use a free Upstash Redis database as shared memory: continue a task after a crash, split a job queue between sub-agents, lock a file, and cache slow API calls. With code and the output of each run."
 ---
 
-An agent loses its memory when a session crashes or the context is compacted, and sub-agents can't see each other's work. A free Upstash Redis database solves both problems. Create one on the free tier, and every agent that has its URL and token can read and write the same data.
+An agent loses its memory when a session crashes or the context is compacted, and sub-agents can't see each other's work. A free Upstash Redis database solves both problems. Every agent that has its URL and token can read and write the same data.
 
 This post shows how agents use that database to save progress on long tasks, split work between sub-agents without duplicating it, lock files to avoid race conditions, and cache slow API calls.
 
@@ -14,7 +14,7 @@ These examples were tested from an agent sandbox, with a newly created database.
 
 ## Connect an agent to a free Redis database
 
-Create a database in the [Upstash Console](https://console.upstash.com/redis), or let an agent that already has the [Upstash CLI or MCP server](https://upstash.com/docs/agent-resources/overview) create it. Then give the agent the REST URL and token from the database page as environment variables:
+Create a database in the [Upstash Console](https://console.upstash.com/redis), or let an agent that already has the [Upstash CLI or MCP server](#connect-your-coding-agents-to-your-upstash-account-with-one-command) create it. Then give the agent the REST URL and token from the database page as environment variables:
 
 ```bash
 export UPSTASH_REDIS_REST_URL=https://ethical-duckling-84612.upstash.io
