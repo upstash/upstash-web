@@ -310,7 +310,7 @@ export default function AgentSetupButton({
         aria-expanded={open}
         onClick={() => onCopy(PRIMARY_OPTION)}
         className={cx(
-          "group flex h-11 items-stretch overflow-hidden rounded-lg border border-emerald-500",
+          "group flex h-11 items-stretch overflow-hidden rounded-xl border border-emerald-500",
           // A 10% emerald-to-yellow wash over the page colour, per the design.
           "bg-[linear-gradient(90deg,rgba(16,185,129,0.1),rgba(234,179,8,0.1)),linear-gradient(white,white)]",
           "dark:bg-[linear-gradient(90deg,rgba(16,185,129,0.1),rgba(234,179,8,0.1)),linear-gradient(#18181b,#18181b)]",
