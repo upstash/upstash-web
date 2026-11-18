@@ -17,8 +17,8 @@ These examples were tested from an agent sandbox, with a newly created database.
 Create a database in the [Upstash Console](https://console.upstash.com/redis), or let an agent that already has the [Upstash CLI or MCP server](https://upstash.com/docs/agent-resources/overview) create it. Then give the agent the REST URL and token from the database page as environment variables:
 
 ```bash
-UPSTASH_REDIS_REST_URL=https://ethical-duckling-84612.upstash.io
-UPSTASH_REDIS_REST_TOKEN=gQAAAAAA...
+export UPSTASH_REDIS_REST_URL=https://ethical-duckling-84612.upstash.io
+export UPSTASH_REDIS_REST_TOKEN=gQAAAAAA...
 ```
 
 An agent that starts fresh has lost its context, but it still has the environment. This helper returns a client from the [TypeScript SDK](https://upstash.com/docs/redis/sdks/ts):
@@ -26,7 +26,7 @@ An agent that starts fresh has lost its context, but it still has the environmen
 ```ts
 import { Redis } from "@upstash/redis";
 
-export async function connect() {
+export function connect() {
   return Redis.fromEnv();
 }
 ```
