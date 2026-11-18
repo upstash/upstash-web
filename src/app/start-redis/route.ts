@@ -5,10 +5,10 @@ import { trackEvent } from "./analytics";
 // since the old CLI command and MCP tool print the response body as is.
 const GONE_MARKDOWN = `# start-redis is discontinued
 
-https://upstash.com/start-redis no longer creates databases. Create a free Redis database in an Upstash account instead (signing up is free):
+https://upstash.com/start-redis no longer creates databases. Create a free Redis database in an Upstash account instead:
 
 - Console: sign up or sign in at https://console.upstash.com and create a Redis database.
-- Upstash CLI: \`npm i -g upstash\`, then \`upstash login\`, then \`upstash redis create --name my-db --region us-east-1\`.
+- Upstash CLI: set \`UPSTASH_EMAIL\` and \`UPSTASH_API_KEY\` (create a key at https://console.upstash.com/account/api), then run \`npx -y upstash redis create --name my-db --region us-east-1\`.
 - Upstash MCP server: lets your agent create and manage databases in your account. Setup: https://upstash.com/docs/agent-resources/overview
 
 A database created earlier with start-redis can still be claimed until it expires, 72 hours after creation: https://upstash.com/start-redis/console/<database-id>
