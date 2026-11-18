@@ -6,60 +6,32 @@ title: "Redis for AI Agents: The Easiest Way for Agents to Share Memory"
 description: "How AI agents use a free Upstash Redis database as shared memory: continue a task after a crash, split a job queue between sub-agents, lock a file, and cache slow API calls. With code and the output of each run."
 ---
 
-An agent loses its memory when a session crashes or the context is compacted, and sub-agents can't see each other's work. A free Upstash Redis database solves both problems. An agent can [create one with a single HTTP request](https://upstash.com/blog/redis-database-for-agents), no account or API key required, and every agent that has the database ID can read and write the same data.
+An agent loses its memory when a session crashes or the context is compacted, and sub-agents can't see each other's work. A free Upstash Redis database solves both problems. Create one on the free tier, and every agent that has its URL and token can read and write the same data.
 
 This post shows how agents use that database to save progress on long tasks, split work between sub-agents without duplicating it, lock files to avoid race conditions, and cache slow API calls.
 
 These examples were tested from an agent sandbox, with a newly created database. The output from the run is included below each code block.
 
-## Get a free Redis database without an account or API key
+## Connect an agent to a free Redis database
 
-The agent creates the database by sending a UUID it generated as the `Idempotency-Key` header. That UUID becomes the database ID. Sending it again returns the same database with the same credentials, so the agent only needs to save the ID in a file:
+Create a database in the [Upstash Console](https://console.upstash.com/redis), or let an agent that already has the [Upstash CLI or MCP server](https://upstash.com/docs/agent-resources/overview) create it. Then give the agent the REST URL and token from the database page as environment variables:
 
 ```bash
-node -e 'console.log(crypto.randomUUID())' > db-id.txt
-
-curl -X POST https://upstash.com/start-redis \
-  -H "Idempotency-Key: $(cat db-id.txt)" \
-  -H "User-Agent: claude-code"
+UPSTASH_REDIS_REST_URL=https://ethical-duckling-84612.upstash.io
+UPSTASH_REDIS_REST_TOKEN=gQAAAAAA...
 ```
 
-The response is a markdown document with the endpoint, the token and a quickstart:
-
-```text
-# Your Redis is ready
-
-**Database ID:** db9e5b59-4f46-40c6-...
-**Endpoint:** https://ethical-duckling-84612.upstash.io
-**Token:** gQAAAAAA...
-**Expires:** 2026-11-15 (3 days from creation).
-```
-
-An agent that starts fresh has lost the token, but it still has the file. This helper reads the ID, asks for the credentials again and returns a client from the [TypeScript SDK](https://upstash.com/docs/redis/sdks/ts):
-
-![](https://cdn.bydefault.so/drawing-hbIpD6WV6YJhATxzJ1fqq.png)
+An agent that starts fresh has lost its context, but it still has the environment. This helper returns a client from the [TypeScript SDK](https://upstash.com/docs/redis/sdks/ts):
 
 ```ts
 import { Redis } from "@upstash/redis";
-import { readFileSync } from "node:fs";
 
 export async function connect() {
-  const id = readFileSync("db-id.txt", "utf8").trim();
-
-  const res = await fetch("https://upstash.com/start-redis", {
-    method: "POST",
-    headers: { "Idempotency-Key": id, "User-Agent": "claude-code" },
-  });
-  const text = await res.text();
-
-  const url = text.match(/\*\*Endpoint:\*\* (\S+)/)![1];
-  const token = text.match(/\*\*Token:\*\* (\S+)/)![1];
-
-  return new Redis({ url, token });
+  return Redis.fromEnv();
 }
 ```
 
-Any [person with the id can view, edit or claim](https://upstash.com/blog/redis-database-for-agents#a-note-on-data) the database if it hasn't been claimed yet, so we have added the `db-id.txt` to the `.gitignore` and did not store personal data/secrets in it.
+Keep the token out of git, and treat it like any other secret.
 
 The helper above is included in the beginning of all the scripts below.
 
@@ -151,7 +123,7 @@ agent-c 4 jobs
 total 12 unique 12
 ```
 
-This example uses one process for workers to keep things succinct, but sub-agents can be separate processes, in which case they make the same call with the same database ID.
+This example uses one process for workers to keep things succinct, but sub-agents can be separate processes, in which case they connect with the same URL and token.
 
 A queue hands out jobs, but two agents can still want the same file, like `package.json`. For that, an agent sets a key only if the key does not exist yet. The first agent to set it holds the lock:
 
@@ -245,17 +217,11 @@ The keys from the three examples are there:
 }
 ```
 
-Each database also has a metrics URL that returns usage as JSON, with no token needed. For this database it counted 32 commands and 189,235 bytes of memory.
-
-The metrics arrive a few minutes late. Right after the runs above, the endpoint still showed zero commands, and the real numbers appeared about four minutes after I created the database. An agent that wants to know if a write worked gets a faster answer by reading the key back.
-
-For you, the response has a console URL. The agent is told to pass it on to you. You can open it to see the keys, and click Claim to move the database into your Upstash account. A claimed database [has no expiry and gets the full free-tier quota](https://upstash.com/blog/redis-database-for-agents#every-db-includes-metrics-and-a-way-to-claim). Without a claim, Upstash deletes it after three days.
-
-![](https://cdn.bydefault.so/image-sfd6U0_3CRg6xMfyOu2Eu.png)
+For you, the database page in the [Upstash Console](https://console.upstash.com/redis) shows the same keys in its Data Browser, along with usage metrics.
 
 ## Connect your coding agents to your Upstash account with one command
 
-A scratch database covers state. Once you have an Upstash account, the agent can also work with the rest of your resources. One command sets that up for the coding agents on your machine:
+A database covers state. With your Upstash account, the agent can also work with the rest of your resources. One command sets that up for the coding agents on your machine:
 
 ```bash
 npx upstash
@@ -278,5 +244,3 @@ The [remote MCP server](https://upstash.com/docs/agent-resources/mcp) has 76 too
 The server signs in with OAuth on the first tool call, and the consent page lets you make the connection read-only. On a read-only connection the server refuses the tools that change something. Running Redis commands still works there, but only for commands on a list of read-only ones.
 
 The agent also works without seeing your tokens. The server looks up the credentials of a resource on its side and calls the endpoint itself. A tool returns credentials only when the agent asks for them with `include_credentials`.
-
-So an agent can start with a database it made itself, and move to your account when the work is worth keeping.
