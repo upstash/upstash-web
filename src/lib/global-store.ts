@@ -32,20 +32,14 @@ export const useGlobalStore = create(
     }),
     {
       name: "global-store",
-      version: 4,
+      version: 3,
+      // v3: UK and Swiss visitors used to be granted consent without a banner,
+      // and an automatic grant can't be told from an Accept, so every earlier
+      // grant (and v1's boolean) goes back to pending and is asked again.
       migrate: (state, version) => {
-        let persisted = state as GlobalStore;
-        // v3: UK and Swiss visitors used to be granted consent without a banner,
-        // and an automatic grant can't be told from an Accept, so every earlier
-        // grant (and v1's boolean) goes back to pending and is asked again.
+        const persisted = state as GlobalStore;
         if (version < 3 && persisted.cookieConsent !== "pending-eu") {
-          persisted = { ...persisted, cookieConsent: "pending" };
-        }
-        // v4: the November 2026 Privacy Policy change. Visitors who dismissed
-        // the policy notice before it see it once more; it is the home-page
-        // notice of material changes that the policy promises.
-        if (version < 4) {
-          persisted = { ...persisted, isTermsUpdateAcknowledged: false };
+          return { ...persisted, cookieConsent: "pending" };
         }
         return persisted;
       },
