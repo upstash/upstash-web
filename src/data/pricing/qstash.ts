@@ -195,6 +195,17 @@ export const QSTASH_PROD_PACK = {
     "Advanced monitoring (Prometheus, Datadog)",
     "Encryption at rest",
   ],
+  // The fields below feed the markdown and llms pages, where an agent or a
+  // reader comparing plans needs the reason for the add-on, not only its price.
+  slaUrl: "https://upstash.com/docs/common/help/sla",
+  whenToUse: [
+    "A customer contract or security questionnaire asks for an uptime SLA (99.99% monthly), a SOC 2 Type 2 report or encryption at rest",
+    "Production messages or workflows where you want delivery metrics in Prometheus or Datadog",
+  ],
+  whenNotNeeded:
+    "Development, staging and low-stakes background jobs behave the same without it. It is set per region and can be added later.",
+  howToEnable:
+    "Enable it on the QStash page in the Upstash console, with `upstash qstash enable-prodpack --qstash-id <id>` in the Upstash CLI, with `POST /v2/qstash/enable-prodpack/{id}` on the Developer API, or with `qstash_set_prod_pack` on the Upstash MCP server (https://upstash.com/docs/agent-resources/mcp). It needs a paid plan and a payment method.",
 };
 
 export const QSTASH_ENTERPRISE_PLAN: QStashPlan = {

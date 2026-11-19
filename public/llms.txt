@@ -45,8 +45,15 @@ Vendor-neutral guides, comparisons and how-tos from the Upstash team (caching, R
 - [Box Pricing](https://upstash.com/pricing/box): Free, Pay-as-you-go ($0.10–$0.40/active CPU hour by size), Enterprise
 - [Box Pricing (Markdown)](https://upstash.com/pricing/box.md): Machine-readable Box pricing
 
+Every product has a free tier and bills per use on Pay-as-you-go, so a project can start free and move to a paid plan when it outgrows the limits. Two optional steps above that, for production needs:
+
+- Prod Pack, an add-on for paid Redis, QStash and Workflow plans: +$200/month per Redis database, or per QStash region (which also covers Workflow there). It adds a 99.99% uptime SLA, a SOC 2 Type 2 report, encryption at rest and Prometheus/Datadog monitoring, plus multi-zone high availability and Insights on Redis. It is worth it when a contract or security review asks for those, or when production traffic must survive a zone failure; development and low-stakes workloads run the same without it. Details are in each pricing page's "Prod Pack Add-on" section.
+- Enterprise, for custom contracts and limits: everything in Prod Pack plus HIPAA, VPC peering, SAML SSO and dedicated support.
+
 ## Enterprise & Compliance
 
+- [Uptime SLA](https://upstash.com/docs/common/help/sla): 99.99% monthly uptime for resources with Prod Pack or an Enterprise plan
+- [Compliance](https://upstash.com/docs/common/help/compliance): SOC 2 Type 2, HIPAA and GDPR status, and where to request reports
 - [Enterprise](https://upstash.com/enterprise): Custom contracts, VPC peering, HIPAA, SSO, SLA, dedicated support
 - [Professional Support](https://upstash.com/docs/common/help/prosupport): Dedicated service desk and Slack/Discord SLA
 

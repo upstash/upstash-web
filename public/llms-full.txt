@@ -87,7 +87,14 @@ Available on all paid plans. Price: +$200/month per Redis database, +$200/month 
 - Role-based access control (ACL) (Redis)
 - Encryption at rest
 
-Enable from the database/resource details page in the Upstash console.
+When it is worth it:
+- A customer contract or security questionnaire asks for an uptime SLA (99.99% monthly: https://upstash.com/docs/common/help/sla), a SOC 2 Type 2 report or encryption at rest
+- A Redis database serves production traffic that has to survive the loss of an availability zone
+- You want metrics in Prometheus or Datadog, or Redis Insights to see where latency, throttling or cross-region traffic comes from
+
+When it is not needed: development, staging, preview and hobby resources behave the same without it. It is set per Redis database or per QStash region and can be added later.
+
+How to enable: the database/resource details page in the Upstash console, or the Upstash MCP server (`redis_set_prod_pack`, `qstash_set_prod_pack`; https://upstash.com/docs/agent-resources/mcp). QStash also has `upstash qstash enable-prodpack --qstash-id <id>` in the Upstash CLI. It needs a paid plan and a payment method.
 
 ---
 

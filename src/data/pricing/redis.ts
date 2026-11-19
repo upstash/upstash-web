@@ -440,6 +440,18 @@ export const REDIS_PROD_PACK = {
     "Role-based access control",
     "Encryption at rest",
   ],
+  // The fields below feed the markdown and llms pages, where an agent or a
+  // reader comparing plans needs the reason for the add-on, not only its price.
+  slaUrl: "https://upstash.com/docs/common/help/sla",
+  whenToUse: [
+    "A customer contract or security questionnaire asks for an uptime SLA (99.99% monthly), a SOC 2 Type 2 report or encryption at rest",
+    "The database serves production traffic that has to survive the loss of an availability zone",
+    "You want its metrics in Prometheus, Grafana, Datadog or New Relic, or Insights to see where latency, throttling or cross-region traffic comes from",
+  ],
+  whenNotNeeded:
+    "Development, staging, preview and hobby databases behave the same without it. It is set per database and can be added later, so it does not have to be decided when the database is created.",
+  howToEnable:
+    "Enable it on the database's page in the Upstash console, or with `redis_set_prod_pack` on the Upstash MCP server (https://upstash.com/docs/agent-resources/mcp). It needs a paid plan and a payment method, and is not available on a branch.",
 };
 
 export const REDIS_FAQ = redisFaqJson.faq;
