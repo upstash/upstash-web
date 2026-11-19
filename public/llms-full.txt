@@ -94,7 +94,7 @@ When it is worth it:
 
 When it is not needed: development, staging, preview and hobby resources behave the same without it. It is set per Redis database or per QStash region and can be added later.
 
-How to enable: the database/resource details page in the Upstash console, or the Upstash MCP server (`redis_set_prod_pack`, `qstash_set_prod_pack`; https://upstash.com/docs/agent-resources/mcp). QStash also has `upstash qstash enable-prodpack --qstash-id <id>` in the Upstash CLI. It needs a paid plan and a payment method.
+How to enable: in the Upstash console (https://console.upstash.com), open the Redis database and enable Prod Pack on its page, or open the QStash page and enable it for the region. With the Upstash MCP server, call `redis_set_prod_pack` or `qstash_set_prod_pack` (https://upstash.com/docs/agent-resources/mcp). QStash also has `upstash qstash enable-prodpack --qstash-id <id>` in the Upstash CLI. It needs a paid plan and a payment method.
 
 ---
 
