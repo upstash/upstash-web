@@ -1,0 +1,178 @@
+---
+authors: [ozan]
+slug: how-we-scaled-upstash-support
+tags: [redis, search, context7, ai, rag, agents]
+title: "How We Scaled Upstash Support: The Story of support7"
+description: "How Upstash support turned its ticket archive into a knowledge base that stays correct as the product changes, built on Upstash Redis, Redis Search, Upstash Search and Context7."
+---
+
+A couple of years ago, Upstash support meant a few hundred tickets a month and a reply written by hand for each one. Today a very small team resolves thousands of tickets. Every open ticket has a drafted reply waiting for it with its sources attached, and a chatbot answers a good share of the how-to questions with no human in the loop.
+
+What sits between those two pictures is an internal tool we call **support7**. Nobody designed it up front. It grew one bottleneck at a time: ticket volume crossed some threshold, something that used to work stopped working, and we built the next layer.
+
+This is the first of two posts that walk through those layers in the order we hit them: what broke, what we built, and what we would keep. This first part is about **how we built a support knowledge base that keeps itself correct**. It follows the knowledge behind every draft, from raw ticket history to articles we can trust. The second part is about the chatbot we built on top of it. If you run support for a product that changes quickly, there is a good chance you will hit the same walls in the same order.
+
+It is also, almost by accident, a tour of our own products. support7 runs on an [Upstash Box](https://upstash.com/docs/box/overall/quickstart), which the second post covers, and keeps its state in [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted). It searches by meaning with [Upstash Search](https://upstash.com/docs/search/overall/whatisupstashsearch) and by exact text with [Redis Search](https://upstash.com/docs/redis/search/introduction), which is part of Upstash Redis. Its first version used [Upstash Vector](https://upstash.com/docs/vector/overall/whatisvector). [Context7](https://context7.com) supplies live documentation. Each one was pulled in because it was the shortest way past a specific problem, and we will point out where.
+
+![Each layer of support7 exists because the one before it ran into a bottleneck. This post covers the first four layers.](/blog/how-we-scaled-upstash-support/01-bottlenecks.png)
+
+## Before the pipeline: replies by hand
+
+In the beginning there was no system. A ticket came in, one of us investigated, and wrote the answer.
+
+LLMs helped at the edges. We would write a few dense lines of facts and let a model expand them into a complete, friendly reply, or have it write the script that reproduced a customer's bug.
+
+That saved typing, but the model knew nothing we had not just told it. Finding the answer, whether it sat in the docs, in the code, or in a ticket a teammate closed eight months ago, was still entirely on us. At a few hundred tickets a month that is fine. Beyond that, most of the day goes into deriving answers we have already given.
+
+## First bottleneck: every draft starts from zero
+
+Most support questions have been asked before. We had thousands of closed conversations in Intercom in which a teammate had already worked out the right answer. So the first real version of support7 did one thing: for every open ticket, find the past conversations that solved the same problem, and draft a reply from them.
+
+Raw conversations make poor search documents. They are long, they wander, and the actual question is often spread across five messages. So we indexed something smaller. For every closed ticket, an LLM extracts **question and answer pairs**: the customer's problem rewritten as one self-contained question, and the final answer we gave, with code and error messages kept verbatim. (The very first version ran on a local model on a laptop, which was enough to prove the idea.)
+
+Each pair became one document in an index. We started on [Upstash Vector](https://upstash.com/docs/vector/overall/whatisvector), a serverless vector database whose built-in embedding models let us send plain text and skip the embedding pipeline entirely. By the time we wired retrieval into reply drafting, we had moved the index to [Upstash Search](https://upstash.com/docs/search/overall/whatisupstashsearch), which combines semantic and full-text matching and reranks the results behind one call.
+
+The pair is what we search. It is not what the model reads. A match points back to its conversation, and we load the **whole transcript** from [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted), where every ticket we download is stored, so the model sees how the problem was really solved. Search something small and question-shaped, then read something complete: we ended up reusing this pattern in every later layer.
+
+The second source was [Context7](https://context7.com), which serves current documentation for libraries and products to LLMs. The model names the Upstash products a ticket involves, and we fetch the up-to-date docs for exactly those while the draft is being written.
+
+![The first pipeline: Q&A pairs are what we search, whole conversations are what the model reads, and Context7 adds the current documentation.](/blog/how-we-scaled-upstash-support/02-first-pipeline.png)
+
+Soon every open ticket had a drafted reply waiting, with the sources it used listed underneath. A good share of those drafts needed no editing: the answer was already somewhere in our history, and the pipeline found it.
+
+## Second bottleneck: the past goes stale
+
+The archive had a flaw that took a while to show. It ages.
+
+Upstash ships fast. Limits change, prices change, features get deprecated, the console gets redesigned. A ticket archive does none of that. When the Redis free tier went from 10,000 commands per day to 500,000 per month, every conversation we had ever had about the free tier kept saying 10,000 per day, in our own confident voice.
+
+The prompt told the model to trust the most recent conversation when sources disagreed. That rule leaks. A newer ticket can repeat the old number. A teammate can simply get it wrong. Two answers that look contradictory can both be right, for different plans.
+
+![A ticket archive keeps every answer, including the ones that stopped being true. "Newest wins" does not save you when a newer ticket repeats the old number.](/blog/how-we-scaled-upstash-support/03-stale-archive.png)
+
+Our first fix was a patch: a small, hand-written **context index**. When something changed, we wrote the new fact down as a short entry in a separate Upstash Search index. The same query searched it, and whatever it returned went first in the prompt, labeled as the source of truth. The new free-tier limit was the textbook entry.
+
+For the conflicts we noticed, it did its job. But the context index knew only what one of us had caught and taken the time to write up. It grew as fast as we tended it, while the archive grew on its own.
+
+That matters more than it sounds. A wrong answer from support can cost a customer hours of building on something false. So every draft had to be read line by line, and that reading became the new bottleneck.
+
+By then we knew where we wanted to end up: a chatbot that carries some conversations entirely by itself, and for everything else, drafts good enough that approving them takes seconds. Both need a source of context we can trust, with no stale and no conflicting information in it. We did not have one.
+
+## A knowledge base distilled from our own answers
+
+The idea was simple. Stop retrieving raw history at answer time. Distill the history once into a knowledge base of articles, then keep the articles true.
+
+The raw material stays the same: our own tickets. What we tell a customer is the best answer we have at the moment we say it, and tickets cover exactly the questions customers really ask. The archive was never the problem. Reading it raw was.
+
+### Replaying history
+
+Our first attempt clustered the archive by similarity, planning to write one article per cluster. The archive fell apart into tiny clusters, nearly all of them with a single member. People phrase the same question in too many ways for clustering to see it as one.
+
+What worked was a replay. We fed every past ticket through one function, oldest first. For each question and answer pair, the function searches the knowledge base as it exists at that moment, takes the ten closest articles, and asks an LLM to compare them with the pair and the full ticket. The model picks one outcome:
+
+- **Skip.** Nothing here is worth an article.
+- **New topic.** Write a new article.
+- **Duplicate.** We already say this. Record the ticket as one more source.
+- **Extension.** The ticket adds a detail. Rewrite the article to include it.
+- **Contradiction.** The ticket disagrees with the article. Rewrite the article around the new value.
+
+The order is what makes this work. Going forward through time, the ticket being replayed is always the newest evidence the knowledge base has seen, so "newer wins" is true by construction. When a later ticket states a new limit, the article is rewritten in place and keeps one short note about what it replaced, such as "500,000 commands per month (previously 10,000 per day)". Many articles carry a note like that.
+
+There is no separate bootstrap code. The replay ran on the path that runs in production today; the only difference was that every outcome was applied automatically.
+
+![One loop builds the knowledge base and maintains it: find the closest articles, let an LLM decide how the ticket relates to them, apply the clear cases and queue the contested ones.](/blog/how-we-scaled-upstash-support/04-distillation-loop.png)
+
+### One article, two indexes
+
+An article lives in two places, for two kinds of search.
+
+The article itself (topic, answer in markdown, status, source tickets, date of the newest source) is a JSON document in Upstash Redis, with a [Redis Search](https://upstash.com/docs/redis/search/introduction) index on top. Redis Search indexes the JSON you already keep in Redis by key prefix, so there is nothing to sync, and it gives us full-text search over the actual answers: exact phrases, regular expressions, highlighted snippets.
+
+```ts
+await redis.search.createIndex({
+  name: "kb-entries",
+  dataType: "json",
+  prefix: "kb:entry:",
+  schema: s.object({
+    topic: s.string(),
+    answer: s.string(),
+    status: s.keyword(), // "auto" or "approved"
+  }),
+});
+```
+
+Next to it, in Upstash Search, sits the article's **search card**: the topic, the questions a user might ask about it, and a short summary, written by an LLM in the words customers use. The card exists only for retrieval, and it is regenerated every time the article changes.
+
+Retrieval goes through the card. We ask Upstash Search for the top ten cards, reranked, and load those articles from Redis:
+
+```ts
+const cards = await search.index("curated_kb").search({
+  query,
+  limit: 10,
+  reranking: true,
+});
+
+const articles = await Promise.all(
+  cards.map((card) => redis.json.get(`kb:entry:${card.id}`, "$")),
+);
+```
+
+There is no score threshold. Whether a candidate is relevant is the LLM's call, made with the full article in front of it.
+
+![Every article is stored twice. The search card in Upstash Search answers "which articles are about this?". The full text in Upstash Redis, indexed by Redis Search, answers "which articles say exactly this?".](/blog/how-we-scaled-upstash-support/05-two-indexes.png)
+
+### Keeping it alive
+
+Being correct on the day it is built is the easy half. Every hour, support7 picks up the tickets closed since the last run and sends them through the same function.
+
+What happens next depends on what the change touches. New topics go in right away. So do extensions to articles no human has reviewed yet. A contradiction, a low-confidence match, or any change to an article a human has already approved goes to a **review queue**, where we see the proposal as a diff against the live article. An article has at most one pending proposal; later tickets fold into it instead of queueing up behind it.
+
+Part of that review is automated too. A coding agent checks the factual claims in a proposal against the source code of our products. A proposal whose claims are all confirmed is approved automatically. Nothing is ever rejected automatically.
+
+For drafting, the knowledge base has taken over the job that raw past conversations used to do. Those conversations were the entire foundation of the previous version. The prompt now allows them for tone and phrasing only, never for facts.
+
+## The curator agent
+
+Every article is written to stand on its own. If retrieval surfaces only one article, that article has to be enough, so the facts it depends on are restated inside it. We chose this on purpose: whichever article comes back can answer the question by itself.
+
+It also means one fact lives in many places. About fifty articles mention the Redis free-tier quota. The hourly pipeline rewrites only the article that matched the ticket. The other forty-nine keep the old number, and the knowledge base starts to disagree with itself.
+
+Fixing that means finding every mention first, and this is where the two indexes pay off. The **curator agent** is an LLM with three tools: semantic search over the cards in Upstash Search, text search over the full articles in Redis Search (plain terms, exact phrase, or regex, with match counts and highlighted snippets), and a tool to read articles in full. We give it one instruction in plain language. The placeholder in its input box is, of course, the free-tier one:
+
+> Some entries still say the Redis free tier limit is 10K commands per day — find them and fix it to 500K per month.
+
+Semantic search finds the articles *about* the free tier. Phrase search finds every article that says "10K commands" in passing, deep inside an answer about something else. A card would never surface those, because a card summarizes. The agent then proposes a list of edits, merges and deletions, each shown as a diff, and nothing changes until we approve it.
+
+One instruction replaces fifty edits, which is what makes the redundancy affordable. We have since automated the common case too: when an approved change establishes a new value for a fact, support7 sweeps for articles that still state the old one and proposes the rewrites, approved once per fact.
+
+## The stack so far
+
+Here is what each Upstash product does in the part of support7 this post covers:
+
+| Product | What it does in support7 |
+| --- | --- |
+| [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted) | All state: the ticket cache, every draft, knowledge base articles as JSON, the review queue, job queues, locks |
+| [Redis Search](https://upstash.com/docs/redis/search/introduction) | Full-text index over the knowledge base articles: phrase and regex search with highlights, for the curator agent |
+| [Upstash Search](https://upstash.com/docs/search/overall/whatisupstashsearch) | Semantic retrieval with reranking over Q&A pairs from past tickets and knowledge base cards |
+| [Upstash Vector](https://upstash.com/docs/vector/overall/whatisvector) | First version only: the original Q&A index, with built-in embeddings. Replaced by Upstash Search. |
+| [Context7](https://context7.com) | Current documentation for every Upstash product, fetched while a draft is written |
+
+Three of these rows are search, and each was the right tool for its stage. Upstash Vector got the first index running without an embedding pipeline. Upstash Search replaced it and added full-text matching and reranking behind the same call. Redis Search came in once the articles lived in Redis and we needed to find exact text inside them. Redis Search has [hybrid search](https://upstash.com/docs/redis/search/hybrid-search) now, so the next step is to bring both kinds of search into Redis.
+
+## What we would tell another support team
+
+- **Your ticket archive is your best source and your worst one.** It holds every answer, including the ones that stopped being true. Distill it. Do not retrieve it raw.
+- **Process history in order.** Replaying tickets from oldest to newest turned "which answer is current?" from a judgment call into a property of the pipeline.
+- **Search something small, read something complete.** Q&A pairs in front of conversations, search cards in front of articles. The text that retrieves well and the text that answers well are different texts.
+- **Keep two kinds of search.** Semantic search finds what an article is about. Text search finds what it happens to say. Maintenance needs the second one.
+
+## Next in this series
+
+The second post picks up where this one ends. It covers a guide to the Upstash Console that is generated from the console's own source code, and the checks that decide when a drafted reply may go out with no human reading it first.
+
+After that, there are two more things we want to write about:
+
+- **Moving the knowledge base from Upstash Search to Redis hybrid search**, which would put the articles and both kinds of search in the same database.
+- **Beyond the chatbot: the support assistant.** support7 now exposes its tickets, drafts and knowledge base to other agents over MCP, and more of our daily support work happens by talking to an assistant instead of opening a dashboard.
+
+If you are building something similar and want to compare notes, we would love to hear from you.
