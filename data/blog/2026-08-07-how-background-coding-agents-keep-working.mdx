@@ -4,7 +4,7 @@ slug: how-background-coding-agents-keep-working
 tags: [box, ai, devtools]
 title: "How to Build a Background Coding Agent: 7 Infrastructure Layers"
 description: "How to build a background coding agent that keeps working after you close your laptop: the seven infrastructure layers it needs (isolation, environment, idle handling, recovery, triggers, conversation, fan-out) and how Upstash Box covers each."
-updated: "2026-10-14"
+updated: "2026-11-13"
 ---
 
 Coding agents are moving off our laptops. Cursor's cloud agents [keep working when your laptop is closed](https://cursor.com/blog/cloud-agent-development-environments). OpenAI's Codex [runs each task in its own cloud sandbox](https://openai.com/index/introducing-codex/), preloaded with your repository. Claude Code on the web [runs coding tasks on Anthropic-managed infrastructure](https://www.anthropic.com/news/claude-code-on-the-web). The workflow is the same in all three: hand over a task, close the tab, review a pull request later.
@@ -93,7 +93,7 @@ file=persistent hello package=true process_after_resume=stopped
 
 The file and the installed npm package came back after the pause. The background process did not. That field shows the limit of pause and resume: state comes back, a running process does not.
 
-For a box that has to stay on, a warm agent or a permanent webhook endpoint, setting `keepAlive: true` [turns off auto-pausing](https://upstash.com/docs/box/overall/keep-alive) and switches billing to a fixed price: [$8 per month for a small box, $16 for medium, $32 for large](https://upstash.com/pricing/box), replacing the CPU and storage charges.
+For a box that has to stay on, a warm agent or a permanent webhook endpoint, setting `keepAlive: true` [turns off auto-pausing](https://upstash.com/docs/box/overall/keep-alive) and switches billing to a fixed rate: [$0.0111 per hour (about $8 per month) for a small box, $0.0222 for medium, $0.0444 for large](https://upstash.com/pricing/box), replacing the CPU and storage charges.
 
 ## Do long-running agents need a separate workflow engine?
 

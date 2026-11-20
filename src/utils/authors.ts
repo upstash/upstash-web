@@ -473,7 +473,12 @@ export const authors: Record<
     name: "Ramazan Onur Acar",
     title: "Software Engineer @Upstash",
     image: "ramazan.jpeg",
-  }
+  },
+  ozan: {
+    name: "Ozan Kilic",
+    title: "Support Manager @Upstash",
+    image: "ozan.jpg",
+  },
 };
 
 /**

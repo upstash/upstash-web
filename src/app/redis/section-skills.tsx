@@ -9,15 +9,15 @@ import cx from "@/utils/cx";
 const INSTALL_COMMAND =
   "npx skills add https://github.com/upstash/skills --skill upstash";
 
-const START_REDIS_COMMAND = "curl -X POST https://upstash.com/start-redis";
-
 export default function SectionSkills() {
   return (
     <section className="relative py-10 md:py-20">
       <Bg className="top-32 h-1/2" />
 
       <Container className="max-w-screen-md">
-        <PageHeaderTitle as="h2">Build Redis with your AI agent</PageHeaderTitle>
+        <PageHeaderTitle as="h2">
+          Build Redis with your AI agent
+        </PageHeaderTitle>
 
         <PageHeaderDesc className="mt-3">
           Install the Upstash skill so Claude Code, Cursor, and other coding
@@ -31,16 +31,6 @@ export default function SectionSkills() {
             View the Upstash skills on GitHub
           </OutLink>
         </div>
-
-        <PageHeaderDesc className="mt-14 text-pretty">
-          Your agent can also create a free Redis database instantly with the{" "}
-          <code className="font-mono">start-redis</code> endpoint - no signup or
-          authentication required. It
-          gets back credentials and a quickstart in markdown, and unclaimed
-          databases are deleted after 3 days.
-        </PageHeaderDesc>
-
-        <CommandBlock className="mt-8" command={START_REDIS_COMMAND} />
       </Container>
     </section>
   );

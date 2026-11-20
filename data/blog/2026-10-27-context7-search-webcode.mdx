@@ -1,0 +1,123 @@
+---
+authors: [ramazan]
+slug: context7-search-webcode
+tags: [context7, search, benchmark]
+title: "Context7 vs Exa 3.0 on WebCode: The Same Accuracy in a Fifth of the Tokens"
+description: On Exa's WebCode benchmark, Context7 Search and Exa 3.0 led to as many correct answers, with about a fifth of the tokens for Context7 and a third of the wrong answers.
+---
+
+WebCode is the coding search benchmark that Exa open-sourced this year. We ran it on [Context7 Search](https://upstash.com/blog/context7-search) and on Exa 3.0, the latest version of Exa's search.
+
+With Context7's results, the model answered 85.7% of the questions correctly. With Exa Lite's and Exa Auto's, 86.2% each. Context7 did it with about 1,050 tokens per question, against about 5,000 for Exa Lite and 4,650 for Exa Auto, and with about a third of the wrong answers: 2.3%, against 7.3% for Lite and 8.0% for Auto.
+
+![Correct answers on WebCode RAG: Context7 Search 85.7%, Exa 3.0 Lite 86.2%, Exa 3.0 Auto 86.2%](/blog/context7-webcode/correct.png)
+
+We build Context7, so this post first explains how the benchmark works and how we ran it.
+
+## What is WebCode?
+
+[WebCode](https://exa.ai/blog/webcode) is a set of search tests for coding agents that Exa published in 2026. We used its RAG test, which works like this:
+
+1. Each question comes from a detail buried deep in a long documentation page, like a default value in the HAProxy manual or a rule in an RFC. Exa kept only questions that two frontier models could not answer from memory.
+2. The search tool gets the question and returns its results.
+3. An answer model writes an answer from those results, and only from them.
+4. A judge model compares that answer with the expected one. The answer is **correct** if it matches, **wrong** if the model gave an answer that does not match, and **"I don't know"** if the model said the results did not contain the answer.
+
+![How WebCode scores a search: the search tool returns results, an answer model (DeepSeek V4.1 Flash) answers from them, and a judge (Claude Opus 5.5) marks the answer correct, wrong or "I don't know"](/blog/context7-webcode/scoring.png)
+
+There are 307 questions. About 40% of them are about standards and manuals (W3C, IETF, ECMAScript, GNU), and the rest cover libraries and tools from Node.js and Spring Boot to Bazel and LuaTeX.
+
+## How did we run it?
+
+We ran Exa's open-source WebCode harness with one addition, a search adapter that calls the Context7 Search API. Every setup used the same settings:
+
+- the same 307 questions from WebCode's RAG test;
+- up to 10 results per question;
+- the same answer model, **DeepSeek V4.1 Flash**, and the same judge model, **Claude Opus 5.5**;
+- three runs per setup, against production, between October 19 and 26, 2026.
+
+For Exa we turned on highlights for both search types, Lite and Auto, as Exa recommends for agents. For Context7 we called the public Search API with the question as the only input, no library or version hints.
+
+The judge grades the answer without seeing the search results. In a separate step it reads the search results and marks which of them contain the expected answer; that is how we count the share of useful results below.
+
+## What are Exa Lite and Exa Auto?
+
+[Exa 3.0](https://exa.ai/blog/exa-3) comes with two search types, and we tested both:
+
+- **Exa Lite** is the cheaper one, at $4 per 1,000 searches. Exa built it for apps where cost matters most.
+- **Exa Auto** searches the same index but spends more compute on finding and ranking pages, at $7 per 1,000 searches.
+
+Both return 10 web pages per search. With highlights turned on, each page comes with the passages Exa thinks are most relevant to the question, instead of the whole page. On WebCode the two scored almost the same.
+
+## How do Context7 and Exa compare on WebCode?
+
+On the 307 questions:
+
+- **Correct answers.** About the same: 85.7% with Context7's results, 86.2% with Exa's (Lite and Auto). The runs overlap: Context7 scored between 84.7% and 86.6%, Exa Lite between 85.7% and 86.6%.
+- **Wrong answers.** These are answers the model gave that did not match the expected one; an "I don't know" is not counted as wrong. This is where the two differ most. With Exa's results, the model gave a wrong answer three times as often: 7.3% of the time with Lite and 8.0% with Auto, against 2.3% with Context7. Over the 307 questions, that is about 22 wrong answers with Exa Lite, against 7 with Context7.
+- **Size.** A Context7 response was about 1,050 tokens. Exa Lite's were about 5,020 and Exa Auto's about 4,650.
+- **Less to read.** About half of Context7's results contained the answer. For Exa Lite and Exa Auto, about a third did.
+- **Speed.** Exa is faster: a search took about 0.6 seconds with Lite and 1.3 seconds with Auto, against about 3.7 seconds for Context7.
+
+![Wrong answers on WebCode RAG: Context7 Search 2.3%, Exa 3.0 Lite 7.3%, Exa 3.0 Auto 8.0%](/blog/context7-webcode/wrong.png)
+
+![Tokens per question: Context7 Search about 1,050, Exa 3.0 Lite about 5,020, Exa 3.0 Auto about 4,650](/blog/context7-webcode/tokens.png)
+
+| Setup | Correct answer | Wrong answer | Tokens per question | Search latency |
+| --- | --- | --- | --- | --- |
+| Context7 Search | 85.7% | 2.3% | ~1,050 | ~3.7 s |
+| Exa 3.0 Lite, highlights | 86.2% | 7.3% | ~5,020 | ~0.6 s |
+| Exa 3.0 Auto, highlights | 86.2% | 8.0% | ~4,650 | ~1.3 s |
+
+Each number is the average of three runs per setup. Latency is the median time of the search alone, without the answer model, measured on October 27 from the same client for both tools.
+
+## Why does Context7 lead to fewer wrong answers?
+
+With the same answer model, Context7's results led to a third of the wrong answers. The difference is in what the model has to read.
+
+A Context7 response is about a fifth as long as an Exa response, and a larger share of it contains the answer: about half of Context7's results did, against about a third of Exa Lite's and Exa Auto's. With Exa, the model more often has to pick one fact out of many similar ones, and sometimes it picks the wrong one:
+
+- **When the results contained the answer**, the model got it right 98.0% of the time with Context7, 94.6% with Exa Lite and 94.7% with Exa Auto.
+- **When they did not**, the model usually said so with Context7: it declined to answer 89.8% of the time, against 65.5% with Exa Lite and 58.1% with Exa Auto, where it more often guessed. For a coding agent, "I don't know" is a cue to search again; a wrong answer ends up in the code.
+
+Every setup used the same answer model and judge, so these differences come from the search results, not from the models.
+
+## What does a Context7 result look like?
+
+Here's a WebCode question that Context7 answered correctly in every run and Exa Lite and Exa Auto did not in any run: which address does Prometheus pick for a Scaleway instance?
+
+[Open this search in your browser](https://context7.com/api/v3/search?query=prometheus+scaleway_sd+instance+role+address+selection+order), or run it with curl:
+
+```bash
+curl -G 'https://context7.com/api/v3/search' \
+  --data-urlencode 'query=prometheus scaleway_sd instance role address selection order'
+```
+
+The first result is the exact paragraph from the Prometheus docs:
+
+```text
+Library: /websites/prometheus_io
+
+### operating/configuration.md > <scaleway_sd_config> > Instance role
+
+Source: https://prometheus.io/docs/operating/configuration
+
+This role uses the first address it finds in the following order: private IPv4, public IPv4, public IPv6. This can be changed with relabeling, as demonstrated in the Prometheus scaleway-sd configuration file . Should an instance have no address before relabeling, it will not be added to the target list and you will not be able to relabel it.
+```
+
+Both Exa types returned pages from the same docs, but the highlights they picked from them did not include this sentence, and the model answered that it did not know. The two tools are strong on different questions: Context7 answered 24 questions correctly in every run that Exa Lite missed in every run (20 for Exa Auto), and Exa Lite answered 24 others that Context7 missed (24 for Exa Auto).
+
+## How do I try Context7 Search?
+
+It's one GET request, and you don't need an API key to try it. Open this link in your browser:
+
+[https://context7.com/api/v3/search?query=How+do+I+stream+an+OpenAI+response+from+a+Next.js+route+handler%3F](https://context7.com/api/v3/search?query=How+do+I+stream+an+OpenAI+response+from+a+Next.js+route+handler%3F)
+
+Or run the same search with curl:
+
+```bash
+curl -G 'https://context7.com/api/v3/search' \
+  --data-urlencode 'query=How do I stream an OpenAI response from a Next.js route handler?'
+```
+
+To use it in an agent, see the [Search API docs](https://context7.com/docs/search-api) or the [TypeScript SDK](https://context7.com/docs/sdks/ts/getting-started). Each search counts as one API call. The [Free plan includes 1,000 calls a month](https://context7.com/docs/plans-pricing), and Pro costs $10 per seat a month with 2,000 calls per seat, then $5 per 1,000 calls. For comparison, [Exa 3.0](https://exa.ai/blog/exa-3) costs $4 per 1,000 searches for Lite and $7 for Auto.

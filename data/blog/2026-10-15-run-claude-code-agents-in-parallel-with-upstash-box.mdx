@@ -124,7 +124,7 @@ Environment variables in a box are [visible to all code running inside it](https
 
 ## How much does it cost to run agents in parallel?
 
-Upstash Box charges $0.10 per active CPU hour for a small box, plus model tokens. A coding agent spends much of its time waiting for the model. A waiting box consumes very little CPU. For example, a box that consumes [10% of one core for one hour costs $0.01](https://upstash.com/blog/software-factory-needs-a-sandbox-per-agent). In one day-long agent pipeline experiment on Box, [sandbox compute came to about one cent, while tokens cost several dollars](https://www.mindstudio.ai/blog/upstash-sandbox-pricing-ai-agents).
+Upstash Box charges $0.10 per active CPU hour for a small box. Model tokens are billed by your own provider. A coding agent spends much of its time waiting for the model. A waiting box consumes very little CPU. For example, a box that consumes [10% of one core for one hour costs $0.01](https://upstash.com/blog/software-factory-needs-a-sandbox-per-agent). In one day-long agent pipeline experiment on Box, [sandbox compute came to about one cent, while tokens cost several dollars](https://www.mindstudio.ai/blog/upstash-sandbox-pricing-ai-agents).
 
 The plan you are on sets how many boxes can run at the same time:
 
@@ -134,9 +134,9 @@ The plan you are on sets how many boxes can run at the same time:
 | CPU hours | 5 per month | No limit |
 | Price per active CPU hour | Included | $0.10 small, $0.20 medium, $0.40 large |
 | Idle timeout | 1 hour | 6 hours |
-| Monthly limit for Upstash-provided LLM usage | $1 | $100 |
+| Model usage | Your own provider key | Your own provider key |
 
-Pricing data taken from [Upstash Box pricing page](https://upstash.com/pricing/box). It’s also possible to use your own model key in both plans, as we did. On pay as you go, storage for paused boxes and snapshots costs $0.10 per GB per month. It’s billed until you delete them, so it pays to check that every delete worked.
+Pricing data taken from [Upstash Box pricing page](https://upstash.com/pricing/box). On both plans, agents use your own model provider key, as we did. On pay as you go, storage for paused boxes and snapshots costs $0.10 per GB per month. It’s billed until you delete them, so it pays to check that every delete worked.
 
 ## When another sandbox fits better
 

@@ -76,10 +76,6 @@ It gets expensive when traffic is both high and steady. At 100 million commands 
 
 Upstash is also the only provider here with a REST API, so it works from environments that can't open a Redis TCP connection: Cloudflare Workers, Vercel, and similar.
 
-The REST API lets you do one nice thing: a POST request to `https://upstash.com/start-redis` returns a live database endpoint and token with no login and no API key.
-
-The database it creates is temporary and expires three days after you create it unless you claim it into an account, so it's good for prototypes and quick tests you could do right now.
-
 ### AWS ElastiCache
 
 [ElastiCache](https://aws.amazon.com/elasticache/pricing/) rents nodes by the hour. A `cache.t4g.micro` costs about $12/mo on-demand; an `r7g.xlarge` is roughly $319/mo ($0.437/hr). One-year reserved nodes cost around 40% less.

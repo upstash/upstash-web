@@ -34,12 +34,12 @@ export const BOX_FAQ = [
   {
     question: "Can a box stay on all the time?",
     answer:
-      "Yes. A keep-alive box never pauses, so a personal agent, a bot or a server always has a warm machine. Keep-alive boxes have a fixed monthly price by size: $8 for Small, $16 for Medium and $32 for Large. An init command can start your process every time the box boots.",
+      "Yes. A keep-alive box never pauses, so a personal agent, a bot or a server always has a warm machine. Keep-alive boxes are billed at a fixed rate by size: $0.0111 per hour for Small, $0.0222 for Medium and $0.0444 for Large ($8, $16 and $32 per month), billed per second. An init command can start your process every time the box boots.",
   },
   {
     question: "How much does Upstash Box cost?",
     answer:
-      "The free plan includes up to 10 concurrent boxes, 5 CPU hours per month and $1 of LLM usage per month. Pay as you go bills active CPU only: $0.10, $0.20 or $0.40 per active CPU hour for Small, Medium and Large boxes. Memory is not billed, and an idle box costs nothing for CPU. Storage is $0.10 per GB per month, including snapshots. Keep-alive boxes are $8 to $32 per month with no usage charges. See the pricing page for details.",
+      "The free plan includes up to 10 concurrent boxes and 5 CPU hours per month. Agents use your own model provider key. Pay as you go bills active CPU only: $0.10, $0.20 or $0.40 per active CPU hour for Small, Medium and Large boxes. Memory is not billed, and an idle box costs nothing for CPU. Storage is $0.10 per GB per month, including snapshots. Keep-alive boxes are $8 to $32 per month with no usage charges. See the pricing page for details.",
   },
   {
     question: "How are boxes isolated?",
@@ -49,7 +49,7 @@ export const BOX_FAQ = [
   {
     question: "Can I use my own model API key?",
     answer:
-      "Yes. Bring your own key for any LLM provider on every plan. Without one, boxes use Upstash-provided model usage, capped at $1 per month on the free plan and $100 per month on pay as you go.",
+      "Yes, and it is required to run agents. Agents use your own model provider key (Anthropic, OpenAI, OpenRouter, ...), set on the box or saved on your account. Upstash does not provide or bill model usage. Shell, files, git, SSH, previews and browser CDP work without a key.",
   },
   {
     question: "Where do boxes run?",

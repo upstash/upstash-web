@@ -38,7 +38,7 @@ export default async function KbPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: schema }}
       />
-      <KbGrid articles={articles} />
+      <KbGrid articles={articles} showDate={false} />
     </>
   );
 }

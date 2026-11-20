@@ -25,9 +25,9 @@ const PolicyLink = ({
 
 /**
  * The site's single bottom overlay. It carries two independent notices —
- * cookie consent (EU visitors only) and the terms-update acknowledgement
- * (everyone) — so that they can never stack on top of each other. Each notice
- * keeps its own trigger and its own persistence:
+ * cookie consent (EU, UK and Swiss visitors only) and the terms-update
+ * acknowledgement (everyone) — so that they can never stack on top of each
+ * other. Each notice keeps its own trigger and its own persistence:
  *
  * - cookie consent shows while `cookieConsent === "pending-eu"`; only Accept
  *   grants it. Closing hides the banner for this page view only, so consent is

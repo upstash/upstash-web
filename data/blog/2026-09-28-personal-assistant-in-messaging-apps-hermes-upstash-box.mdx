@@ -14,7 +14,7 @@ What it needs is a computer that is always on. This post runs Hermes on an [Upst
 
 <Summary>
   - Hermes runs one gateway process that connects the agent to your messaging apps. You chat with it like with any other contact.
-  - A keep-alive Small box gives it an always-on, isolated machine for a flat $8 a month. An init script restarts the gateway after a crash.
+  - A keep-alive Small box gives it an always-on, isolated machine at a rate of $0.0111 per hour (about $8 per month). An init script restarts the gateway after a crash.
   - WhatsApp setup is one command: `hermes whatsapp`. Scan a QR code with your phone and the box becomes a linked device.
   - Telegram, Slack, Discord, Signal and the rest follow the same flow: enable the platform, give it a token or pair it, set an allowlist, restart the gateway.
 </Summary>
@@ -25,7 +25,7 @@ What it needs is a computer that is always on. This post runs Hermes on an [Upst
 
 An assistant in a messaging app is only useful if it answers. On your laptop, it stops when the lid closes. On a VM, you take care of a server: updates, disk, security, a process manager.
 
-A box sits between the two. It is a full Linux machine that you create in a minute and reach over SSH. With **keep-alive**, it never pauses, and a Small box (2 vCPU, 4 GB RAM, 10 GB disk) costs a fixed $8 a month. That is enough for Hermes, so Small is the size we recommend.
+A box sits between the two. It is a full Linux machine that you create in a minute and reach over SSH. With **keep-alive**, it never pauses, and a Small box (2 vCPU, 4 GB RAM, 10 GB disk) is billed at a rate of $0.0111 per hour. That is enough for Hermes, so Small is the size we recommend.
 
 Isolation matters here too. Hermes runs shell commands and edits files for you. On a box, anything it does stays inside the box. Your own machine, your SSH keys and your browser sessions are never involved.
 

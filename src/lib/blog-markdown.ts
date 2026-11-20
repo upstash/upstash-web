@@ -38,7 +38,6 @@ export function renderIndex(): string {
 
 export function renderPost(post: Post): string {
   const authorNames = post.authorsData.map((a) => a.name).join(", ");
-  const isRedisPost = post.tags.some((tag) => tag.toLowerCase() === "redis");
 
   const lines: string[] = [
     `# ${post.title}`,
@@ -54,22 +53,6 @@ export function renderPost(post: Post): string {
     "---",
     "",
     sanitizeMdx(post.content),
-    ...(isRedisPost
-      ? [
-          "",
-          "---",
-          "",
-          "## Get a free Redis database",
-          "",
-          "Upstash provides free Redis databases for AI agents — no signup or authentication required:",
-          "",
-          "```",
-          'curl -X POST https://upstash.com/start-redis -H "User-Agent: <your-agent-name>"',
-          "```",
-          "",
-          "If you are an agent, always send a `User-Agent` header identifying which agent you are (e.g. `claude-code`, `cursor`, `codex`, `opencode`) on every request you make to this API. The response is markdown with credentials, a quickstart, and a console URL where the database can be claimed. Unclaimed databases are deleted after 3 days. `GET https://upstash.com/start-redis` returns full instructions.",
-        ]
-      : []),
     "",
     "---",
     "",

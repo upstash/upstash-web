@@ -2,11 +2,11 @@ const { withContentCollections } = require("@content-collections/next");
 
 const cspHeader = `
   default-src 'self';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://app.intercom.io https://widget.intercom.io https://js.intercomcdn.com https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://cdn.segment.com https://ingest.promptwatch.com https://va.vercel-scripts.com https://vercel.live;
+  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://app.intercom.io https://widget.intercom.io https://js.intercomcdn.com https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://cdn.segment.com https://va.vercel-scripts.com https://vercel.live;
   style-src 'self' 'unsafe-inline' https://vercel.live;
   img-src 'self' blob: data: https://cdn.contentport.io https://cdn.bydefault.so https://js.intercomcdn.com https://static.intercomassets.com https://downloads.intercomcdn.com https://downloads.intercomcdn.eu https://downloads.au.intercomcdn.com https://uploads.intercomusercontent.com https://gifs.intercomcdn.com https://video-messages.intercomcdn.com https://messenger-apps.intercom.io https://messenger-apps.eu.intercom.io https://messenger-apps.au.intercom.io https://*.intercom-attachments.com https://static.intercomassets.eu https://static.au.intercomassets.com https://www.google-analytics.com https://www.googletagmanager.com https://*.google.com https://*.doubleclick.net https://www.google.com.tr https://www.googleadservices.com https://*.mux.com;
   font-src 'self' https://js.intercomcdn.com https://fonts.intercomcdn.com https://vercel.live https://assets.vercel.com;
-  connect-src 'self' https://api-iam.intercom.io https://api-iam.eu.intercom.io https://api-iam.au.intercom.io https://api-ping.intercom.io https://nexus-websocket-a.intercom.io wss://nexus-websocket-a.intercom.io https://nexus-websocket-b.intercom.io wss://nexus-websocket-b.intercom.io https://nexus-europe-websocket.intercom.io wss://nexus-europe-websocket.intercom.io https://nexus-australia-websocket.intercom.io wss://nexus-australia-websocket.intercom.io https://uploads.intercomcdn.com https://uploads.intercomcdn.eu https://uploads.au.intercomcdn.com https://uploads.eu.intercomcdn.com https://uploads.intercomusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://cdn.segment.com https://api.segment.io https://vitals.vercel-insights.com https://*.doubleclick.net https://analytics.google.com https://stats.g.doubleclick.net https://ingest.promptwatch.com https://kg2nsnegmd.execute-api.us-west-1.amazonaws.com https://xsdlzzdyji.execute-api.us-west-2.amazonaws.com https://effbmlt2n4.execute-api.us-east-1.amazonaws.com https://fvj3rll99i.execute-api.eu-west-1.amazonaws.com https://bszkhcn2m7.execute-api.eu-central-1.amazonaws.com https://czphf8wj9b.execute-api.ap-southeast-1.amazonaws.com https://gu1zu8xx11.execute-api.ap-east-1.amazonaws.com https://kuhry6kp4h.execute-api.sa-east-1.amazonaws.com https://um7c15bqnl.execute-api.me-south-1.amazonaws.com https://www.google.com https://www.google.com.tr https://www.googleadservices.com https://vercel.live wss://*.pusher.com https://*.mux.com https://*.litix.io;
+  connect-src 'self' https://api-iam.intercom.io https://api-iam.eu.intercom.io https://api-iam.au.intercom.io https://api-ping.intercom.io https://nexus-websocket-a.intercom.io wss://nexus-websocket-a.intercom.io https://nexus-websocket-b.intercom.io wss://nexus-websocket-b.intercom.io https://nexus-europe-websocket.intercom.io wss://nexus-europe-websocket.intercom.io https://nexus-australia-websocket.intercom.io wss://nexus-australia-websocket.intercom.io https://uploads.intercomcdn.com https://uploads.intercomcdn.eu https://uploads.au.intercomcdn.com https://uploads.eu.intercomcdn.com https://uploads.intercomusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://cdn.segment.com https://api.segment.io https://vitals.vercel-insights.com https://*.doubleclick.net https://analytics.google.com https://stats.g.doubleclick.net https://kg2nsnegmd.execute-api.us-west-1.amazonaws.com https://xsdlzzdyji.execute-api.us-west-2.amazonaws.com https://effbmlt2n4.execute-api.us-east-1.amazonaws.com https://fvj3rll99i.execute-api.eu-west-1.amazonaws.com https://bszkhcn2m7.execute-api.eu-central-1.amazonaws.com https://czphf8wj9b.execute-api.ap-southeast-1.amazonaws.com https://gu1zu8xx11.execute-api.ap-east-1.amazonaws.com https://kuhry6kp4h.execute-api.sa-east-1.amazonaws.com https://um7c15bqnl.execute-api.me-south-1.amazonaws.com https://www.google.com https://www.google.com.tr https://www.googleadservices.com https://vercel.live wss://*.pusher.com https://*.mux.com https://*.litix.io;
   object-src 'none';
   base-uri 'self';
   form-action 'self' https://intercom.help https://api-iam.intercom.io https://api-iam.eu.intercom.io https://api-iam.au.intercom.io;
@@ -16,6 +16,17 @@ const cspHeader = `
   frame-ancestors 'none';
   manifest-src 'self' https://upstash.com;
 `;
+
+// Advertised on every page. Next.js keeps only the last matching header with a
+// given key, so pages that add their own Link header must repeat these.
+const SITE_LINKS = [
+  '<https://upstash.com/llms.txt>; rel="alternate"; type="text/plain"; title="LLM-friendly content index"',
+  '<https://upstash.com/.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json"',
+  '<https://context7.com/api/v2/ask?siteKey=ask_4cf2adc7846aa874f833b068>; rel="search"; type="text/plain"; title="Search upstash.com"',
+  '<https://upstash.com/docs/devops/developer-api/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="Upstash Developer API (OpenAPI)"',
+  '<https://upstash.com/docs/qstash/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="QStash REST API (OpenAPI)"',
+  '<https://upstash.com/docs/workflow/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="Upstash Workflow REST API (OpenAPI)"',
+];
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -99,14 +110,7 @@ const nextConfig = {
         headers: [
           {
             key: "Link",
-            value: [
-              '<https://upstash.com/llms.txt>; rel="alternate"; type="text/plain"; title="LLM-friendly content index"',
-              '<https://upstash.com/.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json"',
-              '<https://context7.com/api/v2/ask?siteKey=ask_4cf2adc7846aa874f833b068>; rel="search"; type="text/plain"; title="Search upstash.com"',
-              '<https://upstash.com/docs/devops/developer-api/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="Upstash Developer API (OpenAPI)"',
-              '<https://upstash.com/docs/qstash/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="QStash REST API (OpenAPI)"',
-              '<https://upstash.com/docs/workflow/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="Upstash Workflow REST API (OpenAPI)"',
-            ].join(", "),
+            value: SITE_LINKS.join(", "),
           },
         ],
       },
@@ -120,7 +124,7 @@ const nextConfig = {
         ],
       },
       {
-        // Blog, home and pricing HTML responses are content-negotiated
+        // Blog, knowledge base, home and pricing HTML responses are content-negotiated
         // against text/markdown, so caches must differentiate by Accept.
         source: "/",
         headers: [{ key: "Vary", value: "Accept" }],
@@ -135,6 +139,14 @@ const nextConfig = {
       },
       {
         source: "/blog/:slug",
+        headers: [{ key: "Vary", value: "Accept" }],
+      },
+      {
+        source: "/kb",
+        headers: [{ key: "Vary", value: "Accept" }],
+      },
+      {
+        source: "/kb/:slug",
         headers: [{ key: "Vary", value: "Accept" }],
       },
       {
@@ -187,6 +199,23 @@ const nextConfig = {
           },
         ],
       },
+      // Product landing pages are content-negotiated against text/markdown
+      // too. Keep in sync with PRODUCT_PAGE_SLUGS in src/lib/product-pages.ts.
+      ...["redis", "vector", "qstash", "workflow", "box", "blob"].map(
+        (product) => ({
+          source: `/${product}`,
+          headers: [
+            { key: "Vary", value: "Accept" },
+            {
+              key: "Link",
+              value: [
+                ...SITE_LINKS,
+                `<https://upstash.com/${product}.md>; rel="alternate"; type="text/markdown"`,
+              ].join(", "),
+            },
+          ],
+        }),
+      ),
     ];
   },
 };

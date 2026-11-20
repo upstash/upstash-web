@@ -1,12 +1,13 @@
+import { CTA, FEATURES, HERO, USE_CASES, WHAT_IS } from "@/app/box/content";
 import { BOX_FAQ } from "@/app/box/faq";
 import SectionCode from "@/app/box/section-code";
-import SectionCta from "@/app/box/section-cta";
-import SectionFeatures from "@/app/box/section-features";
-import SectionHero from "@/app/box/section-hero";
 import SectionMcp from "@/app/box/section-mcp";
-import SectionUseCases from "@/app/box/section-use-cases";
-import SectionWhatIs from "@/app/box/section-what-is";
-import SectionFaq from "@/app/redis/section-faq";
+import SectionCta from "@/components/product-page/section-cta";
+import SectionFaq from "@/components/product-page/section-faq";
+import SectionFeatures from "@/components/product-page/section-features";
+import SectionHero from "@/components/product-page/section-hero";
+import SectionUseCases from "@/components/product-page/section-use-cases";
+import SectionWhatIs from "@/components/product-page/section-what-is";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 import type { Metadata } from "next";
 
@@ -54,14 +55,14 @@ export default function BoxPage() {
       />
 
       <main className="text-center">
-        <SectionHero />
-        <SectionFeatures />
+        <SectionHero {...HERO} />
+        <SectionFeatures {...FEATURES} />
         <SectionCode />
         <SectionMcp />
-        <SectionUseCases />
-        <SectionWhatIs />
+        <SectionUseCases {...USE_CASES} />
+        <SectionWhatIs {...WHAT_IS} />
         <SectionFaq items={BOX_FAQ} />
-        <SectionCta />
+        <SectionCta {...CTA} />
       </main>
     </>
   );

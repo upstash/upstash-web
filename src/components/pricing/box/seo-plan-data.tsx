@@ -29,7 +29,6 @@ export default function SeoPlanData() {
             <th>Price</th>
             <th>Concurrent boxes</th>
             <th>CPU hours/month</th>
-            <th>LLM budget/month</th>
           </tr>
         </thead>
         <tbody>
@@ -50,7 +49,6 @@ export default function SeoPlanData() {
                   ? plan.cpuHoursPerMonth.toLocaleString()
                   : plan.cpuHoursPerMonth}
               </td>
-              <td>{plan.llmBudgetPerMonth}</td>
             </tr>
           ))}
         </tbody>
@@ -76,7 +74,10 @@ export default function SeoPlanData() {
               <td>{size.memory}</td>
               <td>{size.storage}</td>
               <td>${size.cpuHourPrice}/active CPU hour</td>
-              <td>${size.keepAlivePrice}/month</td>
+              <td>
+                ${size.keepAlivePrice}/hour ($
+                {size.keepAliveMonthlyApprox}/month)
+              </td>
             </tr>
           ))}
         </tbody>
@@ -94,7 +95,6 @@ export default function SeoPlanData() {
             : BOX_PAYG_PLAN.maxConcurrentBoxes}
         </li>
         <li>CPU hours/month: {BOX_PAYG_PLAN.cpuHoursPerMonth}</li>
-        <li>LLM budget/month: {BOX_PAYG_PLAN.llmBudgetPerMonth}</li>
         {BOX_PAYG_PLAN.storagePrice !== null ? (
           <li>Storage: {BOX_PAYG_PLAN.storagePrice}</li>
         ) : null}

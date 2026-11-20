@@ -3,35 +3,22 @@
 import Bg from "@/components/bg";
 import Container from "@/components/container";
 import { LogoBranch } from "@/components/customers/logo-branch";
-import { LogoCircleback } from "@/components/customers/logo-circleback";
-import { LogoClay } from "@/components/customers/logo-clay";
 import { LogoClickfunnels } from "@/components/customers/logo-clickfunnels";
-import { LogoCodeRabbit } from "@/components/customers/logo-coderabbit";
-import { LogoCoinbase } from "@/components/customers/logo-coinbase";
-import { LogoComposio } from "@/components/customers/logo-composio";
 import { LogoCustomerio } from "@/components/customers/logo-customerio";
 import { LogoDropee } from "@/components/customers/logo-dropee";
 import { LogoDubsh } from "@/components/customers/logo-dubsh";
-import { LogoFal } from "@/components/customers/logo-fal";
 import { LogoFly } from "@/components/customers/logo-fly";
 import { LogoGitbook } from "@/components/customers/logo-gitbook";
 import { LogoMaker } from "@/components/customers/logo-maker";
-import { LogoMeta } from "@/components/customers/logo-meta";
 import { LogoMidjourney } from "@/components/customers/logo-midjourney";
-import { LogoNousResearchWordmark } from "@/components/customers/logo-nous-research-wordmark";
 import { LogoOkara } from "@/components/customers/logo-okara";
 import { LogoOpenart } from "@/components/customers/logo-openart";
-import { LogoOpencode } from "@/components/customers/logo-opencode";
 import { LogoOpenrouter } from "@/components/customers/logo-openrouter";
 import { LogoPaulSmith } from "@/components/customers/logo-paul-smith";
-import { LogoPolymarket } from "@/components/customers/logo-polymarket";
-import { LogoPrivy } from "@/components/customers/logo-privy";
-import { LogoRaindrop } from "@/components/customers/logo-raindrop";
-import { LogoSierra } from "@/components/customers/logo-sierra";
 import { LogoSupabase } from "@/components/customers/logo-supabase";
 import { LogoVercel } from "@/components/customers/logo-vercel";
 import { LogoZapier } from "@/components/customers/logo-zapier";
-import { LogoZoComputer } from "@/components/customers/logo-zo-computer";
+import HeroLogos from "@/components/home/hero/hero-logos";
 import {
   SectionHeader,
   SectionHeaderSummary,
@@ -42,13 +29,7 @@ import cx from "@/utils/cx";
 import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";
 import Link from "next/link";
-import {
-  ComponentType,
-  SVGProps,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function HomeHeroCustomer() {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
@@ -155,39 +136,7 @@ export default function HomeHeroCustomer() {
           </div>
         </div>
 
-        {/* LOGO GRID — rows of 2/4/6 with a centered last row, testimonials clickable, rest static */}
-        <div className="mx-auto mt-16 flex max-w-[1080px] flex-wrap justify-center gap-2 md:mt-24 md:gap-3">
-          {logos.map(({ name, Logo, slug, h = 24 }) => {
-            const item =
-              "w-[calc((100%-8px)/2)] sm:w-[calc((100%-24px)/4)] md:w-[calc((100%-36px)/4)] xl:w-[calc((100%-60px)/6)]";
-            const cell = (
-              <div
-                className={cx(
-                  "group flex h-[72px] w-full items-center justify-center px-4",
-                  "rounded-2xl bg-bg-mute transition-colors md:rounded-4xl dark:bg-bg-mute",
-                  slug &&
-                    "transition-all hover:text-primary hover:shadow-sm dark:hover:bg-white",
-                )}
-              >
-                <Logo style={{ height: h }} className="w-auto max-w-full" />
-              </div>
-            );
-            return slug ? (
-              <Link
-                key={name}
-                href={`/customers/${slug}`}
-                aria-label={name}
-                className={item}
-              >
-                {cell}
-              </Link>
-            ) : (
-              <div key={name} className={item}>
-                {cell}
-              </div>
-            );
-          })}
-        </div>
+        <HeroLogos />
 
         <div className="mt-8 flex justify-center">
           <Link
@@ -201,41 +150,6 @@ export default function HomeHeroCustomer() {
     </section>
   );
 }
-
-// Homepage logo wall — rows of 6 on desktop. `slug` marks a customer story (clickable).
-// Every logo shares one height in the grid; `h` nudges optical size per logo.
-const logos: {
-  name: string;
-  Logo: ComponentType<SVGProps<SVGSVGElement>>;
-  slug?: string;
-  h?: number;
-}[] = [
-  // Row 1 — immediate, broadly recognizable trust
-  { name: "Meta", Logo: LogoMeta, h: 20 },
-  { name: "Coinbase", Logo: LogoCoinbase, h: 19 },
-  { name: "Vercel", Logo: LogoVercel, h: 22 },
-  { name: "Supabase", Logo: LogoSupabase, slug: "supabase", h: 24 },
-  { name: "Midjourney", Logo: LogoMidjourney, h: 30 },
-  { name: "Zapier", Logo: LogoZapier, slug: "zapier", h: 24 },
-  // Row 2 — established companies plus industry variety
-  { name: "GitBook", Logo: LogoGitbook, slug: "gitbook", h: 23 },
-  { name: "Polymarket", Logo: LogoPolymarket, h: 22 },
-  { name: "Fly.io", Logo: LogoFly, h: 24 },
-  { name: "Paul Smith", Logo: LogoPaulSmith, slug: "paul-smith", h: 22 },
-  { name: "Sierra", Logo: LogoSierra, h: 30 },
-  { name: "Privy", Logo: LogoPrivy, h: 22 },
-  // Rows 3-4 — current AI and developer-platform credibility
-  { name: "Clay", Logo: LogoClay, h: 30 },
-  { name: "fal", Logo: LogoFal, h: 24 },
-  { name: "OpenRouter", Logo: LogoOpenrouter, h: 22 },
-  { name: "CodeRabbit", Logo: LogoCodeRabbit, h: 22 },
-  { name: "OpenCode", Logo: LogoOpencode, h: 20 },
-  { name: "Composio", Logo: LogoComposio, h: 22 },
-  { name: "Nous Research", Logo: LogoNousResearchWordmark, h: 22 },
-  { name: "Circleback", Logo: LogoCircleback, h: 17 },
-  { name: "Zo Computer", Logo: LogoZoComputer, h: 25 },
-  { name: "Raindrop", Logo: LogoRaindrop, h: 25 },
-];
 
 const customers = [
   {

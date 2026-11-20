@@ -210,7 +210,7 @@ EVALSHA ffffffffffffffffffffffffffffffffffffffff 0
 (error) NOSCRIPT No matching script. Please use EVAL.
 ```
 
-If you call evalsha() raw, your code has to catch NOSCRIPT and reload the script every time the cache resets. The [@upstash/redis Script class](https://upstash-redis-js.mintlify.app/api/script) does that for you. The first exec() loads and runs the script, later calls run it by hash, and a NOSCRIPT after a cache reset falls back to EVAL on its own:
+If you call evalsha() raw, your code has to catch NOSCRIPT and reload the script every time the cache resets. The [@upstash/redis Script class](https://github.com/upstash/redis-js/blob/main/packages/redis/pkg/script.ts) does that for you. The first exec() loads and runs the script, later calls run it by hash, and a NOSCRIPT after a cache reset falls back to EVAL on its own:
 
 ```typescript
 const incr = redis.createScript<number>(`
