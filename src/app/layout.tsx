@@ -46,6 +46,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         {/* Proves to Context7 Ask that upstash.com is ours. */}
         <meta name="context7-site-verification" content={ASK_SITE_KEY} />
+        {/* AI Catalog link relation, for clients that read HTML rather than headers. */}
+        <link
+          rel="ai-catalog"
+          href="/.well-known/ai-catalog.json"
+          type="application/ai-catalog+json"
+        />
       </head>
       <IntercomWrapper>
         <body

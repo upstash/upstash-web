@@ -1,23 +1,35 @@
 {
-  "specVersion": "1.0",
+  "specVersion": "0.9",
   "host": {
     "displayName": "Upstash",
-    "documentationUrl": "https://upstash.com/docs/agent-resources/overview"
+    "identifier": "upstash.com",
+    "documentationUrl": "https://upstash.com/docs/agent-resources/overview",
+    "logoUrl": "https://upstash.com/logo/upstash-icon-white-bg.svg"
   },
   "entries": [
     {
-      "identifier": "urn:air:upstash.com:mcp:upstash",
+      "identifier": "urn:air:upstash.com:upstash:mcp",
       "type": "application/mcp-server-card+json",
       "url": "https://mcp.upstash.com/mcp/server-card",
-      "tags": ["redis", "qstash", "workflow", "vector", "search", "box", "blob"]
+      "tags": ["redis", "qstash", "workflow", "vector", "search", "box", "blob"],
+      "publisher": {
+        "identifier": "upstash.com",
+        "displayName": "Upstash",
+        "identityType": "dns"
+      }
     },
     {
-      "identifier": "urn:air:upstash.com:skill:upstash",
+      "identifier": "urn:air:upstash.com:upstash:skill",
       "displayName": "Upstash",
       "type": "application/agent-skills+md",
       "description": "Agent skill for every Upstash product, SDK and tool: Redis, Ratelimit, QStash, Workflow, Vector, Search, Box, Blob, the Upstash CLI and no-signup scratch Redis.",
       "url": "https://raw.githubusercontent.com/upstash/skills/main/skills/upstash/SKILL.md",
-      "tags": ["redis", "ratelimit", "qstash", "workflow", "vector", "search", "box", "blob", "cli"]
+      "tags": ["redis", "ratelimit", "qstash", "workflow", "vector", "search", "box", "blob", "cli"],
+      "publisher": {
+        "identifier": "upstash.com",
+        "displayName": "Upstash",
+        "identityType": "dns"
+      }
     }
   ]
 }
