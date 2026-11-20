@@ -23,12 +23,12 @@ export default function FastStatistic() {
         )}
       >
         <FastCard>
-          <FastCardValue>160B</FastCardValue>
+          <FastCardValue>400B</FastCardValue>
           <FastCardTitle>Redis Commands</FastCardTitle>
         </FastCard>
 
         <FastCard>
-          <FastCardValue>210M</FastCardValue>
+          <FastCardValue>540M</FastCardValue>
           <FastCardTitle>QStash Messages</FastCardTitle>
         </FastCard>
 
