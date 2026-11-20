@@ -1,75 +1,35 @@
-import { apiError } from "@/lib/api-error";
 import { NextResponse, type NextRequest } from "next/server";
-import { clientHeaders, trackEvent } from "./analytics";
+import { trackEvent } from "./analytics";
 
-const UPSTASH_BACKEND_URL =
-  process.env.UPSTASH_BACKEND_URL ?? "https://api.upstash.com";
+// start-redis is discontinued. Both methods answer 410 Gone with markdown,
+// since the old CLI command and MCP tool print the response body as is.
+const GONE_MARKDOWN = `# start-redis is discontinued
 
-export async function GET(req: NextRequest) {
-  try {
-    trackEvent("start_redis_get", req);
+https://upstash.com/start-redis no longer creates databases. Create a free Redis database in an Upstash account instead:
 
-    const upstream = await fetch(
-      `${UPSTASH_BACKEND_URL}/v2/agent/redis/start`,
-      {
-        method: "GET",
-        headers: clientHeaders(req),
-        cache: "no-store",
-      },
-    );
+- Console: sign up or sign in at https://console.upstash.com and create a Redis database.
+- Upstash CLI: set \`UPSTASH_EMAIL\` and \`UPSTASH_API_KEY\` (create a key at https://console.upstash.com/account/api), then run \`npx -y upstash redis create --name my-db --region us-east-1\`.
+- Upstash MCP server: lets your agent create and manage databases in your account. Setup: https://upstash.com/docs/agent-resources/overview
 
-    const body = await upstream.text();
-    return new NextResponse(body, {
-      status: upstream.status,
-      headers: {
-        "Content-Type":
-          upstream.headers.get("Content-Type") ?? "application/json",
-      },
-    });
-  } catch (error) {
-    console.error("Failed to fetch Redis start info:", error);
-    return apiError(
-      500,
-      "upstream_unavailable",
-      "Could not fetch the Redis start instructions from the Upstash API.",
-      "Retry after a short delay. If the problem persists, contact support@upstash.com.",
-    );
-  }
+A database created earlier with start-redis can still be claimed until it expires, 72 hours after creation: https://upstash.com/start-redis/console/<database-id>
+`;
+
+function gone(): NextResponse {
+  return new NextResponse(GONE_MARKDOWN, {
+    status: 410,
+    headers: {
+      "Content-Type": "text/markdown; charset=utf-8",
+      "Cache-Control": "no-store",
+    },
+  });
 }
 
-export async function POST(req: NextRequest) {
-  try {
-    trackEvent("start_redis_post", req);
+export function GET(req: NextRequest) {
+  trackEvent("start_redis_get", req);
+  return gone();
+}
 
-    const idempotencyKey = req.headers.get("Idempotency-Key");
-
-    const upstream = await fetch(
-      `${UPSTASH_BACKEND_URL}/v2/agent/redis/start`,
-      {
-        method: "POST",
-        headers: {
-          ...clientHeaders(req),
-          ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
-        },
-        cache: "no-store",
-      },
-    );
-
-    const body = await upstream.text();
-    return new NextResponse(body, {
-      status: upstream.status,
-      headers: {
-        "Content-Type":
-          upstream.headers.get("Content-Type") ?? "application/json",
-      },
-    });
-  } catch (error) {
-    console.error("Failed to start Redis agent:", error);
-    return apiError(
-      500,
-      "upstream_unavailable",
-      "Could not reach the Upstash API to create the Redis database.",
-      "Retry after a short delay. If the problem persists, contact support@upstash.com.",
-    );
-  }
+export function POST(req: NextRequest) {
+  trackEvent("start_redis_post", req);
+  return gone();
 }
