@@ -1,0 +1,185 @@
+---
+authors: [josh]
+slug: upstash-realtime-2x-faster
+tags: [realtime, redis]
+title: Upstash Realtime Is Now Almost 2x Faster
+description: Upstash Realtime 1.2 stores and publishes an event in one Redis request instead of two. Emits are almost 2x faster, and a multiplayer shooter runs on it.
+---
+
+Until this month, every `emit()` in Upstash Realtime made two requests to Redis. The first request stored the event in a stream, and the second one published it to the subscribers. Each event waited for two round trips before the next one could go out.
+
+Realtime 1.2 stores and publishes an event with a single request. We streamed the same AI answer through the old and the new version at the same time to see what that does to a real workload. The old version finished in 4.0 seconds, and the new one finished in 2.2 seconds.
+
+![](https://cdn.bydefault.so/image-D_gbQ8qekW8pTMa5Mx9C5.png)
+
+We also wanted to know if this is fast enough for an online game. So we built a multiplayer shooter where every tick goes through Realtime, and played it with the team.
+
+It works extremely well.
+
+<Frame>
+  <video
+    src="/blog/upstash-realtime-2x-faster/shooter.mp4"
+    poster="/blog/upstash-realtime-2x-faster/shooter-poster.jpg"
+    autoPlay
+    muted
+    loop
+    playsInline
+    aria-label="The Upstash team playing a top-down multiplayer shooter that runs on Upstash Realtime"
+    className="block h-auto w-full"
+  />
+</Frame>
+
+## How did we make realtime faster?
+
+[Upstash Realtime](https://upstash.com/docs/realtime/overall/quickstart) stores every event in two places. A Redis Stream stores the history, so a client that reconnects can catch up on what it missed. Redis Pub/Sub delivers the event to everyone who is connected right now.
+
+Up to version 1.1, `emit()` wrote to those two places with two requests, one after the other. Now, one Lua script appends the event to the stream and publishes it:
+
+```lua
+local id
+if ARGV[4] == '' then
+  id = redis.call('XADD', KEYS[1], '*', 'data', ARGV[1], 'event', ARGV[2], 'channel', KEYS[1])
+else
+  id = redis.call('XADD', KEYS[1], 'MAXLEN', '=', ARGV[4], '*', 'data', ARGV[1], 'event', ARGV[2], 'channel', KEYS[1])
+end
+if ARGV[5] ~= '' then
+  redis.call('EXPIRE', KEYS[1], ARGV[5])
+end
+local payload = ARGV[3]
+if ARGV[6] == '1' then
+  payload = '{"data":' .. ARGV[1] .. payload
+end
+redis.call('PUBLISH', KEYS[1], payload .. id .. '"}')
+return id
+```
+
+Now both writes occur inside of Redis and your server only has to wait for a single round trip.
+
+![](https://cdn.bydefault.so/drawing-rcjZv9BS2FQR-lOB_Tvxt.png)
+
+We measured both versions from a server in the same region as the database. The median time of one `emit()` went from 2.6 ms to 1.4 ms:
+
+|  | Old (1.1.1) | New (1.2.1) |
+| --- | --- | --- |
+| One `emit()` | 2.6 ms | 1.4 ms |
+| From `emit()` to a subscriber | 2.7 ms | 1.5 ms |
+
+The script also fixes the order of events. With two separate requests, events that were emitted at the same moment could reach subscribers in a different order than the one in the history. Redis runs a script as one step, so both orders now always match.
+
+## Streaming AI responses is (a lot) faster now
+
+A chat backend calls `emit()` once for every piece of text that the model produces. It waits for each call so that the pieces stay in order, which means every piece pays for the trip to Redis. If we can make this shorter, the whole answer would stream faster.
+
+Here is the same AI answer, streamed through both versions at the same time. The old version is on the left and the new one is on the right:
+
+<Frame>
+  <video
+    src="/blog/upstash-realtime-2x-faster/stream-demo.mp4"
+    poster="/blog/upstash-realtime-2x-faster/stream-demo-poster.jpg"
+    autoPlay
+    muted
+    loop
+    playsInline
+    aria-label="The same AI answer streamed through the old and the new version of Upstash Realtime at the same time. The old version finishes after 4.0 seconds and the new one after 2.2 seconds."
+    className="block h-auto w-full"
+  />
+</Frame>
+
+The old version needed 4.0 seconds for this answer, and the new one needed 2.2 seconds.
+
+## One Redis subscription per channel
+
+The second change is about what your server does when many people listen at once.
+
+Before 1.2, the server opened its own subscription to Redis for every channel of every connected browser. With 30 people on 2 channels, that was 60 subscriptions, and all of them received the same messages.
+
+Now the browsers that are connected to one server share a single subscription per channel. The server reads each message from Redis once and passes it on to everyone who listens:
+
+![](https://cdn.bydefault.so/drawing-HSRJtKUFyRxfv3XgLyF_x.png)
+
+In a test with 1,000 clients on one server, delivering the same events took 19x less CPU.
+
+The keepalive pings got the same fix. Every connection used to ping its channel once a minute, and everyone else on that channel received the ping. Now a channel gets a single ping, and only when it has been quiet.
+
+On Cloudflare Workers and Vercel Edge, connections can't share a subscription, so each one still opens its own.
+
+## Bug fixes in 1.2
+
+We also fixed the bugs we found while testing:
+
+- **Duplicate events.** After a reconnect, a client could receive events it already had. Every event now arrives once and in order.
+- **Reconnects for no reason.** The connection restarted whenever a component with `useRealtime` mounted or unmounted. It now only restarts when the channels change.
+- **Connections that went quiet.** When the link between the server and Redis broke without an error, clients stayed connected and received nothing. Realtime now detects this, reconnects the clients, and replays what they missed.
+- **Large events that went missing.** Events above about 16 kB could get lost on the way to the client. They now arrive, and `emit()` throws a clear error for an event that is too large to deliver.
+- **Pings from closed subscriptions.** A subscription on the server kept sending pings after it was closed.
+
+## Emits lock only their channel
+
+Moving `emit()` into a script had one downside. Upstash Redis normally locks only the keys that a command uses, so commands on other keys run at the same time. A Lua script [locks the whole database by default](https://upstash.com/docs/redis/features/key-locking), because Redis can't tell in advance which keys the script will use.
+
+So on 1.2.0, every other command on your database had to wait while an emit ran.
+
+Version 1.2.1 adds one line to the top of the script:
+
+```lua
+#!lua flags=allow-key-locking
+```
+
+With this flag, an emit only locks its own channel. Emits to the same channel still run one after another, so events stay in order. Everything else on your database keeps running.
+
+## Is Upstash Realtime fast enough for a multiplayer game?
+
+Yes. We built a multiplayer shooter on it, and a player's update reaches the other players in about 60 ms, also with 20 players in one room. The server and the database were in Frankfurt, and we played from Germany.
+
+The game is a top-down shooter built with Next.js, three.js and `@upstash/realtime` 1.2.0. This is the whole Realtime setup:
+
+```ts
+import { Realtime, type InferRealtimeEvents } from "@upstash/realtime"
+import { Redis } from "@upstash/redis"
+import { matchSchema, tickSchema } from "@/lib/game/protocol"
+
+const schema = {
+  game: {
+    tick: tickSchema,
+    match: matchSchema,
+  },
+}
+
+export const redis = Redis.fromEnv()
+
+export const realtime = new Realtime({
+  schema,
+  redis,
+  // A game only cares about now. Keep just enough history to bridge a
+  // reconnect, and let an empty room's stream expire.
+  history: { maxLength: 256, expireAfterSecs: 60 },
+})
+
+export type RealtimeEvents = InferRealtimeEvents<typeof realtime>
+```
+
+A browser can't publish to Realtime directly. So each player posts its position, aim and health to a route 20 times a second, and the route calls `emit()` with it. One of these updates is called a tick. Everyone in the room receives the tick on their event stream. The sender receives it too, and the time until its own tick comes back is the ping that the game shows in the corner.
+
+![](https://cdn.bydefault.so/drawing-tWaW5boIia2so_kJnMxZq.png)
+
+Every player's update goes to every other player, so the load grows fast with the size of a room. With 20 players, the server receives 400 updates a second and Realtime delivers 8,000 messages a second.
+
+Our game trusts its players, so a player could report any position or health. A real game would check every update on the server before it publishes it.
+
+## Upgrading
+
+The API is the same as in 1.1, so the upgrade is one install:
+
+```bash
+npm install @upstash/realtime@latest @upstash/redis@latest
+```
+
+Three things to know before you upgrade:
+
+- You need `@upstash/redis` 1.36.1 or newer.
+- `emit()` throws an error for an event above 1,000,000 characters.
+- From 1.2.1 on, `emit()` needs an Upstash database, because stock Redis rejects the script flag.
+
+Old and new servers can use the same channels, so you can roll the update out one server at a time.
+
+The release notes for [1.2.0](https://github.com/upstash/realtime/releases/tag/v1.2.0) and [1.2.1](https://github.com/upstash/realtime/releases/tag/v1.2.1) list every change.
