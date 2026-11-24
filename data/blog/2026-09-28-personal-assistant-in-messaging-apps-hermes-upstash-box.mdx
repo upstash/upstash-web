@@ -4,6 +4,7 @@ title: "Setting Up a Personal Assistant in Your Messaging Apps with Hermes and U
 authors: [alitarik]
 tags: [ai, box, agents]
 description: "Hermes is an open-source agent from Nous Research that you can talk to from WhatsApp, Telegram, Slack, Discord and more. This post runs it on an Upstash Box so it stays online, then walks through connecting WhatsApp as an example. Every other messaging app follows the same flow."
+updated: "2026-11-24"
 ---
 
 The best place for an AI assistant is the app you already have open all day. You don't need a new tab or a new app. You send a message, the way you would to a friend, and the answer comes back in the same chat.
@@ -33,7 +34,9 @@ Isolation matters here too. Hermes runs shell commands and edits files for you. 
 
 ## 1. Create a box and install Hermes
 
-In the [Upstash Console](https://console.upstash.com/box), create a box with size **Small** and **Keep alive** turned on. Then connect to it. The username is the box name, and the password is your Box API key.
+In the [Upstash Console](https://console.upstash.com/box), create a box with size **Small** and **Keep alive** turned on. Then open the box and go to its **Terminal** tab, which gives you a shell in the browser.
+
+If you prefer your own terminal, connect over SSH. The username is the box name, and the password is your Box API key.
 
 ```bash
 ssh <box-name>@us-east-1.box.upstash.com
