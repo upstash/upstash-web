@@ -199,6 +199,16 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: "/pricing/blob",
+        headers: [
+          {
+            key: "Link",
+            value:
+              '<https://upstash.com/pricing/blob.md>; rel="alternate"; type="text/markdown"; title="Blob Pricing (Markdown)"',
+          },
+        ],
+      },
       // Product landing pages are content-negotiated against text/markdown
       // too. Keep in sync with PRODUCT_PAGE_SLUGS in src/lib/product-pages.ts.
       ...["redis", "vector", "qstash", "workflow", "box", "blob"].map(

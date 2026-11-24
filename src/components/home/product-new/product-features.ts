@@ -86,7 +86,7 @@ export const PRODUCT_FEATURES: Record<
     {
       title: ["Highly Available,", "Infinitely Scalable"],
       bullets: [
-        "99.99% uptime guarantee",
+        "99.99% uptime SLA with Prod Pack",
         "Automatic scaling to meet your demands",
         "No server management required",
       ],

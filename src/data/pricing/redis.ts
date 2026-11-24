@@ -165,7 +165,7 @@ export const REDIS_FREE_PLAN: RedisPlan = {
   uptimeSLA: false,
   tlsEncryption: true,
   ipAllowlist: false,
-  acl: false,
+  acl: true,
   encryptionAtRest: false,
   soc2: false,
   privateLink: false,
@@ -429,7 +429,7 @@ export const REDIS_ALL_PLANS: RedisPlan[] = [
 export const REDIS_PROD_PACK = {
   monthlyPrice: 200,
   description:
-    "Prod Pack is an add-on available for any paid plan (Pay as You Go or Fixed). Enable it from your database details page in the Upstash console.",
+    "Prod Pack is an add-on available for any paid plan (Pay as You Go or Fixed) on a global database. Enable it from your database details page in the Upstash console.",
   features: [
     "Uptime SLA",
     "Multi-Zone High Availability (regions deployed across multiple availability zones, with automatic same-region failover if a zone or replica fails)",
@@ -437,7 +437,6 @@ export const REDIS_PROD_PACK = {
     "Advanced monitoring (Prometheus, Grafana, Datadog, New Relic)",
     "Insights in the console (request routing, latency, limits, Lua and keyspace analysis)",
     "Traffic insights (where clients connect from by network, cloud provider and region; the SDKs, platforms and runtimes they use; and which requests are served cross-region)",
-    "Role-based access control",
     "Encryption at rest",
   ],
   // The fields below feed the markdown and llms pages, where an agent or a

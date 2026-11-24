@@ -36,7 +36,7 @@ This site has a search endpoint: https://context7.com/api/v2/ask?siteKey=ask_4cf
 
 **Quick reference:**
 - Free: $0, 1,000 messages/day
-- Pay as You Go: $1 per 100K messages, unlimited messages/day (retries are free)
+- Pay as You Go: $1 per 100K messages, unlimited messages/day (each retry counts as a message)
 - Fixed 1M: $180/month, 1M messages/day, 1 TB bandwidth
 - Fixed 10M: $420/month, 10M messages/day, 5 TB bandwidth
 - Enterprise: Custom — contact sales@upstash.com
@@ -70,8 +70,7 @@ This site has a search endpoint: https://context7.com/api/v2/ask?siteKey=ask_4cf
 - Free: $0, 10 concurrent boxes, 5 CPU hours/month
 - Agents use your own model provider key (Anthropic, OpenAI, OpenRouter, ...)
 - Pay as You Go (usage): Small $0.10, Medium $0.20, Large $0.40 per active CPU hour + $0.10/GB/month storage
-- Pay as You Go (keep-alive): Small $0.0111, Medium $0.0222, Large $0.0444 per hour ($8, $16, $32 per month)
-- Enterprise: Custom — contact sales@upstash.com
+- Fixed (keep-alive): Small $0.0111, Medium $0.0222, Large $0.0444 per hour ($8, $16, $32 per month)
 
 ---
 
@@ -84,7 +83,6 @@ Available on all paid plans. Price: +$200/month per Redis database, +$200/month 
 - Multi-Zone high availability (Redis)
 - Insights in the console: request routing, latency, limits, Lua and keyspace analysis (Redis)
 - Traffic insights: client networks, cloud providers and regions, SDKs and runtimes, cross-region requests (Redis)
-- Role-based access control (ACL) (Redis)
 - Encryption at rest
 
 When it is worth it:

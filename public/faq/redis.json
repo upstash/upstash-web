@@ -14,7 +14,7 @@
     },
     {
       "question": "How does the budget work?",
-      "answer": "Budget is only available for the pay-as-you-go plan. You can set a maximum monthly budget for your database so you won't be charged beyond that limit. We send email notifications when you reach 70% and 90% of your monthly budget so you can adjust the limit or upgrade to a Fixed plan. If your usage exceeds the budget cap, your database will be rate limited and your total cost will not exceed the chosen budget. If you change from a Fixed plan to pay-as-you-go mid-month, your budget only tracks your pay-as-you-go spending."
+      "answer": "Budget is only available for the pay-as-you-go plan. You can set a maximum monthly budget for your database so you won't be charged beyond that limit. We send email notifications when you reach 70% and 90% of your monthly budget so you can adjust the limit or upgrade to a Fixed plan. If your usage exceeds the budget cap, your total cost will not exceed the chosen budget; for budgets under $1,000 the database is also rate limited. If you change from a Fixed plan to pay-as-you-go mid-month, your budget only tracks your pay-as-you-go spending."
     },
     {
       "question": "Do Fixed plans have command count pricing or limits?",
@@ -62,11 +62,11 @@
     },
     {
       "question": "Can I purchase Prod Pack for any plan?",
-      "answer": "Yes. You can purchase Prod Pack for any plan except the Free tier. It costs $200/month per database on top of the plan price. You can enable it from your Upstash dashboard database details page."
+      "answer": "Yes. You can purchase Prod Pack for any paid plan (Pay as You Go or Fixed) on a global database. It costs $200/month per database on top of the plan price. You can enable it from your Upstash dashboard database details page."
     },
     {
       "question": "What is included in Prod Pack?",
-      "answer": "Prod Pack includes uptime SLA, SOC 2 Type 2 report, advanced monitoring with Prometheus, Grafana, Datadog, and New Relic, Insights in the console, traffic insights (where clients connect from, the SDKs and runtimes they use, and cross-region requests), multi-zone high availability, role-based access control, and encryption at rest."
+      "answer": "Prod Pack includes uptime SLA, SOC 2 Type 2 report, advanced monitoring with Prometheus, Grafana, Datadog, and New Relic, Insights in the console, traffic insights (where clients connect from, the SDKs and runtimes they use, and cross-region requests), multi-zone high availability, and encryption at rest."
     },
     {
       "question": "Does enabling multi-zone high availability change my bill?",

@@ -48,7 +48,8 @@ export interface BlobMeter {
   label: string;
   /**
    * What the free plan includes each month. A hard cap, not an allowance that
-   * carries: past it the bucket stops serving until the window rolls over.
+   * carries: past the operations or egress cap the bucket stops serving until
+   * the next calendar month; past the storage cap it becomes read-only.
    */
   freeIncluded: string;
   /**

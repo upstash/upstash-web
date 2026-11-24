@@ -70,6 +70,7 @@ const PRICING_MD_PRODUCTS = [
   "vector",
   "workflow",
   "box",
+  "blob",
 ] as const;
 
 const PRICING_DEFAULT_PRODUCT = "redis";

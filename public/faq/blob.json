@@ -22,7 +22,7 @@
     },
     {
       "question": "What happens if I exceed the free tier?",
-      "answer": "Your bucket stops serving requests until the 30-day window rolls over. You are never charged on the free plan. Adding a credit card upgrades you to pay-as-you-go, which removes the caps. Storage and operations are billed from the first unit; egress stays free up to 1 TB a month."
+      "answer": "If you go over the free operations or egress caps, your bucket stops serving requests until the start of the next calendar month. If you go over the free storage cap, the bucket becomes read-only until you delete data or upgrade. You are never charged on the free plan. Adding a credit card upgrades you to pay-as-you-go, which removes the caps. Storage and operations are billed from the first unit; egress stays free up to 1 TB a month."
     },
     {
       "question": "Does the pay-as-you-go plan include a free allowance?",

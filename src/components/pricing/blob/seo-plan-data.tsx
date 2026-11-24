@@ -75,9 +75,10 @@ export default function SeoPlanData() {
       </ul>
 
       <p>
-        The free plan&apos;s monthly amounts are hard caps: past them the bucket
-        stops serving requests until the 30-day window rolls over, and the free
-        plan is never charged. Pay as You Go bills from the first byte and the
+        The free plan&apos;s monthly amounts are hard caps: past the operations
+        or egress caps the bucket stops serving requests until the next calendar
+        month, past the storage cap it becomes read-only, and the free plan is
+        never charged. Pay as You Go bills from the first byte and the
         first operation, except egress, which is free up to 1 TB a month.
       </p>
 
