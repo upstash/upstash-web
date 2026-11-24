@@ -10,8 +10,8 @@ In this article I want to show you how I run OpenCode in a cloud sandbox, but st
 
 But, it keeps working if we shut down the mac, has much better internet speed, cannot see my local API keys and cannot put my mac in danger with any weird behavior. To me, it's one of the nicest cloud dev setups possible.
 
-\<Frame>
-  \<video
+<Frame>
+  <video
     src="/blog/opencode-remote-terminal-upstash-box/terminal.mp4"
     poster="/blog/opencode-remote-terminal-upstash-box/terminal-poster.jpg"
     controls
@@ -20,7 +20,7 @@ But, it keeps working if we shut down the mac, has much better internet speed, c
     aria-label="OpenCode running in an Upstash Box and shown in a Ghostty window on a laptop, streamed over Upstash Realtime"
     className="block h-auto w-full"
   />
-\</Frame>
+</Frame>
 
 We don't connect via an SSH session to the sandbox. Instead, a small host process inside an [Upstash Box](https://upstash.com/docs/box/overall/quickstart) publishes every byte that OpenCode writes, and a client on our laptop writes those bytes into Ghostty. Our client publishes our keystrokes back in the other direction. Both processes talk through [Upstash Realtime](https://upstash.com/docs/realtime/overall/quickstart), an HTTP pub/sub service backed by Redis. In practice, typing feels local.
 
