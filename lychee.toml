@@ -21,6 +21,9 @@ accept = ["200..=299", "403", "429"]
 remap = ["^file://.*/public/docs([/?#].*)?$ https://upstash.com/docs$1"]
 
 exclude = [
+  # cursor.com fails lychee with an HTTP/2 protocol error, though the pages load.
+  "^https://cursor\\.com/",
+
   # --- Local / dev-only ---
   "://localhost",
   "127\\.0\\.0\\.1",
