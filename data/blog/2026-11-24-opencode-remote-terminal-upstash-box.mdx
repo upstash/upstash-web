@@ -1,0 +1,275 @@
+---
+authors: [josh]
+slug: opencode-remote-terminal-upstash-box
+tags: [realtime, box, agents, redis]
+title: Running OpenCode in a Cloud Sandbox and Streaming It to Ghostty
+description: OpenCode runs in an Upstash Box and a small client mirrors it in Ghostty over Upstash Realtime. How the relay works, why we used Realtime and not SSH, and the code.
+---
+
+In this article I want to show you how I run OpenCode in a cloud sandbox, but stream it to my local mac Ghostty terminal so it looks like a native OpenCode instance. 
+
+But, it keeps working if we shut down the mac, has much better internet speed, cannot see my local API keys and cannot put my mac in danger with any weird behavior. To me, it's one of the nicest cloud dev setups possible.
+
+<Frame>
+  <video
+    src="/blog/opencode-remote-terminal-upstash-box/terminal.mp4"
+    poster="/blog/opencode-remote-terminal-upstash-box/terminal-poster.jpg"
+    controls
+    playsInline
+    preload="metadata"
+    aria-label="OpenCode running in an Upstash Box and shown in a Ghostty window on a laptop, streamed over Upstash Realtime"
+    className="block h-auto w-full"
+  />
+</Frame>
+
+We don't connect via an SSH session to the sandbox. Instead, a small host process inside an [Upstash Box](https://upstash.com/docs/box/overall/quickstart) publishes every byte that OpenCode writes, and a client on our laptop writes those bytes into Ghostty. Our client publishes our keystrokes back in the other direction. Both processes talk through [Upstash Realtime](https://upstash.com/docs/realtime/overall/quickstart), an HTTP pub/sub service backed by Redis. In practice, typing feels local.
+
+## How do you run OpenCode remotely?
+
+Running OpenCode on another machine comes down to forwarding raw terminal bytes in both directions. On the remote machine, we start OpenCode inside a pseudo-terminal, stream everything it writes to our local terminal, and send our keystrokes back. Because we run OpenCode in an Upstash Box and carry both directions over Upstash Realtime, our laptop only makes HTTPS requests.
+
+A pseudo-terminal takes the place of a real terminal window for a command-line program. OpenCode writes its output to one end and reads keystrokes from it, while our host process holds the other end and relays those bytes over the network.
+
+We split the project into three parts:
+
+- **The host** runs inside the box. It launches OpenCode in a pseudo-terminal, publishes every byte OpenCode writes, and feeds every byte it receives into OpenCode.
+- **The client** is a single JavaScript file on our laptop. It puts our terminal into raw mode so keystrokes pass straight to the client instead of waiting for a full line. It writes everything the host publishes to our screen, and it publishes everything our terminal produces back to the host: keys, mouse events, pasted text, and answers to the queries OpenCode sends a terminal.
+- **A setup script** creates the box, installs the host inside it, and starts the host.
+
+![](https://cdn.bydefault.so/drawing-cMTNsoi493rwp7E-DB23w.png)
+
+Starting a session takes two commands:
+
+```sh
+bun box up
+node dist/oc.mjs
+```
+
+Our relayed setup is one of three ways to run OpenCode on another machine:
+
+- **Its own server.** Running `opencode serve` starts OpenCode as [a server](https://opencode.ai/docs/cli/web/), and a client on our machine connects to it with `opencode --server` and the server URL.
+- **Its web UI.** Running `opencode pair --remote` prints a link that opens the web UI from anywhere through a tunnel.
+- **A relayed terminal.** This is what we built. Raw terminal bytes travel over Realtime, so both the box and our laptop only make outgoing HTTPS requests.
+
+## Why Realtime and not SSH?
+
+An Upstash Box [accepts SSH](https://upstash.com/docs/box/overall/shell), which works well for running a quick command. With Realtime, however, Upstash holds the session instead of tying it to a direct connection between two machines. For a terminal that we leave and come back to, the relay gives us four advantages:
+
+- **Any device can join.** Our client only makes HTTPS requests, so it runs anywhere HTTPS works: a second laptop, a server, or a network that blocks SSH.
+- **It fits into a web app.** Realtime provides a [client for the browser](https://upstash.com/docs/realtime/features/client-side), so a web page can subscribe to the same channel and draw the terminal with a library like xterm.js. The host stays the same.
+- **One central place holds the session.** An SSH session lives in a single network connection and ends when that connection drops unless we add a terminal multiplexer like tmux. With the relay, both sides talk only to Upstash. Redis stores the recent messages of the session, so a client that was away picks up where it stopped, and OpenCode keeps running whether or not anyone is connected.
+- **Several clients can watch at once.** Every client subscribed to the session receives the same output.
+
+## Two channels and one schema
+
+To separate the two directions of traffic, each session uses two Realtime channels. The host publishes to the downstream channel, and clients publish to the upstream channel. Here is the complete Realtime setup along with the message schema for both directions:
+
+```ts
+import { Realtime } from "@upstash/realtime"
+import { Redis } from "@upstash/redis"
+import * as z from "zod/v4"
+
+const lane = { l: z.string().max(32), s: z.number().int().positive() }
+const size = { cols: z.number().int().min(1).max(1000), rows: z.number().int().min(1).max(1000) }
+
+const down = z.discriminatedUnion("t", [
+  z.object({ ...lane, t: z.literal("o"), d: z.string() }),
+  z.object({ ...lane, t: z.literal("sync"), c: z.string(), pre: z.string(), fresh: z.boolean() }),
+  z.object({ ...lane, t: z.literal("exit"), code: z.number().int() }),
+  z.object({ ...lane, t: z.literal("hb") }),
+  z.object({ ...lane, t: z.literal("reattach"), c: z.string() }),
+])
+
+const up = z.discriminatedUnion("t", [
+  z.object({ ...lane, t: z.literal("i"), d: z.string() }),
+  z.object({ ...lane, t: z.literal("attach"), ...size }),
+  z.object({ ...lane, t: z.literal("resize"), ...size }),
+  z.object({ ...lane, t: z.literal("detach") }),
+  z.object({ ...lane, t: z.literal("beat") }),
+])
+
+const redis = Redis.fromEnv()
+const realtime = new Realtime({ schema: { term: { down, up } }, redis, history: { maxLength: 512 } })
+
+export const session = {
+  down: realtime.channel("oc:main:down"),
+  up: realtime.channel("oc:main:up"),
+}
+```
+
+Both channels carry terminal-data messages alongside control messages. Realtime validates every message against the schema before publishing it.
+
+The `history` setting tells Realtime to keep the last 512 messages of each channel in a Redis Stream, an append-only log stored in Redis. If either side briefly loses its connection, it replays the missed messages from that stream.
+
+With the channels configured, sending terminal output and receiving it take one call each:
+
+```ts
+const unsubscribe = await session.down.subscribe({
+  events: ["term.down"],
+  onData: ({ data, cursor }) => console.log(cursor, data),
+})
+
+await session.down.emit("term.down", { l: "host", s: 1, t: "o", d: "hello from the box\r\n" })
+```
+
+```text
+1795506126164-0 { l: 'host', s: 1, t: 'o', d: 'hello from the box\r\n' }
+```
+
+The first value (`1795506126164-0`) is the event cursor, which marks that message's position in the stream. We use that cursor later to resume a dropped connection.
+
+## Every emit is its own HTTP request
+
+Realtime publishes messages over HTTP, so every message from the host or client becomes its own request. When we type two keys quickly in succession, those two requests can race each other. The second key can reach Redis before the first.
+
+To restore order, every message carries a sender ID and a sequence number. The receiver delivers messages in sequence order and holds any message that arrives early until the missing ones show up. If a gap lasts for 4 seconds, the client stops waiting and asks the host for the full screen again.
+
+![](https://cdn.bydefault.so/drawing-Q5Wkh2TPaFoM5ILzGh7z6.png)
+
+Because sequence numbers put messages back in order, our client does not have to wait for one key's HTTP request to finish before sending the next. It sends up to four input requests at a time.
+
+The host takes the opposite approach because OpenCode constantly writes many small chunks to its pseudo-terminal. To send as few messages as possible, the host applies three limits:
+
+- It combines output that piles up while requests are in flight into the next message.
+- It waits at least 33 ms after sending a message before sending another, which gives us up to 30 screen updates per second.
+- It stops publishing messages when no client is attached, since any newly attached client receives the current screen.
+
+While OpenCode streams an answer, those limits keep the host around 18 messages per second. When the screen sits idle, the host sends one heartbeat message every 15 seconds to signal that it is still alive.
+
+Our client also throttles mouse movement. OpenCode asks the terminal to report every character cell the pointer crosses, yet only the most recent position matters. The client sends these pointer reports at most once every 50 ms.
+
+Message size needs a cap as well. Realtime rejects events longer than 1,000,000 characters, and escape characters can expand up to six characters when JSON-encoded, so we limit each message to 96,000 characters of terminal data.
+
+## A terminal that attaches late
+
+The host waits until the first client attaches before starting OpenCode. On startup, OpenCode sends its terminal around 20 queries asking about the color scheme, the cursor position, the active keyboard protocol, and the pixel size of a terminal cell. Because OpenCode is connected to a pseudo-terminal, a real terminal has to answer those queries. Starting OpenCode on first attach lets Ghostty receive those queries and send its answers back over the relay as normal input.
+
+Once OpenCode is running, any client that attaches later needs both the current screen state and the terminal modes that OpenCode turned on. By that point, OpenCode has enabled mouse reporting, the alternate screen, and the kitty keyboard protocol. The alternate screen gives terminal apps a separate full-screen buffer without disturbing scrollback, and the kitty keyboard protocol encodes modified keys unambiguously. A late client also needs the whole screen drawn, because terminal UIs only write the cells that changed since the previous frame. To bring a late client up to date, the host takes three steps:
+
+1. **Modes.** The host tracks every terminal mode that OpenCode enables or disables. When a client attaches late, the host first sends escape sequences, the special control bytes that configure a terminal, to turn those modes on.
+2. **Snapshot.** The host also writes all OpenCode output to a headless terminal built with `@xterm/headless`, which maintains the screen in memory without showing a window. On attach, the host serializes that hidden screen and sends it over so the late client gets an immediate snapshot.
+3. **Repaint.** The host shrinks the pseudo-terminal height by one row for 250 ms. Terminal UIs repaint the whole screen when they notice a size change, so that redraw overwrites the snapshot and fixes any mistakes in it.
+
+![](https://cdn.bydefault.so/drawing-AqI6wxukz8_SwCFzjlT30.png)
+
+Here is the repaint function on the host:
+
+```ts
+function repaint() {
+  if (!proc || !USES_REPAINT) return
+
+  const child = proc
+  const { cols, rows } = size
+  child.resize(cols, Math.max(1, rows - 1))
+  setTimeout(() => {
+    if (proc === child && size.cols === cols && size.rows === rows) child.resize(cols, rows)
+  }, REPAINT_HOLD_MS)
+}
+```
+
+OpenCode waits 100 ms after a size change before drawing again, so the host holds the smaller height for 250 ms.
+
+Our client tracks those same terminal modes so it can clean up on exit. When it detaches, it switches off every mode that OpenCode turned on, returning Ghostty to our shell prompt with the mouse and keyboard in their normal modes.
+
+We verify this behavior by running our real client inside a local pseudo-terminal wired to a headless terminal emulator, so our tests inspect the exact screen the client drew. A terminal that attaches late displays the same text and colors as the first one, cell for cell.
+
+## The first key after a pause was slow
+
+In our first version, most keys echoed back in one network round trip to the box plus about 10 ms. Steady typing felt fast, yet pausing for a few seconds made the next key take more than three network round trips.
+
+Node's built-in `fetch` caused that delay by closing idle connections after four seconds. Whenever we pressed a key after a brief pause, the request had to wait while Node opened a new encrypted connection to Redis, which takes several round trips.
+
+Both ends now send every request over a single HTTP/2 connection. Because the open subscription keeps that connection alive for as long as the program runs, every keystroke finds a connection that is already open:
+
+```ts
+import { Agent, fetch as undiciFetch } from "undici"
+
+export function installTransport() {
+  if (process.env.OC_HTTP1 === "1") return
+
+  const agent = new Agent({
+    allowH2: true,
+    keepAliveTimeout: 10 * 60_000,
+    keepAliveMaxTimeout: 10 * 60_000,
+  })
+
+  const viaAgent = (input: unknown, init?: Record<string, unknown>) =>
+    undiciFetch(input as Parameters<typeof undiciFetch>[0], { ...init, dispatcher: agent })
+
+  globalThis.fetch = viaAgent as unknown as typeof fetch
+}
+```
+
+After that change, the first key after a pause is just as fast as steady typing:
+
+|  | HTTP/1.1 | HTTP/2 |
+| --- | --- | --- |
+| First key after a pause | more than 3 round trips | 1 round trip |
+| Steady typing | 1 round trip | 1 round trip |
+
+All that remains is the distance between our laptop and the box, plus the 10 ms added by the relay. Upstash Boxes [run in us-east-1 today](https://upstash.com/box).
+
+Database placement matters too, so we put our Redis database in the same region as the box. Because the host waits on Redis for every screen update, keeping both in us-east-1 brings each emit down to 1.4 ms. When we tried running the host on our laptop against a database in us-east-1, every key took two round trips to come back.
+
+## Detach, pause, and wake
+
+When no commands are active, boxes [auto pause](https://upstash.com/docs/box/overall/how-it-works) after 1 hour on the free plan or 6 hours on paid plans. Pausing keeps files on disk, but it stops every running process, so the host inside the box can no longer receive Realtime messages. To handle pausing, our client does two things:
+
+- At startup, it checks the box status through the Box API and resumes the box if it is paused.
+- While attached, it sends an empty command to the box every 10 minutes. Because the host runs as a background process, the box does not count it as an active command and would otherwise pause in the middle of a session.
+
+When we want to step away from a session, we press Ctrl+]. Detaching restores our local terminal settings, exits the client, and leaves OpenCode running inside the box, along with any work the agent is doing. We can reconnect later by running the client again, even from another machine. Typing `/exit` quits OpenCode instead, so the next client starts a new one.
+
+Catching Ctrl+] requires matching two encodings. Normally, a terminal sends Ctrl+] as a single byte, but once OpenCode activates the kitty keyboard protocol, the terminal sends Ctrl+] as an escape sequence. Our client watches for both forms.
+
+Here is the startup check that wakes a paused box:
+
+```ts
+export async function wake(apiKey: string, boxId: string, notice: (text: string) => void) {
+  const box = await getBox(apiKey, boxId)
+  const { status } = await box.getStatus()
+
+  if (status === "paused") {
+    notice("The box was asleep. Waking it…")
+    await box.resume()
+  }
+}
+```
+
+Every time a box resumes, it runs its init command, which starts our host again. The host can tell that the previous OpenCode process did not end with `/exit`, so it launches the new one with `--continue` and OpenCode reopens the conversation it was in. Waking from a paused box takes about 9 seconds after we launch the client.
+
+![](https://cdn.bydefault.so/drawing-KD8IgIiopljk490FZPoqY.png)
+
+Connecting from a second machine requires Node 20.18 or newer, the client file, and a link that our client prints on the first machine. That link holds the Redis token and the Box API key, so anyone who has it can type into our box.
+
+## When the connection drops
+
+Realtime subscriptions do not raise an error when the server cuts off communication. Both ends therefore watch for silence instead. The host sends a heartbeat after 15 seconds without sending anything, and every client sends a heartbeat every 20 seconds. If our client goes 40 seconds without receiving a message, it reopens its subscription.
+
+Because Realtime gives every event a cursor, the client can pick up without missing output. It stores the cursor of the last event it received and passes that cursor when subscribing again, so Realtime replays everything published after that event:
+
+```ts
+const pending = this.opts.channel.subscribe({
+  events: [this.opts.event],
+  ...(isResuming && this.cursor ? { after: this.cursor } : {}),
+  onData: (event: { data: unknown; cursor: RealtimeCursor }) => {
+    if (generation !== this.generation) return
+    this.cursor = event.cursor
+    this.lastAt = performance.now()
+    const message = this.opts.parse(event.data)
+    if (message) this.opts.onMessage(message)
+  },
+})
+```
+
+The Redis Stream keeps only the last 512 messages, so a cursor older than that causes Realtime to throw a `CursorUnavailableError`. At that point the output in between is gone. The client attaches again and receives the terminal modes, a snapshot, and a repaint, just like any terminal that attaches late.
+
+We test this recovery path by stopping the host underneath an attached client and starting a new one. The client detects the new host from its sender ID and attaches to it.
+
+## What you need to build this
+
+The source code is on GitHub at [upstash/remote-sandbox-terminal](https://github.com/upstash/remote-sandbox-terminal). Our project is three small programs built on top of three pieces:
+
+- An [Upstash Box](https://upstash.com/docs/box/overall/quickstart), which comes with OpenCode installed.
+- An Upstash Redis database in us-east-1, in the same region as the box.
+- `@upstash/realtime` 1.2 or newer on both ends.
