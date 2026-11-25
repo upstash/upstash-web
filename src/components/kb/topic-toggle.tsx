@@ -19,7 +19,7 @@ const TOPIC_ICONS: Record<
   (props: SVGProps<SVGSVGElement>) => ReactNode
 > = {
   redis: IconRedis,
-  "redis-search": IconSearch,
+  "redis-search": IconRedis,
   search: IconSearch,
   vector: IconVector,
   qstash: IconQStash,
