@@ -108,8 +108,8 @@ export default function FAQ() {
         <AccordionTrigger>How is the storage cost calculated?</AccordionTrigger>
         <AccordionContent>
           <p className="mt-4">
-            For each database, the first 1GB is free. Beyond that, storage is
-            charged at $0.25 per GB of total storage.
+            Storage is charged at $0.25 per GB of total storage. There is no
+            free storage allowance on paid plans.
           </p>
           <p className="mt-4">
             Total storage is determined by adding up the storage at all replicas

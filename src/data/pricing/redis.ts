@@ -191,7 +191,7 @@ export const REDIS_PAYG_PLAN: RedisPlan = {
   monthlyPrice: null,
   readRegionPrice: null,
   requestPrice: "$0.20 per 100K commands",
-  storagePrice: "$0.25 per GB (first 1 GB free)",
+  storagePrice: "$0.25 per GB, counted on every replica",
   bandwidthPrice: "Free up to 200 GB/month, then $0.03/GB",
   dataSize: "100 GB",
   monthlyCommands: null,

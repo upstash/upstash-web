@@ -34,7 +34,7 @@
     },
     {
       "question": "How is the storage cost calculated?",
-      "answer": "For each database, the first 1GB is free. Beyond that, storage is charged at $0.25 per GB of total storage. Total storage is determined by adding up the storage at all replicas and regions. Even if you do not access your data, it still needs to stay persistent in the cloud provider's block storage for durability and high availability. To calculate storage cost, we take the daily average of your total data size across replicas and regions and apply the monthly rate at the end of the month. If you use your database as a cache, setting a timeout with EXPIRE is a good way to minimize cost."
+      "answer": "Storage is charged at $0.25 per GB of total storage. There is no free storage allowance on paid plans. Total storage is determined by adding up the storage at all replicas and regions. Even if you do not access your data, it still needs to stay persistent in the cloud provider's block storage for durability and high availability. To calculate storage cost, we take the daily average of your total data size across replicas and regions and apply the monthly rate at the end of the month. If you use your database as a cache, setting a timeout with EXPIRE is a good way to minimize cost."
     },
     {
       "question": "What happens when I hit limits on pay-as-you-go plan?",
