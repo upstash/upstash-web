@@ -10,7 +10,7 @@ import SectionWhatIs from "@/components/product-page/section-what-is";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 import type { Metadata } from "next";
 
-const title = "Serverless Message Queue";
+const title = "QStash: Serverless Message Queue";
 const description =
   "Upstash QStash is a serverless message queue and task scheduler over HTTP: background jobs, cron schedules, delays, retries, and fan-out for Next.js, Vercel, Cloudflare Workers, and any HTTP endpoint, with no workers to run.";
 
