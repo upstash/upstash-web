@@ -3,7 +3,31 @@ import Container from "@/components/container";
 import PageBodyGradient from "@/components/page-body-gradient";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
+import type { Metadata } from "next";
 import { Benefits } from "./benefits";
+
+const title = "Open Source Program";
+const description =
+  "Upstash supports open-source projects building on Upstash with credit grants and exclusive access to support.";
+
+export const metadata: Metadata = {
+  title,
+  description,
+  alternates: {
+    canonical: "/open-source",
+  },
+  openGraph: {
+    type: "website",
+    title,
+    description,
+    url: "/open-source",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
+};
 
 const Page = () => {
   return (
