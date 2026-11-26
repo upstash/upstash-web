@@ -1035,7 +1035,7 @@ export default function CompareTable({
           <th className="px-0 text-left font-normal">ACL</th>
           {/**/}
           <Col plan={showFree}>
-            <CompareValue type="boolean" valid={false} />
+            <CompareValue type="boolean" />
           </Col>
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" />

@@ -41,7 +41,7 @@ The important framing for this post: **Valkey is an engine, Upstash is a service
 
 Either way, ElastiCache is a piece of *infrastructure inside your AWS network*. It's fastest when your application runs in the same region and VPC, talking to it over the Redis protocol on a private endpoint.
 
-**Upstash Redis** is the opposite design: a serverless database with a public HTTPS endpoint (and a Redis-protocol endpoint), global replication you toggle per region, per-request pricing, and nothing to size or operate. There's no VPC to peer, no node to patch, no failover to configure.
+**Upstash Redis** is the opposite design: a serverless database with a public HTTPS endpoint (and a Redis-protocol endpoint), global replication you toggle per region, per-request pricing, and nothing to size or operate. You don't need a VPC to reach it (VPC peering and AWS PrivateLink are available on the Enterprise plan if you want one), and there's no node to patch and no failover to configure.
 
 The rest of this comparison is really about what falls out of that one difference: *managed infrastructure in a VPC* vs *a serverless API you call from anywhere*.
 

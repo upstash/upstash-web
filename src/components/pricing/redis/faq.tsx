@@ -51,8 +51,9 @@ export default function FAQ() {
             the limit or upgrade to a Fixed plan.
           </p>
           <p className="mt-4">
-            If your usage exceeds the budget cap, your database will be rate
-            limited and your total cost will not exceed the chosen budget.
+            If your usage exceeds the budget cap, your total cost will not
+            exceed the chosen budget. For budgets under $1,000 the database is
+            also rate limited.
           </p>
           <p className="mt-4">
             If you change from a Fixed plan to pay-as-you-go mid-month, your
@@ -255,8 +256,9 @@ export default function FAQ() {
           Can I purchase Prod Pack for any plan?
         </AccordionTrigger>
         <AccordionContent>
-          Yes. You can purchase Prod Pack for any plan except the Free tier. You
-          can enable it from your Upstash dashboard database details page.
+          Yes. You can purchase Prod Pack for any paid plan (Pay as You Go or
+          Fixed) on a global database. You can enable it from your Upstash
+          dashboard database details page.
         </AccordionContent>
       </AccordionItem>
 

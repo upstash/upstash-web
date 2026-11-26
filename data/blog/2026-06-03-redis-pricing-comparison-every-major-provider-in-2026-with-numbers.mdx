@@ -52,7 +52,7 @@ Railway is a bit different: it doesn't sell a managed Redis tier, so you deploy 
 
 Upstash has two billing models: Pay-as-you go and fixed plans.
 
-Pay-as-you-go databases charge per command and per GB of storage. The free tier covers 250 MB and 500,000 commands a month. [Pay-as-you-go](https://upstash.com/pricing/redis) is $0.20 per 100,000 commands plus $0.25 per GB-month of storage beyond the first 1 GB, which is free, and there's no bandwidth charge.
+Pay-as-you-go databases charge per command and per GB of storage. The free tier covers 250 MB and 500,000 commands a month. [Pay-as-you-go](https://upstash.com/pricing/redis) is $0.20 per 100,000 commands plus $0.25 per GB-month of storage, counted on every replica, and there's no bandwidth charge.
 
 There are also fixed plans, a flat monthly price with unlimited commands. This is especially useful for workloads with a lot of commands. Here are the plans:
 
@@ -152,7 +152,7 @@ I worked out the figures below from each provider's published unit prices. Also 
 
 | Provider | Monthly cost |
 | --- | --- |
-| Upstash pay-as-you-go | $10.00 |
+| Upstash pay-as-you-go | $10.25 |
 | AWS ElastiCache cache.t4g.micro | $12.41 |
 | DigitalOcean Valkey 1 GiB | $15.00 |
 | Azure Cache Basic C0 | $16.06 |
@@ -161,7 +161,7 @@ I worked out the figures below from each provider's published unit prices. Also 
 | Upstash Fixed 1 GB | $20.00 |
 | Google Memorystore Basic M1 1 GiB | $35.77 |
 
-The Upstash pay-as-you-go is $10 of commands and $0 of storage, since the first 1 GB is free.
+The Upstash pay-as-you-go is $10 of commands and $0.25 of storage for 1 GB on a single-region database. Each read region adds another copy of the data, so another $0.25.
 
 Memorystore at $35.77 is the most expensive RAM-only row, mostly because its smallest instance sits in the pricey M1 range.
 
