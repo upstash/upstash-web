@@ -30,6 +30,7 @@ export function renderHome(): string {
     "",
     "## For AI agents",
     "",
+    `- Set up Upstash in your agent (MCP server, plugin and skills, for every client): ${SITE_URL}/get-started.md`,
     `- ${ASK_NOTE}`,
     `- OpenAPI spec for the Upstash Developer API (authenticated; manage databases, teams and billing): ${SITE_URL}/docs/devops/developer-api/openapi.yaml`,
     `- LLM-friendly site index: ${SITE_URL}/llms.txt (full version: ${SITE_URL}/llms-full.txt)`,

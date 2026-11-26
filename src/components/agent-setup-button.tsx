@@ -15,25 +15,12 @@ import { createPortal } from "react-dom";
 
 /**
  * Kept in sync with the copy-prompt on the docs landing page
- * (upstash/docs → introduction.mdx) and the console's agent setup menu. It
- * tells the agent to run `upstash setup` itself rather than hand the reader a
- * command to run.
+ * (upstash/docs → introduction.mdx) and the console's agent setup menu. The
+ * steps live in upstash.com/get-started.md, which covers every client (chat
+ * apps included) and counts its reads, so the prompt itself stays one line.
  */
-export const AGENT_SETUP_PROMPT = [
-  "Set up Upstash in my coding agent using the official Upstash instructions, and run the commands yourself instead of asking me to.",
-  "",
-  "1. Run `npx -y upstash setup --yes` with the flag for the agent you are (`--claude`, `--codex`, `--cursor`, `--gemini`, `--vscode`, `--copilot` or `--opencode`). It installs the Upstash plugin where your agent supports plugins, and otherwise adds the remote MCP server https://mcp.upstash.com/mcp (OAuth on first use) and the Upstash skills.",
-  "2. For any other agent, install the skills with `npx -y skills add upstash/skills --global` and add https://mcp.upstash.com/mcp to your MCP config (see https://upstash.com/docs/agent-resources/clients).",
-  "3. Tell me what was installed and whether I need to restart or reload (in Claude Code, `/reload-plugins`).",
-  "",
-  "The skills cover:",
-  "",
-  "- SDKs for Redis, Ratelimit, QStash, Workflow, Vector, Search, Blob and Box",
-  "- The `upstash` CLI",
-  "- Running work in Box cloud sandboxes",
-  "",
-  "For anything else, read the docs at https://upstash.com/docs/introduction (every page is listed in https://upstash.com/docs/llms.txt).",
-].join("\n");
+export const AGENT_SETUP_PROMPT =
+  "Read https://upstash.com/get-started.md and set up Upstash";
 
 type SetupOption = {
   id: string;
