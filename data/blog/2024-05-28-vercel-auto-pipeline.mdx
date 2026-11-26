@@ -19,7 +19,9 @@ This setup can generate a significant number of requests to Redis each time the 
 A conventional solution in such situations is to use Redis pipelines. Instead of sending requests one by one, pipelines allow you to collect multiple commands and execute them together. This way, a single HTTP request carries multiple Redis commands, significantly reducing the number of HTTP requests and improving performance.
 
 ```tsx
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
+
+const kv = Redis.fromEnv();
 
 const pipeline = kv.pipeline();
 
