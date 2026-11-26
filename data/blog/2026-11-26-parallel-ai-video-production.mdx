@@ -1,0 +1,107 @@
+---
+authors: [alitarik]
+slug: parallel-ai-video-production
+tags: [box, ai, agents, sandbox, qstash]
+title: "Fast AI Video Production with Parallel Box Processing"
+description: I wanted an AI agent to turn research papers into narrated videos. Scene by scene, that is over six minutes a video. A director and one worker per scene, each in its own box, took under two.
+---
+
+I wanted to paste a research paper and get back a short narrated video that explains it. Not a clip from a video model. A real animation, built with code, the kind you would make with Manim if you had a free weekend.
+
+An agent can do this. Give it a sandbox with the right tools and it writes the animation, renders it, adds a voice, and hands you an MP4. The first scene I got back was honestly good.
+
+It also took over a minute. For one scene.
+
+<Frame>
+  <video
+    src="/blog/parallel-ai-video-production/atari.mp4"
+    poster="/blog/parallel-ai-video-production/atari-poster.jpg"
+    controls
+    playsInline
+    preload="metadata"
+    aria-label="An 82-second narrated explainer animation generated for the paper Playing Atari with Deep Reinforcement Learning"
+    className="block h-auto w-full"
+  />
+</Frame>
+
+This is where I ended up: an 82-second video about the [Atari deep learning paper](https://arxiv.org/abs/1312.5602), made in 109 seconds from pasting the link to the finished file. That run used Claude Sonnet 5.5 in the Claude Code harness, `large` boxes (8 vCPU, 16 GB), and 1080p output at 30 frames per second. Here is how I got there.
+
+## Why it was slow
+
+A good scene is not written once. The agent writes the code, renders a draft, looks at a few frames, sees that a label runs off the screen, fixes it, and renders again. That look-and-fix loop is the whole reason the result is watchable. Skip it and you get overlapping text.
+
+A scene takes about 75 seconds this way. A 90-second video has five or six scenes, and one agent does them one after another. Do the math and it is six to seven minutes per video.
+
+My first instinct was a bigger machine. It did nothing. The agent spends most of its time waiting for the model, not rendering. For one video, my seven boxes were alive for about 630 seconds in total and used 380 seconds of CPU between them. Each one has eight cores.
+
+So I was stuck with a bad trade. Every extra review pass made the video better and the wait longer, multiplied by the number of scenes.
+
+## The fix: a director and workers
+
+Then I looked at what scene four actually needs from scene three. Not its code. Not its frames. Only what it was about, so the story keeps going. And that is already in the plan.
+
+Once there is a plan, the scenes have nothing to do with each other. So I stopped treating the video as one job and set it up like a small factory:
+
+![One director plans the video, five workers each build one scene in their own box at the same time, and the director joins the clips](/blog/parallel-ai-video-production/factory.png)
+
+- **The director** is one agent. It reads the paper and writes the storyboard: the scenes, the narration, what each scene shows. It draws nothing. At the end it joins the clips.
+- **The workers** are one agent per scene, each in its own [Upstash Box](https://upstash.com/docs/box/overall/how-it-works). A worker gets its scene and the full storyboard, does the whole loop alone, and hands back one clip. Workers never talk to each other.
+
+Each worker needs a real computer with Manim, LaTeX, ffmpeg and a speech model on it, so I installed all of that once and saved a [snapshot](https://upstash.com/docs/box/overall/snapshots). Every box starts from it:
+
+```typescript
+const boxes = await Promise.all(
+  scenes.map(() => Box.fromSnapshot(snapshot.id, { size: "large", agent, networkPolicy: { mode: "deny-all" } })),
+)
+
+// each worker: run the agent in its box, then collect the finished clip
+const clips = await Promise.allSettled(scenes.map((scene, i) => buildScene(boxes[i], scene, storyboard)))
+```
+
+Seven boxes are ready in about 10 seconds.
+
+## What changed
+
+**The wait.** The six scenes of the Atari video took 43 to 68 seconds each. That is 343 seconds of work, done in 68. The whole video took 109 seconds. In a row it would have been about 6.4 minutes. (That second number is my scene times added up, not a separate run.)
+
+**The trade is gone.** Every scene gets its own full review loop, and one more pass costs its time once, not six times.
+
+**Seven machines did not mean seven times the bill.** Box [bills the CPU you use](https://upstash.com/blog/ai-sandbox-pricing-active-cpu-vs-wall-clock), not the time a box sits waiting, and the amount of rendering is the same however many machines share it. The Atari video used 380 core-seconds across its seven boxes, about $0.04 at the `large` rate. The model cost $1.02 for that one and $0.85 on average. I never ran the one-agent version, so I can't tell you its token bill, but the compute is not what you pay for here.
+
+**One bad scene is just one bad scene.** If a worker fails, the others still finish. The pipeline then tries to render that worker's last draft, and if there is none it drops in a plain narrated card. The video is only abandoned if fewer than half the scenes make it.
+
+## These are small numbers
+
+Ninety seconds is a short video, so I pushed the other way first: five videos at once, 35 boxes. Each one still finished in 200 to 245 seconds.
+
+Now think about a 10-minute lesson. That is around 40 scenes.
+
+One agent would need about 50 minutes, because its time is scenes times 75 seconds. With workers, the time is the plan, plus the slowest scene, plus the join. Forty scenes means forty workers, not forty waits. My guess is four to six minutes.
+
+I have not rendered a 10-minute video, so that is arithmetic and not a result. My pipeline is also capped at six scenes today, so a long video means raising that cap and the time limits, not only asking the director for more.
+
+## The part I did not expect
+
+I thought I was building a faster video. What I actually have now is a setup, and that turned out to matter more.
+
+- **The look** is one style file in the snapshot. I change it, rebuild in five minutes, and every video after that looks different.
+- **The format** is a few numbers in the director's brief: how many scenes, how many words each. Change them and a teaser becomes a lesson.
+- **The source** is the director's first step. Only that step knows the input is a paper. It could be a docs page or a changelog.
+- **One wrong scene** could mean one worker running again for a minute, then a new join. I have not built that button yet, but the clips are already separate files, so no other scene would have to be redone.
+
+With one agent in one long session, all of that is tangled together. Here every change has one place to go.
+
+## What else it needed
+
+The boxes make the video. Turning it into something other people can use took a few more pieces:
+
+- **[QStash](https://upstash.com/docs/qstash/features/flowcontrol)** queues the videos and runs ten at a time, so a busy hour does not start hundreds of boxes.
+- **[Redis](https://upstash.com/docs/redis/overall/getstarted)** holds the progress bar's state, a cache so a paper is never rendered twice, and the catalog. [Redis Search](https://upstash.com/docs/redis/search) makes the catalog searchable.
+- **[Ratelimit](https://upstash.com/docs/redis/sdks/ratelimit-ts/overview)** gives each visitor one video a day, because every video costs money.
+- **[Blob](https://upstash.com/docs/blob/overall/quickstart)** stores the clips and the final videos.
+
+## Try it
+
+Paste an arXiv link at [upstash-paper-explainer.vercel.app](https://upstash-paper-explainer.vercel.app) and watch it work. The code is at [upstash/paper-explainer](https://github.com/upstash/paper-explainer) if you want to point the same setup at your own kind of video.
+
+![The Paper Explainer home page: one input for an arXiv link and a row of example videos](/blog/parallel-ai-video-production/home.png)
