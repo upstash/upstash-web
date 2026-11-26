@@ -10,6 +10,12 @@ export const authors: Record<
     website?: string;
   }
 > = {
+  leodev: {
+    name: "Leo",
+    title: "Guest Author",
+    twitter: "leodev",
+    image: "leodev.jpg",
+  },
   sertug: {
     name: "Sertuğ Kaya",
     title: "VP of Customer Success @Upstash",
