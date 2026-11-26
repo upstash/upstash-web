@@ -30,7 +30,7 @@ For a side project, the free tier and the setup decide almost everything, becaus
 
 Six things change the bill or the setup time:
 
-- **What happens when you pass the free tier.** Upstash Blob's free plan is a hard limit. Past it, the bucket stops serving requests until the 30-day window rolls over, and [the free plan is never charged](https://upstash.com/pricing/blob).
+- **What happens when you pass the free tier.** Upstash Blob's free plan is a hard limit. Past the operations or egress caps, the bucket stops serving requests until the next calendar month. Past 1 GB of storage, it turns read-only. Either way, [the free plan is never charged](https://upstash.com/pricing/blob).
 - **Egress.** This is how many bytes you move out of the bucket. So every time someone downloads a file, this counts. S3 charges [$0.09 per GB](https://aws.amazon.com/s3/pricing/) after the first 100 GB a month. R2 egress is free, and Upstash Blob egress is free up to 1 TB a month on pay as you go.
 - **Operation fees.** Each upload, read and list is a billed request. Upstash Blob splits them into cheap reads and pricier writes and lists, and deletes are free.
 - **How many secrets you manage.** One bucket token is one environment variable. S3 means an access key, a secret key, a region and an IAM policy.

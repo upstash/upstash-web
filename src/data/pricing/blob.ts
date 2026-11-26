@@ -12,7 +12,7 @@ import blobFaqJson from "../../../public/faq/blob.json";
  * - Bandwidth, on bytes served *out* of the bucket only. Uploads are free, as
  *   they are on every other object store, so writing an object costs storage
  *   and an advanced operation but no bandwidth. On pay-as-you-go, egress is
- *   free up to `BLOB_FREE_EGRESS` a month and billed past it.
+ *   free up to `BLOB_FREE_EGRESS` a month per bucket and billed past it.
  *
  * A failed request is still a billed operation, which is the one part of this a
  * customer does not expect and the FAQ says out loud. The only free failures are
@@ -31,7 +31,7 @@ export const BLOB_RATES = {
   advancedOpsPerMillion: 4.5,
 } as const;
 
-/** Monthly egress that pay-as-you-go includes at no charge. */
+/** Monthly egress that pay-as-you-go includes at no charge, per bucket. */
 export const BLOB_FREE_EGRESS = "1 TB";
 
 /**
@@ -47,8 +47,10 @@ export interface BlobMeter {
   key: string;
   label: string;
   /**
-   * What the free plan includes each month. A hard cap, not an allowance that
-   * carries: past it the bucket stops serving until the window rolls over.
+   * What the free plan includes each bucket each calendar month. A hard cap,
+   * not an allowance that carries: past the operations or egress cap the bucket
+   * stops serving until the 1st of the next month (UTC); past the storage cap
+   * it turns read-only until it is back under 1 GB.
    */
   freeIncluded: string;
   /**
@@ -104,9 +106,9 @@ export const BLOB_METERS: BlobMeter[] = [
     label: "Bandwidth (Egress)",
     freeIncluded: "10 GB / month",
     rate: `$${BLOB_RATES.bandwidthPerGb.toFixed(2)} per GB`,
-    paygIncluded: `${BLOB_FREE_EGRESS} / month`,
+    paygIncluded: `${BLOB_FREE_EGRESS} / month per bucket`,
     tooltip:
-      "Bytes served out of the bucket. Uploads are free, and on pay as you go the first 1 TB out each month is free too.",
+      "Bytes served out of the bucket. Uploads are free, and on pay as you go the first 1 TB out of each bucket each month is free too.",
     showOnCard: true,
   },
 ];
