@@ -44,7 +44,7 @@ Vendor-neutral guides, comparisons and how-tos from the Upstash team (caching, R
 - [Workflow Pricing (Markdown)](https://upstash.com/pricing/workflow.md): Machine-readable Workflow pricing
 - [Box Pricing](https://upstash.com/pricing/box): Free, Pay-as-you-go ($0.10–$0.40/active CPU hour by size), Fixed (keep-alive, $8–$32/month by size)
 - [Box Pricing (Markdown)](https://upstash.com/pricing/box.md): Machine-readable Box pricing
-- [Blob Pricing](https://upstash.com/pricing/blob): Free, Pay-as-you-go ($0.02/GB-month storage, egress free up to 1 TB/month)
+- [Blob Pricing](https://upstash.com/pricing/blob): Free, Pay-as-you-go ($0.02/GB-month storage, egress free up to 1 TB/month per bucket)
 - [Blob Pricing (Markdown)](https://upstash.com/pricing/blob.md): Machine-readable Blob pricing
 
 Every product has a free tier and bills per use on Pay-as-you-go, so a project can start free and move to a paid plan when it outgrows the limits. Two optional steps above that, for production needs:
