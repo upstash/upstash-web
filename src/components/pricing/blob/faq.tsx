@@ -60,11 +60,11 @@ export default function FAQ() {
       <AccordionItem value="item-5">
         <AccordionTrigger>When am I charged for bandwidth?</AccordionTrigger>
         <AccordionContent>
-          Upstash Blob pay-as-you-go includes 1 TB of free egress each month, so
-          you only pay for bytes that leave the bucket past that. Uploads are
-          always free. Egress past 1 TB is $0.02 per GB, the same whether it is
-          served from the CDN cache or from the origin. The free plan includes
-          10 GB of egress a month.
+          Upstash Blob pay-as-you-go includes 1 TB of free egress per bucket each
+          month, so you only pay for bytes that leave a bucket past its own 1 TB.
+          Uploads are always free. Egress past 1 TB is $0.02 per GB, the same
+          whether it is served from the CDN cache or from the origin. The free
+          plan includes 10 GB of egress per bucket a month.
         </AccordionContent>
       </AccordionItem>
 
@@ -73,10 +73,15 @@ export default function FAQ() {
           What happens if I exceed the free tier?
         </AccordionTrigger>
         <AccordionContent>
-          Your bucket stops serving requests until the 30-day window rolls over.
-          You are never charged on the free plan. Adding a credit card upgrades
-          you to pay-as-you-go, which removes the caps. Storage and operations
-          are billed from the first unit; egress stays free up to 1 TB a month.
+          The free caps apply to each bucket and reset on the 1st of every
+          calendar month (UTC). Past the operations or egress cap, the bucket
+          stops serving requests until the next month starts. Past the 1 GB
+          storage cap, the bucket becomes read-only: reads and downloads keep
+          working, and uploads are refused until you delete enough to get back
+          under 1 GB. You are never charged on the free plan. Adding a credit
+          card upgrades you to pay-as-you-go, which removes the caps. Storage and
+          operations are billed from the first unit; egress stays free up to 1 TB
+          per bucket a month.
         </AccordionContent>
       </AccordionItem>
 
@@ -86,7 +91,7 @@ export default function FAQ() {
         </AccordionTrigger>
         <AccordionContent>
           Yes, for egress: Upstash Blob pay-as-you-go includes 1 TB of free
-          egress every month. Storage and operations are billed from the first
+          egress per bucket every month. Storage and operations are billed from the first
           byte stored and the first operation made, at $0.02 per GB of storage,
           $0.30 per 1M simple operations and $4.50 per 1M advanced operations.
           Egress past 1 TB is $0.02 per GB.
