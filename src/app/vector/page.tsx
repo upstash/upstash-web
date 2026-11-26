@@ -10,7 +10,7 @@ import SectionWhatIs from "@/components/product-page/section-what-is";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 import type { Metadata } from "next";
 
-const title = "Serverless Vector Database";
+const title = "Vector: Serverless Vector Database";
 const description =
   "Upstash Vector is a serverless vector database for RAG, semantic search, and AI apps: built-in embedding models, hybrid search, metadata filtering, and namespaces, priced per request and per GB stored.";
 

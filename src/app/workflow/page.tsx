@@ -16,7 +16,7 @@ import SectionWhatIs from "@/components/product-page/section-what-is";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 import type { Metadata } from "next";
 
-const title = "Durable Workflows";
+const title = "Workflow: Durable Serverless Workflows";
 const description =
   "Upstash Workflow brings durable execution to serverless functions: multi-step workflows that survive failures and timeouts, sleep for days, wait for events, and retry each step on its own, on Next.js, Cloudflare Workers, FastAPI, and more.";
 

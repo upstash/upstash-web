@@ -30,14 +30,14 @@ export default function SeoPlanData() {
 
       <p>
         Upstash Blob pay-as-you-go costs $0.02 per GB stored per month, with
-        egress free up to 1 TB a month and $0.02 per GB past that.
+        egress free up to 1 TB per bucket a month and $0.02 per GB past that.
       </p>
 
       <table>
         <caption>
-          Billed resources. The Free column is what the plan includes each
-          month; the Pay as You Go column is the rate, billed from the first
-          unit except egress, which is free up to 1 TB a month.
+          Billed resources, per bucket. The Free column is what the plan
+          includes each month; the Pay as You Go column is the rate, billed from
+          the first unit except egress, which is free up to 1 TB a month.
         </caption>
         <thead>
           <tr>
@@ -75,11 +75,13 @@ export default function SeoPlanData() {
       </ul>
 
       <p>
-        The free plan&apos;s monthly amounts are hard caps: past the operations
-        or egress caps the bucket stops serving requests until the next calendar
-        month, past the storage cap it becomes read-only, and the free plan is
-        never charged. Pay as You Go bills from the first byte and the
-        first operation, except egress, which is free up to 1 TB a month.
+        The free plan&apos;s amounts are hard caps per bucket that reset on the
+        1st of every calendar month (UTC). Past the operations or egress cap the
+        bucket stops serving requests until the next month starts; past the
+        storage cap it becomes read-only, so reads and downloads keep working
+        but uploads are refused. The free plan is never charged. Pay as You Go
+        bills from the first byte and the first operation, except egress, which
+        is free up to 1 TB per bucket a month.
       </p>
 
       <p>

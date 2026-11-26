@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 
 const title = "Blob Pricing";
 const description =
-  "Upstash Blob pay-as-you-go costs $0.02 per GB stored with free egress up to 1 TB a month. The free tier includes 1 GB storage and 10 GB bandwidth.";
+  "Upstash Blob pay-as-you-go costs $0.02 per GB stored with free egress up to 1 TB per bucket a month. The free tier includes 1 GB storage and 10 GB bandwidth.";
 
 export const metadata: Metadata = {
   title,
