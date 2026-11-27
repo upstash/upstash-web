@@ -20,6 +20,7 @@ This site has a search endpoint: https://context7.com/api/v2/ask?siteKey=ask_4cf
 
 ## How agents should call Upstash
 
+- To set Upstash up in an agent (MCP server, plugin and skills, for every client): https://upstash.com/get-started.md
 - OpenAPI spec for the Upstash Developer API (manage databases, teams and billing at api.upstash.com, authenticated): https://upstash.com/docs/devops/developer-api/openapi.yaml — also at https://upstash.com/openapi.json and listed in https://upstash.com/.well-known/api-catalog
 - OpenAPI specs for the product REST APIs: QStash https://upstash.com/docs/qstash/openapi.yaml · Workflow https://upstash.com/docs/workflow/openapi.yaml
 - The homepage, product pages, pricing pages, blog pages and knowledge base articles can be fetched as markdown by sending `Accept: text/markdown`; product pages, pricing pages, blog posts and knowledge base articles also have `.md` URLs (e.g. https://upstash.com/qstash.md, https://upstash.com/pricing/redis.md, https://upstash.com/blog.md, https://upstash.com/kb.md). Unknown paths return a 404 with a markdown body.
